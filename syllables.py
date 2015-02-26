@@ -14,7 +14,7 @@ CONSONANTS = "bcdfgklmnpqrstvxyz"
 VOWELS = "aehiouw"
 
 def syllables(s):
-    return re.findall(r'[*()/\\=+|' + CONSONANTS + r']?[*()/\\=+|' + VOWELS + r']{1,2}[*()/\\=+|' + CONSONANTS + ']*\'?', s)
+    return re.findall(r'(?:\*[()/\\=+|]*)?[' + CONSONANTS + r']?[()/\\=+|]*(?:[' + VOWELS + r']){1,2}[()/\\=+|]*[' + CONSONANTS + ']?\'?', s)
 
 def tone_of(syl):
     if "/" in syl:
