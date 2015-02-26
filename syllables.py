@@ -1,7 +1,14 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 import re
 import sys
+import unicodedata
+
+import beta
+
+def fix_sigmas(s):
+    return re.sub(ur'σ\b', u"ς", s, flags=re.UNICODE)
 
 CONSONANTS = "bcdfgklmnpqrstvxyz"
 VOWELS = "aehiouw"
@@ -49,7 +56,7 @@ with open("theogony.beta") as f:
         print "<tr><td>"
         for syl in syllables(line):
             sys.stdout.write("<img src=%s>" % IMG_MAP[tone_of(syl)])
-        print "</td><td>" + line + "</td></tr>"
+        print "</td><td>" + unicodedata.normalize("NFC", fix_sigmas(beta.decode(line))).encode("utf-8") + "</td></tr>"
 
 print """
 </table>
