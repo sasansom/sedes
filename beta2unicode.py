@@ -350,14 +350,3 @@ def beta2unicodeTrie():
     
     
     return t
-
-t = beta2unicodeTrie()
-
-import sys
-
-for line in file(sys.argv[1]):
-    a, b = t.convert(line)
-    if b:
-        print a.encode("utf-8"), b
-        raise Exception
-    print a.encode("utf-8")
