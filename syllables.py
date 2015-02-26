@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import re
+import sys
 
 CONSONANTS = "bcdfgklmnpqrstvxyz"
 VOWELS = "aehiouw"
@@ -19,10 +20,35 @@ def tone_of(syl):
 
 SENTENCE = "mousa/wn *(elikwnia/dwn a)rxw/meq' a)ei/dein,"
 
-print SENTENCE
-print syllables(SENTENCE)
-print " ".join([tone_of(syl) for syl in syllables(SENTENCE)])
+print """\
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8>
+</head>
+<body>
+<p>
+"""
+
+IMG_MAP = {
+    ".": "1.png",
+    "/": "2.png",
+    "\\": "3.png",
+    "=": "4.png",
+}
 
 with open("theogony.beta") as f:
     for line in f:
-        print " ".join([tone_of(syl) for syl in syllables(line)])
+        line = line.strip()
+        if line == "":
+            print "</p><p>"
+            continue
+        for syl in syllables(line):
+            sys.stdout.write("<img src=%s>" % IMG_MAP[tone_of(syl)])
+        print "<br>"
+
+print """
+</p>
+</body>
+</html>
+"""
