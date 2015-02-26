@@ -18,48 +18,23 @@ def tone_of(syl):
         return "="
     return "."
 
-# mous a/ wn *(el ik wn i a/d wn a)rx w/m eq' a) ei/d ein
-# SENTENCE = "mousa/wn *(elikwnia/dwn a)rxw/meq' a)ei/dein,"
-# SENTENCE = "h)\ *(/ippou krh/nhs h)\ *)olmeiou= zaqe/oio"
-# print SENTENCE
-# print " ".join(syllables(SENTENCE))
-
-# sys.exit()
-
-print """\
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset=utf-8>
-<style>
-p {
-    line-spacing: 0.5em;
-}
-</style>
-</head>
-<body>
-<p>
-"""
-
-IMG_MAP = {
-    ".": "1.png",
-    "/": "2.png",
-    "\\": "3.png",
-    "=": "4.png",
-}
+COUNTS = {}
+LINES = []
 
 with open("theogony.beta") as f:
+    lineno = 0
     for line in f:
         line = line.strip()
         if line == "":
-            print "</p><p>"
             continue
-        for syl in syllables(line):
-            sys.stdout.write("<img src=%s>" % IMG_MAP[tone_of(syl)])
-        print "<br>"
+        lineno += 1
+        LINES.append(line)
+        key = "".join([tone_of(syl) for syl in syllables(line)])
+        COUNTS.setdefault(key, [])
+        COUNTS[key].append(lineno)
 
-print """
-</p>
-</body>
-</html>
-"""
+for key, lines in sorted(COUNTS.items(), key=lambda x: len(x[1])):
+    print "%-20s %s" % (key, ", ".join("%4d"%x for x in lines))
+    for line in lines:
+        print LINES[line-1]
+    print
