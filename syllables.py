@@ -7,7 +7,7 @@ CONSONANTS = "bcdfgklmnpqrstvxyz"
 VOWELS = "aehiouw"
 
 def syllables(s):
-    return re.findall('[*()/\\=+|' + CONSONANTS + ']?[*()/\\=+|' + VOWELS + ']{1,2}[*()/\\=+|' + CONSONANTS + ']*\'?', s)
+    return re.findall(r'[*()/\\=+|' + CONSONANTS + r']?[*()/\\=+|' + VOWELS + r']{1,2}[*()/\\=+|' + CONSONANTS + ']*\'?', s)
 
 def tone_of(syl):
     if "/" in syl:
@@ -29,12 +29,10 @@ with open("theogony.beta") as f:
             continue
         lineno += 1
         LINES.append(line)
-        key = "".join([tone_of(syl) for syl in syllables(line)])
-        COUNTS.setdefault(key, [])
-        COUNTS[key].append(lineno)
+        for syl in syllables(line):
+            tone = tone_of(syl)
+            COUNTS.setdefault(tone, 0)
+            COUNTS[tone] += 1
 
-for key, lines in sorted(COUNTS.items(), key=lambda x: len(x[1])):
-    print "%-20s %s" % (key, ", ".join("%4d"%x for x in lines))
-    for line in lines:
-        print LINES[line-1]
-    print
+for key, count in sorted(COUNTS.items(), key=lambda x: x[1]):
+    print "%s %s" % (key, count)
