@@ -30,7 +30,7 @@ p {
 </style>
 </head>
 <body>
-<p>
+<table>
 """
 
 IMG_MAP = {
@@ -44,14 +44,15 @@ with open("theogony.beta") as f:
     for line in f:
         line = line.strip()
         if line == "":
-            print "</p><p>"
+            print "<tr></tr>"
             continue
+        print "<tr><td>"
         for syl in syllables(line):
             sys.stdout.write("<img src=%s>" % IMG_MAP[tone_of(syl)])
-        print "<br>"
+        print "</td><td>" + line + "</td></tr>"
 
 print """
-</p>
+</table>
 </body>
 </html>
 """
