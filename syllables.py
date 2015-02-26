@@ -18,21 +18,56 @@ def tone_of(syl):
         return "="
     return "."
 
-COUNTS = {}
-LINES = []
+print """\
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8>
+<style>
+p {
+    line-spacing: 0.5em;
+}
+</style>
+</head>
+<body>
+<p>
+"""
+
+IMG_MAP = {
+    ".": "1.png",
+    "/": "2.png",
+    "\\": "3.png",
+    "=": "4.png",
+}
 
 with open("theogony.beta") as f:
-    lineno = 0
     for line in f:
         line = line.strip()
         if line == "":
+            print "</p><p>"
             continue
-        lineno += 1
-        LINES.append(line)
         for syl in syllables(line):
-            tone = tone_of(syl)
-            COUNTS.setdefault(tone, 0)
-            COUNTS[tone] += 1
+            sys.stdout.write("<img src=%s>" % IMG_MAP[tone_of(syl)])
+        print "<br>"
 
-for key, count in sorted(COUNTS.items(), key=lambda x: x[1]):
-    print "%s %s" % (key, count)
+print """
+</p>
+</body>
+</html>
+"""
+
+# with open("theogony.beta") as f:
+#     lineno = 0
+#     for line in f:
+#         line = line.strip()
+#         if line == "":
+#             continue
+#         lineno += 1
+#         LINES.append(line)
+#         for syl in syllables(line):
+#             tone = tone_of(syl)
+#             COUNTS.setdefault(tone, 0)
+#             COUNTS[tone] += 1
+# 
+# for key, count in sorted(COUNTS.items(), key=lambda x: x[1]):
+#     print "%s %s" % (key, count)
