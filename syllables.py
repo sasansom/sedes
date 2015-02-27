@@ -47,13 +47,16 @@ IMG_MAP = {
 }
 
 with codecs.open("theogony.beta", encoding="utf-8") as f:
+    lineno = 0
     for beta_line in f:
         beta_line = beta_line.strip()
         line = beta.decode(beta_line)
         if line == u"":
-            print "<tr></tr>"
+            print "<tr><td>&nbsp;</td></tr>"
             continue
-        print "<tr>"
+        lineno += 1
+        print "<tr id=l%d>" % lineno
+        print "<td align=right><a href=\"#l%d\">%d</a></td>" % (lineno, lineno)
         print "<td>"
         for syl in syllables(line):
             sys.stdout.write("<img src=%s>" % IMG_MAP[tone_of(syl)])
