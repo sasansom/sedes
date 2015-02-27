@@ -29,11 +29,6 @@ print """\
 <html>
 <head>
 <meta charset=utf-8>
-<style>
-p {
-    line-spacing: 0.5em;
-}
-</style>
 </head>
 <body>
 <table>
