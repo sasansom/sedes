@@ -10,6 +10,7 @@ class Context(object):
     def __init__(self, outfile):
         self.outfile = outfile
         self.lineno = 0
+        self.parts = []
 
     def check_lineno(self, elem):
         n = elem.get("n")
@@ -19,50 +20,44 @@ class Context(object):
                 print >> sys.stderr, "warning: expected line %d on line %d" % (self.lineno, n)
                 self.lineno = n
 
-    def write_beta_line(self, betacode):
-        self.outfile.write((beta.decode(betacode) + u"\n").encode("utf-8"))
+    def add_beta(self, betacode):
+        self.parts.append(beta.decode(betacode))
 
-def convert_text(soup, ctx):
-    parts = []
-    for x in soup.children:
-        if type(x) == bs4.element.Tag:
-            if x.name in ("lb",):
-                betacode = u"".join(parts).strip()
-                if betacode:
-                    ctx.write_beta_line(betacode)
-                ctx.lineno += 1
-                ctx.check_lineno(x)
-                parts = []
-            elif x.name in ("milestone",):
-                pass
-            else:
-                raise ValueError("don't understand element %r" % x.name)
-        elif type(x) == bs4.element.Comment:
-            pass
-        else:
-            parts.append(unicode(x))
-    betacode = u"".join(parts).strip()
-    if betacode:
-        ctx.write_beta_line(betacode)
+    def line_sep(self):
+        line = u"".join(self.parts).strip()
+        if line:
+            self.outfile.write((line + u"\n").encode("utf-8"))
+        self.lineno += 1
+        self.parts = []
 
 def convert_elem(soup, ctx):
-    for elem in soup.find_all(recursive=False):
-        if elem.name in ("div1",):
-            ctx.lineno = 0
-            convert_elem(elem, ctx)
-        elif elem.name in ("milestone", "q", "sp"):
-            convert_elem(elem, ctx)
-        elif elem.name in ("p", "l"):
-            ctx.lineno += 1
-            ctx.check_lineno(elem)
-            convert_text(elem, ctx)
+    for elem in soup.children:
+        if type(elem) == bs4.element.Tag:
+            if elem.name in ("div1",):
+                ctx.lineno = 0
+                convert_elem(elem, ctx)
+            elif elem.name in ("q", "sp"):
+                convert_elem(elem, ctx)
+            elif elem.name in ("milestone",):
+                pass
+            elif elem.name in ("l", "lb"):
+                ctx.line_sep()
+                ctx.check_lineno(elem)
+                convert_elem(elem, ctx)
+            elif elem.name in ("p",):
+                convert_elem(elem, ctx)
+            else:
+                raise ValueError("don't understand element %r" % elem.name)
+        elif type(elem) == bs4.element.Comment:
+            pass
         else:
-            raise ValueError("don't understand element %r" % elem.name)
+            ctx.add_beta(unicode(elem))
 
 def convert(infile, outfile):
     soup = bs4.BeautifulSoup(infile, "xml")
     ctx = Context(outfile)
-    return convert_elem(soup.find("text").find("body"), ctx)
+    convert_elem(soup.find("text").find("body"), ctx)
+    ctx.line_sep()
 
 def input_files(args):
     if len(args) == 0:
