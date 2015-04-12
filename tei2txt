@@ -15,7 +15,11 @@ class Context(object):
     def check_lineno(self, elem):
         n = elem.get("n")
         if n is not None:
-            n = int(n)
+            try:
+                n = int(n)
+            except ValueError:
+                print >> sys.stderr, "warning: cannot parse line number %r" % n
+                return
             if self.lineno != n:
                 print >> sys.stderr, "warning: expected line %d on line %d" % (self.lineno, n)
                 self.lineno = n
