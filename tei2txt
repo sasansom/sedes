@@ -21,13 +21,24 @@ def extract_text(soup):
     return u"".join(parts)
 
 def convert_elem(soup, outfile):
+    lineno = 1
     for elem in soup.find_all():
-        if elem.name in ("div1", "milestone", "q"):
+        if elem.name in ("div1",):
+            lineno = 1
+        elif elem.name in ("milestone", "q"):
             pass
         elif elem.name in ("l",):
             betacode = extract_text(elem)
             text = beta.decode(betacode)
             outfile.write((text + u"\n").encode("utf-8"))
+
+            n = elem.get("n")
+            if n is not None:
+                n = int(n)
+                if lineno != n:
+                    print >> sys.stderr, "warning: expected line %d on line %d" % (lineno, n)
+                    lineno = n
+            lineno += 1
         else:
             raise ValueError("don't understand element %r" % elem.name)
 
