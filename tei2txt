@@ -7,7 +7,8 @@ import sys
 import beta
 
 class Context(object):
-    def __init__(self):
+    def __init__(self, outfile):
+        self.outfile = outfile
         self.lineno = 0
 
     def check_lineno(self, elem):
@@ -32,7 +33,7 @@ def extract_text(soup):
             parts.append(unicode(x))
     return u"".join(parts)
 
-def convert_elem(soup, outfile, ctx):
+def convert_elem(soup, ctx):
     for elem in soup.find_all():
         if elem.name in ("div1",):
             ctx.lineno = 0
@@ -41,7 +42,7 @@ def convert_elem(soup, outfile, ctx):
         elif elem.name in ("l",):
             betacode = extract_text(elem)
             text = beta.decode(betacode)
-            outfile.write((text + u"\n").encode("utf-8"))
+            ctx.outfile.write((text + u"\n").encode("utf-8"))
 
             ctx.lineno += 1
             ctx.check_lineno(elem)
@@ -50,8 +51,8 @@ def convert_elem(soup, outfile, ctx):
 
 def convert(infile, outfile):
     soup = bs4.BeautifulSoup(infile, "xml")
-    ctx = Context()
-    return convert_elem(soup.find("text").find("body"), outfile, ctx)
+    ctx = Context(outfile)
+    return convert_elem(soup.find("text").find("body"), ctx)
 
 def input_files(args):
     if len(args) == 0:
