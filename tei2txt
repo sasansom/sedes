@@ -6,6 +6,18 @@ import sys
 
 import beta
 
+class Context(object):
+    def __init__(self):
+        self.lineno = 0
+
+    def check_lineno(self, elem):
+        n = elem.get("n")
+        if n is not None:
+            n = int(n)
+            if self.lineno != n:
+                print >> sys.stderr, "warning: expected line %d on line %d" % (self.lineno, n)
+                self.lineno = n
+
 def extract_text(soup):
     parts = []
     for x in soup.children:
@@ -20,11 +32,10 @@ def extract_text(soup):
             parts.append(unicode(x))
     return u"".join(parts)
 
-def convert_elem(soup, outfile):
-    lineno = 1
+def convert_elem(soup, outfile, ctx):
     for elem in soup.find_all():
         if elem.name in ("div1",):
-            lineno = 1
+            ctx.lineno = 0
         elif elem.name in ("milestone", "q"):
             pass
         elif elem.name in ("l",):
@@ -32,19 +43,15 @@ def convert_elem(soup, outfile):
             text = beta.decode(betacode)
             outfile.write((text + u"\n").encode("utf-8"))
 
-            n = elem.get("n")
-            if n is not None:
-                n = int(n)
-                if lineno != n:
-                    print >> sys.stderr, "warning: expected line %d on line %d" % (lineno, n)
-                    lineno = n
-            lineno += 1
+            ctx.lineno += 1
+            ctx.check_lineno(elem)
         else:
             raise ValueError("don't understand element %r" % elem.name)
 
 def convert(infile, outfile):
     soup = bs4.BeautifulSoup(infile, "xml")
-    return convert_elem(soup.find("text").find("body"), outfile)
+    ctx = Context()
+    return convert_elem(soup.find("text").find("body"), outfile, ctx)
 
 def input_files(args):
     if len(args) == 0:
