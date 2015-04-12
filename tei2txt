@@ -11,6 +11,7 @@ class Context(object):
         self.outfile = outfile
         self.lineno = 0
         self.parts = []
+        self.div1 = None
 
     def check_lineno(self, elem):
         n = elem.get("n")
@@ -18,11 +19,18 @@ class Context(object):
             try:
                 n = int(n)
             except ValueError:
-                print >> sys.stderr, "warning: cannot parse line number %r" % n
+                self.warn("cannot parse line number %r" % n)
                 return
             if self.lineno != n:
-                print >> sys.stderr, "warning: expected line %d on line %d" % (self.lineno, n)
+                self.warn("on line %d, expected %d" % (n, self.lineno))
                 self.lineno = n
+
+    def warn(self, msg):
+        if self.div1 is None:
+            loc = ""
+        else:
+            loc = self.div1 + ": "
+        print >> sys.stderr, "warning: %s%s" % (loc, msg)
 
     def add_beta(self, betacode):
         self.parts.append(beta.decode(betacode))
@@ -39,6 +47,7 @@ def convert_elem(soup, ctx):
         if type(elem) == bs4.element.Tag:
             if elem.name in ("div1",):
                 ctx.lineno = 0
+                ctx.div1 = "%s %s" % (elem.get("type"), elem.get("n"))
                 convert_elem(elem, ctx)
             elif elem.name in ("q", "sp", "del"):
                 convert_elem(elem, ctx)
