@@ -49,9 +49,9 @@ def convert_elem(soup, ctx):
                 ctx.lineno = 0
                 ctx.div1 = "%s %s" % (elem.get("type"), elem.get("n"))
                 convert_elem(elem, ctx)
-            elif elem.name in ("q", "sp", "del"):
+            elif elem.name in ("div2", "q", "sp", "del"):
                 convert_elem(elem, ctx)
-            elif elem.name in ("milestone", "add"):
+            elif elem.name in ("milestone", "add", "head", "gap"):
                 pass
             elif elem.name in ("l", "lb"):
                 ctx.line_sep()
