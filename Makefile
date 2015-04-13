@@ -1,3 +1,12 @@
+BASENAMES = homerichymns iliad odyssey theogony worksanddays corpus
+DATS = $(addsuffix -1gram.dat,$(BASENAMES)) \
+	$(addsuffix -2gram.dat,$(BASENAMES)) \
+	$(addsuffix -initial2gram.dat,$(BASENAMES)) \
+	$(addsuffix -word2gram.dat,$(BASENAMES))
+GRAPHS = $(addsuffix .png,$(basename $(DATS)))
+
+all: $(DATS) $(GRAPHS)
+
 %.txt: %.xml
 	./tei2txt "$<" > "$@"
 
