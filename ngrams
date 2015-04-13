@@ -1,0 +1,115 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+import codecs
+import getopt
+import re
+import sys
+
+GREEK_LOWER = list(u"αβγδεζηθικλμνξοπρστυφχψω")
+
+def enum_alphabet(n, alphabet):
+    if n == 0:
+        yield ()
+        return
+    for a in alphabet:
+        for b in enum_alphabet(n-1, alphabet):
+            yield tuple([a] + list(b))
+
+# Canonicalize a bare Greek letter.
+def canon(c):
+    c = c.lower()
+    if c == u"ς":
+        c = u"σ"
+    return c
+
+# Canonicalize and additionally combine π/φ and κ/χ.
+def canon_sounds(c):
+    c = canon(c)
+    if c in (u"π", u"φ"):
+        c = u"πφ"
+    elif c in (u"κ", u"χ"):
+        c  = u"κχ"
+    return c
+
+class Calc(object):
+    NULL = "_"
+
+    def __init__(self, n, map=canon, alphabet=[]):
+        self.n = n
+        self.buf = [Calc.NULL] * self.n
+        self.counts = {}
+        self.map = map
+        self.total = 0
+        for buf in enum_alphabet(n, alphabet + [Calc.NULL]):
+            self.counts[buf] = 0
+
+    def observe(self, x):
+        self.buf = self.buf[1:] + [self.map(x)]
+        buf = tuple(self.buf)
+        self.counts.setdefault(buf, 0)
+        self.counts[buf] += 1
+        self.total += 1
+
+    def flush(self):
+        if self.buf[-1] == Calc.NULL:
+            return
+        for _ in range(self.n-1):
+            self.observe(Calc.NULL)
+        self.buf = [Calc.NULL] * self.n
+
+    def dump(self, f):
+        for key, count in sorted(self.counts.items()):
+            print >> f, (u"%d\t%.8f\t%s" % (count, float(count)/self.total, "\t".join(key))).encode("utf-8")
+
+    def dump_file(self, filename):
+        with open(filename, "w") as f:
+            self.dump(f)
+
+def input_files(args):
+    if len(args) == 0:
+        yield sys.stdin
+        return
+    for arg in args:
+        with codecs.open(arg, "r", "utf-8") as f:
+            yield f
+
+all_1gram = Calc(1, alphabet=GREEK_LOWER)
+all_2gram = Calc(2, alphabet=GREEK_LOWER)
+init_2gram = Calc(2, alphabet=GREEK_LOWER)
+word_2gram = Calc(2, alphabet=GREEK_LOWER)
+
+BASENAME = None
+opts, args = getopt.gnu_getopt(sys.argv[1:], "b:", ["base="])
+for o, a in opts:
+    if o == "-b" or o == "--base":
+        BASENAME = a
+
+for f in input_files(args):
+    for line in f:
+        for word in re.split(ur'[^\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+', line, flags=re.UNICODE):
+            if word == u"":
+                continue
+            word_init = True
+            for c in word:
+                if c.isalpha():
+                    all_1gram.observe(c)
+                    all_2gram.observe(c)
+                    word_2gram.observe(c)
+                    if word_init:
+                        init_2gram.observe(c)
+                        word_init = False
+            word_2gram.flush()
+    all_1gram.flush()
+    all_2gram.flush()
+    init_2gram.flush()
+
+def mkfilename(suffix):
+    if BASENAME is None:
+        return suffix
+    return BASENAME + "-" + suffix
+
+all_1gram.dump_file(mkfilename("1gram.dat"))
+all_2gram.dump_file(mkfilename("2gram.dat"))
+init_2gram.dump_file(mkfilename("initial2gram.dat"))
+word_2gram.dump_file(mkfilename("word2gram.dat"))
