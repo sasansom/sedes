@@ -4,7 +4,7 @@ import bs4
 import getopt
 import sys
 
-import beta
+import betacode
 
 class Context(object):
     def __init__(self, outfile):
@@ -32,8 +32,8 @@ class Context(object):
             loc = self.div1 + ": "
         print >> sys.stderr, "warning: %s%s" % (loc, msg)
 
-    def add_beta(self, betacode):
-        self.parts.append(beta.decode(betacode))
+    def add_betacode(self, beta):
+        self.parts.append(betacode.decode(beta))
 
     def line_sep(self):
         line = u"".join(self.parts).strip()
@@ -64,7 +64,7 @@ def convert_elem(soup, ctx):
         elif type(elem) == bs4.element.Comment:
             pass
         else:
-            ctx.add_beta(unicode(elem))
+            ctx.add_betacode(unicode(elem))
 
 def convert(infile, outfile):
     soup = bs4.BeautifulSoup(infile, "xml")

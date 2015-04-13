@@ -6,7 +6,7 @@ import re
 import sys
 import unicodedata
 
-import beta
+import betacode
 
 VOWELS = ur'[αΑεΕηΗιΙοΟωΩυΥ]'
 CONSONANTS = ur'[βΒξΞδΔφΦγΓκΚλΛμΜνΝπΠθΘρΡςΣσϲϹτΤϝϜχΧψΨζΖ]'
@@ -58,7 +58,7 @@ with codecs.open("theogony.beta", encoding="utf-8") as f:
     lineno = 0
     for beta_line in f:
         beta_line = beta_line.strip()
-        line = beta.decode(beta_line)
+        line = betacode.decode(beta_line)
         LINES.append(line)
         if line == u"":
             continue

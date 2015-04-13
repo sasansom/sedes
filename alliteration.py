@@ -5,7 +5,7 @@ import math
 import sys
 import unicodedata
 
-import beta
+import betacode
 
 COLOR_B = (240, 163, 255)
 COLOR_A = (25, 25, 25)
@@ -23,7 +23,7 @@ lineno = 0
 with codecs.open("theogony.beta", encoding="utf-8") as f:
     for beta_line in f:
         beta_line = beta_line.strip()
-        line = beta.decode(beta_line)
+        line = betacode.decode(beta_line)
         if not line:
             continue
         LINES.append(line)
