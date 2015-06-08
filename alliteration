@@ -7,7 +7,6 @@ import math
 import sys
 import unicodedata
 
-import betacode
 from greek import *
 
 COLOR_B = (240, 163, 255)
