@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import codecs
+import getopt
 import math
 import sys
 import unicodedata
@@ -17,17 +18,6 @@ def entropy(a):
         p = float(a.count(x)) / len(a)
         sum += -p * math.log(p, 2)
     return sum
-
-LINES = []
-
-lineno = 0
-with codecs.open("theogony.beta", encoding="utf-8") as f:
-    for beta_line in f:
-        beta_line = beta_line.strip()
-        line = betacode.decode(beta_line)
-        if not line:
-            continue
-        LINES.append(line)
 
 def nfc(u):
     return unicodedata.normalize("NFC", u)
@@ -101,6 +91,15 @@ CANONICAL_LETTERS = {
 }
 def canonicalize_letter(l):
     return CANONICAL_LETTERS.get(l, l).lower()
+
+opts, args = getopt.gnu_getopt(sys.argv[1:], "")
+
+input_filename, = args
+
+LINES = []
+with codecs.open(input_filename, encoding="utf-8") as f:
+    for line in f:
+        LINES.append(line.strip())
 
 print """\
 <!DOCTYPE html>
