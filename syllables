@@ -2,11 +2,10 @@
 # coding: utf-8
 
 import codecs
+import getopt
 import re
 import sys
 import unicodedata
-
-import betacode
 
 VOWELS = ur'[αΑεΕηΗιΙοΟωΩυΥ]'
 CONSONANTS = ur'[βΒξΞδΔφΦγΓκΚλΛμΜνΝπΠθΘρΡςΣσϲϹτΤϝϜχΧψΨζΖ]'
@@ -50,14 +49,17 @@ IMG_MAP = {
     "=": "4.png",
 }
 
+opts, args = getopt.gnu_getopt(sys.argv[1:], "")
+
+input_filename, = args
+
 LINES = []
 TONE_PATTERN_MAP = {}
 
-with codecs.open("theogony.beta", encoding="utf-8") as f:
+with codecs.open(input_filename, encoding="utf-8") as f:
     lineno = 0
-    for beta_line in f:
-        beta_line = beta_line.strip()
-        line = betacode.decode(beta_line)
+    for line in f:
+        line = line.strip()
         LINES.append(line)
         if line == u"":
             continue
@@ -97,19 +99,3 @@ print """
 </body>
 </html>
 """
-
-# with open("theogony.beta") as f:
-#     lineno = 0
-#     for line in f:
-#         line = line.strip()
-#         if line == "":
-#             continue
-#         lineno += 1
-#         LINES.append(line)
-#         for syl in syllables(line):
-#             tone = tone_of(syl)
-#             COUNTS.setdefault(tone, 0)
-#             COUNTS[tone] += 1
-# 
-# for key, count in sorted(COUNTS.items(), key=lambda x: x[1]):
-#     print "%s %s" % (key, count)
