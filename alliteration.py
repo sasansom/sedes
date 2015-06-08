@@ -111,17 +111,13 @@ table {
 </style>
 </head>
 <body>
-<table>
-<tr>
-<th>line</th>
-<th>entropy per word</th>
-<th>line</th>
-</tr>
 """
 
 ENTROPY = []
 min_entropy = 1.0
 max_entropy = 0.0
+
+LOWEST_ENTROPY_LINES = []
 
 for lineno in range(len(LINES)):
     words = []
@@ -140,6 +136,46 @@ for lineno in range(len(LINES)):
     if entropy_per_word > max_entropy:
         max_entropy = entropy_per_word
     ENTROPY.append(entropy_per_word)
+
+    if len(LOWEST_ENTROPY_LINES) < 10 or entropy_per_word < ENTROPY[LOWEST_ENTROPY_LINES[9]]:
+        LOWEST_ENTROPY_LINES.append(lineno)
+        LOWEST_ENTROPY_LINES.sort(key=lambda x: ENTROPY[x])
+        LOWEST_ENTROPY_LINES = LOWEST_ENTROPY_LINES[:10]
+
+print """\
+<h2>Index of lines with least entropy</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>entropy per word</th>
+<th>line</th>
+</tr>
+</thead>
+<tbody>
+"""
+
+for lineno in LOWEST_ENTROPY_LINES:
+    line = LINES[lineno]
+    entropy_per_word = ENTROPY[lineno]
+    print "<tr>"
+    print "<td align=right><a href=\"#l%d\">%d</a></td>" % (lineno+1, lineno+1)
+    print "<td align=center>%.3f</td>" % entropy_per_word
+    print "<td style='background-color: rgb(%d,%d,%d);'>" % round_color(interp_srgb(COLOR_A, COLOR_B, (entropy_per_word - min_entropy) / (max_entropy - min_entropy)))
+    print nfc(line.replace(u" ", u"&nbsp;")).encode("utf-8") + "</td>"
+    print "</tr>"
+
+print """\
+</tbody>
+</table>
+<h2>Poem</h2>
+<table>
+<tr>
+<th>#</th>
+<th>entropy per word</th>
+<th>line</th>
+</tr>
+"""
 
 for lineno in range(len(LINES)):
     line = LINES[lineno]
