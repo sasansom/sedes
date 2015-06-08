@@ -96,7 +96,7 @@ CANONICAL_LETTERS = {
     u"Π": u"Φ/Π",
 }
 def canonicalize_letter(l):
-    return CANONICAL_LETTERS.get(l, l)
+    return CANONICAL_LETTERS.get(l, l).lower()
 
 print """\
 <!DOCTYPE html>
