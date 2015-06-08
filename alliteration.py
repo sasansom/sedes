@@ -89,6 +89,15 @@ WORD_BLACKLIST = set([u"τε", u"τ’"])
 def admit_word(word):
     return word.lower() not in WORD_BLACKLIST
 
+CANONICAL_LETTERS = {
+    u"φ": u"φ/π",
+    u"Φ": u"Φ/Π",
+    u"π": u"φ/π",
+    u"Π": u"Φ/Π",
+}
+def canonicalize_letter(l):
+    return CANONICAL_LETTERS.get(l, l)
+
 print """\
 <!DOCTYPE html>
 <html>
@@ -124,7 +133,7 @@ for lineno in range(len(LINES)):
     letters = []
     for word in words:
         if admit_word(word):
-            letters.append(word[0])
+            letters.append(canonicalize_letter(word[0]))
     entropy_per_word = entropy(letters) / len(words)
     if entropy_per_word < min_entropy:
         min_entropy = entropy_per_word
