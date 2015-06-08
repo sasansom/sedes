@@ -90,6 +90,10 @@ def admit_word(word):
     return word.lower() not in WORD_BLACKLIST
 
 CANONICAL_LETTERS = {
+    u"κ": u"κ/χ",
+    u"Κ": u"Κ/Χ",
+    u"χ": u"κ/χ",
+    u"Χ": u"Κ/Χ",
     u"φ": u"φ/π",
     u"Φ": u"Φ/Π",
     u"π": u"φ/π",
