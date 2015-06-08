@@ -18,10 +18,9 @@ def syllabify(s):
 def tone_of(syl):
     if u"\u0301" in syl:
         return "/"
-    if u"\u0300" in syl:
-        return "\\"
     if u"\u0342" in syl:
         return "="
+    # Grave accent or no diacritical.
     return "."
 
 def nfc(u):
