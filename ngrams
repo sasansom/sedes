@@ -7,6 +7,7 @@ import re
 import sys
 
 GREEK_LOWER = list(u"αβγδεζηθικλμνξοπρστυφχψω")
+GREEK_LOWER_CANON = list(u"αβγδεζηθι") + [u"κχ"] + list(u"λμνξο") + [u"πφ"] + list(u"ρστυψω")
 
 def enum_alphabet(n, alphabet):
     if n == 0:
@@ -74,10 +75,10 @@ def input_files(args):
         with codecs.open(arg, "r", "utf-8") as f:
             yield f
 
-all_1gram = Calc(1, alphabet=GREEK_LOWER)
-all_2gram = Calc(2, alphabet=GREEK_LOWER)
-init_2gram = Calc(2, alphabet=GREEK_LOWER)
-word_2gram = Calc(2, alphabet=GREEK_LOWER)
+all_1gram = Calc(1, map=canon_sounds, alphabet=GREEK_LOWER_CANON)
+all_2gram = Calc(2, map=canon_sounds, alphabet=GREEK_LOWER_CANON)
+init_2gram = Calc(2, map=canon_sounds, alphabet=GREEK_LOWER_CANON)
+word_2gram = Calc(2, map=canon_sounds, alphabet=GREEK_LOWER_CANON)
 
 BASENAME = None
 opts, args = getopt.gnu_getopt(sys.argv[1:], "b:", ["base="])
