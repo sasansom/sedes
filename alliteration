@@ -8,6 +8,7 @@ import sys
 import unicodedata
 
 import betacode
+from greek import *
 
 COLOR_B = (240, 163, 255)
 COLOR_A = (25, 25, 25)
@@ -79,19 +80,6 @@ WORD_BLACKLIST = set([u"τε", u"τ’"])
 def admit_word(word):
     return word.lower() not in WORD_BLACKLIST
 
-CANONICAL_LETTERS = {
-    u"κ": u"κ/χ",
-    u"Κ": u"Κ/Χ",
-    u"χ": u"κ/χ",
-    u"Χ": u"Κ/Χ",
-    u"φ": u"φ/π",
-    u"Φ": u"Φ/Π",
-    u"π": u"φ/π",
-    u"Π": u"Φ/Π",
-}
-def canonicalize_letter(l):
-    return CANONICAL_LETTERS.get(l, l).lower()
-
 opts, args = getopt.gnu_getopt(sys.argv[1:], "")
 
 input_filename, = args
@@ -132,7 +120,7 @@ for lineno in range(len(LINES)):
     letters = []
     for word in words:
         if admit_word(word):
-            letters.append(canonicalize_letter(word[0]))
+            letters.append(canon_sounds(word[0]))
     entropy_per_word = entropy(letters) / len(words)
     if entropy_per_word < min_entropy:
         min_entropy = entropy_per_word

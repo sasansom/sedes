@@ -6,8 +6,7 @@ import getopt
 import re
 import sys
 
-GREEK_LOWER = list(u"αβγδεζηθικλμνξοπρστυφχψω")
-GREEK_LOWER_CANON = list(u"αβγδεζηθι") + [u"κχ"] + list(u"λμνξο") + [u"πφ"] + list(u"ρστυψω")
+from greek import *
 
 def enum_alphabet(n, alphabet):
     if n == 0:
@@ -16,22 +15,6 @@ def enum_alphabet(n, alphabet):
     for a in alphabet:
         for b in enum_alphabet(n-1, alphabet):
             yield tuple([a] + list(b))
-
-# Canonicalize a bare Greek letter.
-def canon(c):
-    c = c.lower()
-    if c == u"ς":
-        c = u"σ"
-    return c
-
-# Canonicalize and additionally combine π/φ and κ/χ.
-def canon_sounds(c):
-    c = canon(c)
-    if c in (u"π", u"φ"):
-        c = u"πφ"
-    elif c in (u"κ", u"χ"):
-        c  = u"κχ"
-    return c
 
 class Calc(object):
     NULL = "_"
@@ -75,10 +58,10 @@ def input_files(args):
         with codecs.open(arg, "r", "utf-8") as f:
             yield f
 
-all_1gram = Calc(1, map=canon_sounds, alphabet=GREEK_LOWER_CANON)
-all_2gram = Calc(2, map=canon_sounds, alphabet=GREEK_LOWER_CANON)
-init_2gram = Calc(2, map=canon_sounds, alphabet=GREEK_LOWER_CANON)
-word_2gram = Calc(2, map=canon_sounds, alphabet=GREEK_LOWER_CANON)
+all_1gram = Calc(1, map=canon_sounds, alphabet=LOWER_SOUNDS)
+all_2gram = Calc(2, map=canon_sounds, alphabet=LOWER_SOUNDS)
+init_2gram = Calc(2, map=canon_sounds, alphabet=LOWER_SOUNDS)
+word_2gram = Calc(2, map=canon_sounds, alphabet=LOWER_SOUNDS)
 
 BASENAME = None
 opts, args = getopt.gnu_getopt(sys.argv[1:], "b:", ["base="])
