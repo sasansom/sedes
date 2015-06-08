@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 import codecs
 import math
@@ -83,6 +84,11 @@ def interp_srgb(ca, cb, p):
 def round_color(rgb):
     return tuple(int(c + 0.5) for c in rgb)
 
+# Is this a word we want to consider?
+WORD_BLACKLIST = set([u"τε", u"τ’"])
+def admit_word(word):
+    return word.lower() not in WORD_BLACKLIST
+
 print """\
 <!DOCTYPE html>
 <html>
@@ -115,7 +121,10 @@ for lineno in range(len(LINES)):
     words.extend(LINES[lineno].split())
     if lineno + 1 < len(LINES):
         words.extend(LINES[lineno+1].split())
-    letters = [word[0] for word in words]
+    letters = []
+    for word in words:
+        if admit_word(word):
+            letters.append(word[0])
     entropy_per_word = entropy(letters) / len(words)
     if entropy_per_word < min_entropy:
         min_entropy = entropy_per_word
