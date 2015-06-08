@@ -64,7 +64,6 @@ def blend_srgb(colors_srgb):
     """Blend RGB triples assumed to be in the sRGB colorspace."""
     # We first convert sRGB values into a linear space, do a linear blend, and
     # then convert back into sRGB space.
-    #
     # http://www.4p8.com/eric.brasseur/gamma.html#formulas
     # https://en.wikipedia.org/wiki/SRGB#Specification_of_the_transformation
     colors_lrgb = map(srgb_to_linear, colors_srgb)
