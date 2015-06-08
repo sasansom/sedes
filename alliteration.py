@@ -144,8 +144,8 @@ for lineno in range(len(LINES)):
 for lineno in range(len(LINES)):
     line = LINES[lineno]
     entropy_per_word = ENTROPY[lineno]
-    print "<tr id=l%d>" % lineno
-    print "<td align=right><a href=\"#l%d\">%d</a></td>" % (lineno, lineno)
+    print "<tr id=l%d>" % (lineno+1)
+    print "<td align=right><a href=\"#l%d\">%d</a></td>" % (lineno+1, lineno+1)
     print "<td align=center>%.3f</td>" % entropy_per_word
     print "<td style='background-color: rgb(%d,%d,%d);'>" % round_color(interp_srgb(COLOR_A, COLOR_B, (entropy_per_word - min_entropy) / (max_entropy - min_entropy)))
     print nfc(line.replace(u" ", u"&nbsp;")).encode("utf-8") + "</td>"
