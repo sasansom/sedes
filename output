@@ -48,7 +48,7 @@ def pct(f):
     return "%.f%%" % (f * 100)
 
 def barchart(f):
-    return "<table width=200 height=24 cellpadding=0 cellspacing=0><tr><td width=%s bgcolor=blue>&nbsp;</td><td></td></tr></table>" % esc(pct(f))
+    return "<table width=1000 height=24 cellpadding=0 cellspacing=0><tr><td width=%s bgcolor=blue>&nbsp;</td><td></td></tr></table>" % esc(pct(f))
 
 def esc(s):
     return cgi.escape(s, True)
