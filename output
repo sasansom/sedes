@@ -48,7 +48,7 @@ def pct(f):
     return "%.f%%" % (f * 100)
 
 def barchart(f):
-    return "<table width=200><tr><td width=%s bgcolor=blue>&nbsp;</td><td></td></tr></table>" % esc(pct(f))
+    return "<table width=200 height=24 cellpadding=0 cellspacing=0><tr><td width=%s bgcolor=blue>&nbsp;</td><td></td></tr></table>" % esc(pct(f))
 
 def esc(s):
     return cgi.escape(s, True)
@@ -84,7 +84,7 @@ table {
 """
 
 print """\
-<table>
+<table cellpadding=2 cellspacing=0>
 <tr>
 <th align=right>#</th>
 <th align=left>line</th>
@@ -102,7 +102,7 @@ for line in lines:
     print "<td align=right><a href=\"#%s\">%d</a></td>" % (esc(lineno_anchor(line.lineno)), line.lineno)
     print "<td align=left>%s</td>" % line.html()
     print "<td align=right>%.3f</td>" % line.entropy
-    print "<td>%s</td>" % barchart(line.entropy / max_entropy)
+    print "<td style='padding: 0'>%s</td>" % barchart(line.entropy / max_entropy)
     print "</tr>"
 
 print """\
