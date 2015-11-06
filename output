@@ -1,0 +1,145 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+import cgi
+import codecs
+import getopt
+import math
+import sys
+import unicodedata
+
+from greek import *
+
+class Line(object):
+    def __init__(self, lineno, text):
+        self.lineno = lineno
+        self.text = text
+        self.entropy = None
+
+    def html(self):
+        return cgi.escape(nfc(self.text).encode("utf-8"), True).replace(" ", "&nbsp;")
+
+# Is this a word we want to consider?
+WORD_BLACKLIST = set([u"τε", u"τ’"])
+def admit_word(word):
+    return word.lower() not in WORD_BLACKLIST
+
+def entropy(a):
+    sum = 0.0
+    for x in set(a):
+        p = float(a.count(x)) / len(a)
+        sum += -p * math.log(p, 2)
+    return sum
+
+def nfc(u):
+    return unicodedata.normalize("NFC", u)
+
+def extract_window(lines, i, j):
+    window = []
+    for n in range(i, j+1):
+        if 0 <= n < len(lines):
+            window.append(lines[n].text)
+    return "".join(window)
+
+def lineno_anchor(lineno):
+    return "l%d" % lineno
+
+def pct(f):
+    return "%.f%%" % (f * 100)
+
+def barchart(f):
+    return "<table width=200><tr><td width=%s bgcolor=blue>&nbsp;</td><td></td></tr></table>" % esc(pct(f))
+
+def esc(s):
+    return cgi.escape(s, True)
+
+opts, args = getopt.gnu_getopt(sys.argv[1:], "")
+
+input_filename, = args
+
+lines = []
+with codecs.open(input_filename, encoding="utf-8") as f:
+    for n, text in enumerate(f):
+        lines.append(Line(n+1, text.strip()))
+
+for i in range(len(lines)):
+    window = extract_window(lines, i-1, i+1)
+    words = [word for word in window.split() if admit_word(word)]
+    initial_letters = [word[0] for word in words]
+    lines[i].entropy = entropy(initial_letters) / len(words)
+
+print """\
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8>
+<style>
+table {
+    cell-spacing: 0;
+    cell-padding: 0;
+}
+</style>
+</head>
+<body>
+"""
+
+print """\
+<table>
+<tr>
+<th>#</th>
+<th>line</th>
+<th colspan=2>mean entropy</th>
+<th></th>
+</tr>
+"""
+
+sorted_entropy = sorted(lines, key=lambda l: l.entropy)
+min_entropy = sorted_entropy[0].entropy
+max_entropy = sorted_entropy[-1].entropy
+
+for line in lines:
+    print "<tr id=\"%s\">" % esc(lineno_anchor(line.lineno))
+    print "<td align=right><a href=\"#%s\">%d</a></td>" % (esc(lineno_anchor(line.lineno)), line.lineno)
+    print "<td align=left>%s</td>" % line.html()
+    print "<td align=right>%.3f</td>" % line.entropy
+    print "<td>%s</td>" % barchart(line.entropy / max_entropy)
+    print "</tr>"
+
+print """\
+</table>
+"""
+
+print """\
+</body>
+</html>
+"""
+
+# </html>
+# """
+# 
+# print """\
+# <h2>Index of lines with least entropy</h2>
+# <table>
+# <thead>
+# <tr>
+# <th>#</th>
+# <th>entropy per word</th>
+# <th>line</th>
+# </tr>
+# </thead>
+# <tbody>
+# """
+# 
+# for lineno in LOWEST_ENTROPY_LINES:
+#     line = LINES[lineno]
+#     entropy_per_word = ENTROPY[lineno]
+#     print "<tr>"
+#     print "<td align=right><a href=\"#l%d\">%d</a></td>" % (lineno+1, lineno+1)
+#     print "<td align=center>%.3f</td>" % entropy_per_word
+#     print "<td style='background-color: rgb(%d,%d,%d);'>" % round_color(interp_srgb(COLOR_A, COLOR_B, (entropy_per_word - min_entropy) / (max_entropy - min_entropy)))
+#     print nfc(line.replace(u" ", u"&nbsp;")).encode("utf-8") + "</td>"
+#     print "</tr>"
+# 
+# print """\
+# </tbody>
+# </table>
