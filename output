@@ -36,6 +36,13 @@ def nfc(u):
 
 def extract_window(lines, i, j):
     window = []
+    # Cheat on the first and last line.
+    if i == -1:
+        i += 1
+        j += 1
+    elif j == len(lines):
+        i -= 1
+        j -= 1
     for n in range(i, j+1):
         if 0 <= n < len(lines):
             window.append(lines[n].text)
