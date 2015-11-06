@@ -86,9 +86,9 @@ table {
 print """\
 <table>
 <tr>
-<th>#</th>
-<th>line</th>
-<th colspan=2>mean entropy</th>
+<th align=right>#</th>
+<th align=left>line</th>
+<th align=left colspan=2>mean entropy</th>
 <th></th>
 </tr>
 """
