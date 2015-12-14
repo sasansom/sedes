@@ -1,11 +1,12 @@
-BASENAMES = homerichymns iliad odyssey theogony worksanddays corpus
+WORKS = homerichymns iliad odyssey theogony worksanddays
+BASENAMES = $(WORKS) corpus
 DATS = $(addsuffix -1gram.dat,$(BASENAMES)) \
 	$(addsuffix -2gram.dat,$(BASENAMES)) \
 	$(addsuffix -initial2gram.dat,$(BASENAMES)) \
 	$(addsuffix -word2gram.dat,$(BASENAMES))
 GRAPHS = $(addsuffix .png,$(basename $(DATS)))
 
-all: $(DATS) $(GRAPHS)
+all: $(DATS) $(GRAPHS) $(addsuffix -entropy.html,$(WORKS))
 
 %.txt: %.xml
 	./tei2txt "$<" > "$@"
@@ -23,3 +24,6 @@ corpus-1gram.dat corpus-2gram.dat corpus-initial2gram.dat corpus-word2gram.dat: 
 	Rscript 2gram.R "$*-word2gram.dat" "\"$*\" within-word digram frequency"
 %-initial2gram.png: %-initial2gram.dat
 	Rscript 2gram.R "$*-initial2gram.dat" "\"$*\" word-initial digram frequency"
+
+%-entropy.html: corpus/%.txt
+	./alliteration "$<" > "$@"
