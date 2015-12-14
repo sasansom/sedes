@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import cgi
 import codecs
 import getopt
 import math
@@ -9,8 +10,19 @@ import unicodedata
 
 from greek import *
 
-COLOR_B = (240, 163, 255)
-COLOR_A = (25, 25, 25)
+class Line(object):
+    def __init__(self, lineno, text):
+        self.lineno = lineno
+        self.text = text
+        self.entropy = None
+
+    def html(self):
+        return cgi.escape(nfc(self.text).encode("utf-8"), True).replace(" ", "&nbsp;")
+
+# Is this a word we want to consider?
+WORD_BLACKLIST = set([u"τε", u"τ’"])
+def admit_word(word):
+    return word.lower() not in WORD_BLACKLIST
 
 def entropy(a):
     sum = 0.0
@@ -22,71 +34,46 @@ def entropy(a):
 def nfc(u):
     return unicodedata.normalize("NFC", u)
 
-def mean(a):
-    return float(sum(a)) / len(a)
+def extract_window(lines, i, j):
+    window = []
+    # Cheat on the first and last line.
+    if i == -1:
+        i += 1
+        j += 1
+    elif j == len(lines):
+        i -= 1
+        j -= 1
+    for n in range(i, j+1):
+        if 0 <= n < len(lines):
+            window.append(lines[n].text)
+    return "".join(window)
 
-def blend_linear(colors):
-    r = mean([rgb[0] for rgb in colors])
-    g = mean([rgb[1] for rgb in colors])
-    b = mean([rgb[2] for rgb in colors])
-    return r, g, b
+def lineno_anchor(lineno):
+    return "l%d" % lineno
 
-def srgb_to_linear_component(c):
-    f = c / 255.0
-    if f <= 0.04045:
-        return (f / 12.92) * 255
-    else:
-        return (((f+0.055) / 1.055)**2.4) * 255
+def pct(f):
+    return "%.f%%" % (f * 100)
 
-def srgb_to_linear(srgb):
-    return tuple(map(srgb_to_linear_component, srgb))
+def barchart(f):
+    return "<table width=800 height=24 cellpadding=0 cellspacing=0><tr><td width=%s bgcolor=blue>&nbsp;</td><td></td></tr></table>" % esc(pct(max(f, 0.01)))
 
-def linear_to_srgb_component(c):
-    f = c / 255.0
-    if f <= 0.0031308:
-        return (12.92 * f) * 255
-    else:
-        return (f**(1/2.4) * 1.055 - 0.055) * 255
-
-def linear_to_srgb(linear):
-    return tuple(map(linear_to_srgb_component, linear))
-
-def blend_srgb(colors_srgb):
-    """Blend RGB triples assumed to be in the sRGB colorspace."""
-    # We first convert sRGB values into a linear space, do a linear blend, and
-    # then convert back into sRGB space.
-    # http://www.4p8.com/eric.brasseur/gamma.html#formulas
-    # https://en.wikipedia.org/wiki/SRGB#Specification_of_the_transformation
-    colors_lrgb = map(srgb_to_linear, colors_srgb)
-    linear = blend_linear(colors_lrgb)
-    return linear_to_srgb(linear)
-
-def interp_srgb(ca, cb, p):
-    sca = srgb_to_linear(ca)
-    scb = srgb_to_linear(cb)
-    linear = (
-        sca[0] + p * (scb[0] - sca[0]),
-        sca[1] + p * (scb[1] - sca[1]),
-        sca[2] + p * (scb[2] - sca[2]),
-    )
-    return linear_to_srgb(linear)
-
-def round_color(rgb):
-    return tuple(int(c + 0.5) for c in rgb)
-
-# Is this a word we want to consider?
-WORD_BLACKLIST = set([u"τε", u"τ’"])
-def admit_word(word):
-    return word.lower() not in WORD_BLACKLIST
+def esc(s):
+    return cgi.escape(s, True)
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "")
 
 input_filename, = args
 
-LINES = []
+lines = []
 with codecs.open(input_filename, encoding="utf-8") as f:
-    for line in f:
-        LINES.append(line.strip())
+    for n, text in enumerate(f):
+        lines.append(Line(n+1, text.strip()))
+
+for i in range(len(lines)):
+    window = extract_window(lines, i-1, i+1)
+    words = [word for word in window.split() if admit_word(word)]
+    initial_letters = [word[0] for word in words]
+    lines[i].entropy = entropy(initial_letters) / len(words)
 
 print """\
 <!DOCTYPE html>
@@ -103,82 +90,60 @@ table {
 <body>
 """
 
-ENTROPY = []
-min_entropy = 1.0
-max_entropy = 0.0
-
-LOWEST_ENTROPY_LINES = []
-
-for lineno in range(len(LINES)):
-    words = []
-    if lineno - 1 >= 0:
-        words.extend(LINES[lineno-1].split())
-    words.extend(LINES[lineno].split())
-    if lineno + 1 < len(LINES):
-        words.extend(LINES[lineno+1].split())
-    letters = []
-    for word in words:
-        if admit_word(word):
-            letters.append(canon_sounds(word[0]))
-    entropy_per_word = entropy(letters) / len(words)
-    if entropy_per_word < min_entropy:
-        min_entropy = entropy_per_word
-    if entropy_per_word > max_entropy:
-        max_entropy = entropy_per_word
-    ENTROPY.append(entropy_per_word)
-
-    if len(LOWEST_ENTROPY_LINES) < 10 or entropy_per_word < ENTROPY[LOWEST_ENTROPY_LINES[9]]:
-        LOWEST_ENTROPY_LINES.append(lineno)
-        LOWEST_ENTROPY_LINES.sort(key=lambda x: ENTROPY[x])
-        LOWEST_ENTROPY_LINES = LOWEST_ENTROPY_LINES[:10]
+sorted_entropy = sorted(lines, key=lambda l: l.entropy)
+min_entropy = sorted_entropy[0].entropy
+max_entropy = sorted_entropy[-1].entropy
 
 print """\
 <h2>Index of lines with least entropy</h2>
-<table>
-<thead>
+<table cellpadding=2 cellspacing=0>
 <tr>
-<th>#</th>
-<th>entropy per word</th>
-<th>line</th>
+<th align=right>#</th>
+<th align=left>line</th>
+<th align=left colspan=2>mean entropy</th>
+<th></th>
 </tr>
-</thead>
 <tbody>
 """
 
-for lineno in LOWEST_ENTROPY_LINES:
-    line = LINES[lineno]
-    entropy_per_word = ENTROPY[lineno]
-    print "<tr>"
-    print "<td align=right><a href=\"#l%d\">%d</a></td>" % (lineno+1, lineno+1)
-    print "<td align=center>%.3f</td>" % entropy_per_word
-    print "<td style='background-color: rgb(%d,%d,%d);'>" % round_color(interp_srgb(COLOR_A, COLOR_B, (entropy_per_word - min_entropy) / (max_entropy - min_entropy)))
-    print nfc(line.replace(u" ", u"&nbsp;")).encode("utf-8") + "</td>"
+for line in sorted_entropy[:10]:
+    print "<tr id=\"%s\">" % esc(lineno_anchor(line.lineno))
+    print "<td align=right><a href=\"#%s\">%d</a></td>" % (esc(lineno_anchor(line.lineno)), line.lineno)
+    print "<td align=left>%s</td>" % line.html()
+    print "<td align=right>%.3f</td>" % line.entropy
+    print "<td style='padding: 0'>%s</td>" % barchart((line.entropy-min_entropy) / (max_entropy-min_entropy))
     print "</tr>"
+
 
 print """\
 </tbody>
 </table>
+"""
+
+print """\
 <h2>Poem</h2>
-<table>
+<table cellpadding=2 cellspacing=0>
 <tr>
-<th>#</th>
-<th>entropy per word</th>
-<th>line</th>
+<th align=right>#</th>
+<th align=left>line</th>
+<th align=left colspan=2>mean entropy</th>
+<th></th>
 </tr>
 """
 
-for lineno in range(len(LINES)):
-    line = LINES[lineno]
-    entropy_per_word = ENTROPY[lineno]
-    print "<tr id=l%d>" % (lineno+1)
-    print "<td align=right><a href=\"#l%d\">%d</a></td>" % (lineno+1, lineno+1)
-    print "<td align=center>%.3f</td>" % entropy_per_word
-    print "<td style='background-color: rgb(%d,%d,%d);'>" % round_color(interp_srgb(COLOR_A, COLOR_B, (entropy_per_word - min_entropy) / (max_entropy - min_entropy)))
-    print nfc(line.replace(u" ", u"&nbsp;")).encode("utf-8") + "</td>"
+for line in lines:
+    print "<tr id=\"%s\">" % esc(lineno_anchor(line.lineno))
+    print "<td align=right><a href=\"#%s\">%d</a></td>" % (esc(lineno_anchor(line.lineno)), line.lineno)
+    print "<td align=left>%s</td>" % line.html()
+    print "<td align=right>%.3f</td>" % line.entropy
+    print "<td style='padding: 0'>%s</td>" % barchart((line.entropy-min_entropy) / (max_entropy-min_entropy))
     print "</tr>"
 
-print """
+print """\
 </table>
+"""
+
+print """\
 </body>
 </html>
 """
