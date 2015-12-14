@@ -107,7 +107,7 @@ print """\
 """
 
 for line in sorted_entropy[:10]:
-    print "<tr id=\"%s\">" % esc(lineno_anchor(line.lineno))
+    print "<tr>"
     print "<td align=right><a href=\"#%s\">%d</a></td>" % (esc(lineno_anchor(line.lineno)), line.lineno)
     print "<td align=left>%s</td>" % line.html()
     print "<td align=right>%.3f</td>" % line.entropy
