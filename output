@@ -90,7 +90,38 @@ table {
 <body>
 """
 
+sorted_entropy = sorted(lines, key=lambda l: l.entropy)
+min_entropy = sorted_entropy[0].entropy
+max_entropy = sorted_entropy[-1].entropy
+
 print """\
+<h2>Index of lines with least entropy</h2>
+<table cellpadding=2 cellspacing=0>
+<tr>
+<th align=right>#</th>
+<th align=left>line</th>
+<th align=left colspan=2>mean entropy</th>
+<th></th>
+</tr>
+<tbody>
+"""
+
+for line in sorted_entropy[:10]:
+    print "<tr id=\"%s\">" % esc(lineno_anchor(line.lineno))
+    print "<td align=right><a href=\"#%s\">%d</a></td>" % (esc(lineno_anchor(line.lineno)), line.lineno)
+    print "<td align=left>%s</td>" % line.html()
+    print "<td align=right>%.3f</td>" % line.entropy
+    print "<td style='padding: 0'>%s</td>" % barchart((line.entropy-min_entropy) / (max_entropy-min_entropy))
+    print "</tr>"
+
+
+print """\
+</tbody>
+</table>
+"""
+
+print """\
+<h2>Poem</h2>
 <table cellpadding=2 cellspacing=0>
 <tr>
 <th align=right>#</th>
@@ -99,10 +130,6 @@ print """\
 <th></th>
 </tr>
 """
-
-sorted_entropy = sorted(lines, key=lambda l: l.entropy)
-min_entropy = sorted_entropy[0].entropy
-max_entropy = sorted_entropy[-1].entropy
 
 for line in lines:
     print "<tr id=\"%s\">" % esc(lineno_anchor(line.lineno))
@@ -120,33 +147,3 @@ print """\
 </body>
 </html>
 """
-
-# </html>
-# """
-# 
-# print """\
-# <h2>Index of lines with least entropy</h2>
-# <table>
-# <thead>
-# <tr>
-# <th>#</th>
-# <th>entropy per word</th>
-# <th>line</th>
-# </tr>
-# </thead>
-# <tbody>
-# """
-# 
-# for lineno in LOWEST_ENTROPY_LINES:
-#     line = LINES[lineno]
-#     entropy_per_word = ENTROPY[lineno]
-#     print "<tr>"
-#     print "<td align=right><a href=\"#l%d\">%d</a></td>" % (lineno+1, lineno+1)
-#     print "<td align=center>%.3f</td>" % entropy_per_word
-#     print "<td style='background-color: rgb(%d,%d,%d);'>" % round_color(interp_srgb(COLOR_A, COLOR_B, (entropy_per_word - min_entropy) / (max_entropy - min_entropy)))
-#     print nfc(line.replace(u" ", u"&nbsp;")).encode("utf-8") + "</td>"
-#     print "</tr>"
-# 
-# print """\
-# </tbody>
-# </table>
