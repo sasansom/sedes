@@ -27,6 +27,12 @@ def parse(soup):
     # Get rid of basefont spam.
     for elem in soup.find_all("basefont"):
         elem.decompose()
+    # Replace Windows-1252 quotation marks.
+    strings = []
+    for string in soup.strings:
+        strings.append(string)
+    for string in strings:
+        string.replace_with(unicode(string).replace(u"\u0093", u"\u201c").replace(u"\u0094", u"\u201d"))
 
     elem = soup.find(id="main_window").hr.next_sibling
     while True:
