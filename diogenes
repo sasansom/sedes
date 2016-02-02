@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+
+import re
+import sys
+
+from bs4 import BeautifulSoup
+
+TLG_MAP = {
+    "0001": "Ap.Rh.",
+    "0012": "Ody.",
+    "0013": "Hymns",
+    "0020": "Theog.",
+    "0653": "Arat",
+}
+
+def parse_jumpto(s):
+    m = re.match(r'^jumpTo\(\'tlg,(\w+),([\w:]+)\'\);$', s)
+    assert m is not None
+    return m.group(1), m.group(2).split(":")
+
+def parse(soup):
+    # Get rid of empty anchors.
+    for elem in soup.find_all("a"):
+        if not elem.contents:
+            elem.decompose()
+    # Get rid of basefont spam.
+    for elem in soup.find_all("basefont"):
+        elem.decompose()
+
+    elem = soup.find(id="main_window").hr.next_sibling
+    while True:
+        end = elem.find_next_sibling("p", string="Go to Context")
+        if end is None:
+            break
+
+        marked_offset = None
+        marked_form = None
+        marked_line = None
+        saw_marked = False
+        line = []
+        offset = 0
+        while elem != end:
+            if elem.name == "br":
+                if saw_marked:
+                    marked_line = u"".join(line).strip()
+                saw_marked = False
+                line = []
+                offset = 0
+            elif elem.name == "a":
+                if elem.font:
+                    saw_marked = True
+                    marked_offset = offset
+                    marked_form = elem.get_text()
+                offset += 1
+            try:
+                line.append(elem.get_text())
+            except AttributeError:
+                line.append(unicode(elem))
+            elem = elem.next_sibling
+
+        work, _ = parse_jumpto(end.a["onclick"])
+        print (u"%s\t%d\t%s\t%s" % (TLG_MAP.get(work, work), marked_offset + 1, marked_form, marked_line)).encode("utf-8")
+
+        elem = elem.find_next_sibling("hr").next_sibling
+
+soup = BeautifulSoup(sys.stdin)
+parse(soup)
