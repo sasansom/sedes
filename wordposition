@@ -74,6 +74,6 @@ _, args = getopt.gnu_getopt(sys.argv[1:], "")
 if args:
     for filename in args:
         with open(filename) as f:
-            parse(BeautifulSoup(f))
+            parse(BeautifulSoup(f, "lxml"))
 else:
-    parse(BeautifulSoup(sys.stdin))
+    parse(BeautifulSoup(sys.stdin, "lxml"))
