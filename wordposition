@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import getopt
 import re
@@ -32,7 +32,7 @@ def parse(soup):
     for string in soup.strings:
         strings.append(string)
     for string in strings:
-        string.replace_with(unicode(string).replace(u"\u0093", u"\u201c").replace(u"\u0094", u"\u201d"))
+        string.replace_with(str(string).replace(u"\u0093", u"\u201c").replace(u"\u0094", u"\u201d"))
 
     elem = soup.find(id="main_window").hr.next_sibling
     while True:
@@ -62,11 +62,11 @@ def parse(soup):
             try:
                 line.append(elem.get_text())
             except AttributeError:
-                line.append(unicode(elem))
+                line.append(str(elem))
             elem = elem.next_sibling
 
         work, _ = parse_jumpto(end.a["onclick"])
-        print (u"%s\t%d\t%s\t%s" % (TLG_MAP.get(work, work), marked_offset + 1, marked_form, marked_line)).encode("utf-8")
+        print(TLG_MAP.get(work, work), marked_offset + 1, marked_form, marked_line, sep='\t')
 
         elem = elem.find_next_sibling("hr").next_sibling
 
