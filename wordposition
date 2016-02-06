@@ -37,6 +37,16 @@ def split_sections(soup, container):
     container.append(section)
 
 def parse_jumpto(s):
+    # "tlg" is normally lowercase, but it was once uppercase in this context:
+    # <a onclick="parse_lat('Georg')">Georg.</a>
+    # <font size="-1">
+    #   <a onclick="PARSE_LAT('I')">I.</a>
+    #   <br>
+    #   <p>
+    #     <a onclick="jumpTo('TLG,0020,004:291:4');">Go to Context</a>
+    #   </p>
+    #   <hr>
+    # </font>
     m = re.match(r'^jumpTo\(\'(?:tlg|TLG),(\w+),(\w+):?([\w:]+)\'\);$', s)
     assert m is not None
     return m.group(1) + ":" + m.group(2), m.group(3)
