@@ -23,7 +23,7 @@ TLG_MAP = {
 }
 
 def parse_jumpto(s):
-    m = re.match(r'^jumpTo\(\'tlg,(\w+),(\w+)(:?[\w:]+)\'\);$', s)
+    m = re.match(r'^jumpTo\(\'(?:tlg|TLG),(\w+),(\w+):?([\w:]+)\'\);$', s)
     assert m is not None
     return m.group(1) + ":" + m.group(2), m.group(3)
 
@@ -31,6 +31,12 @@ def parse(soup):
     # Unwrap spacer elements. The tags are not closed in the input, so they
     # technically introduce an extra level of hierarchy wherever they are used.
     for elem in soup.find_all("spacer"):
+        elem.unwrap()
+    # Similarly unwrap <font size="..."></font> elements. The size="-1" ones are
+    # not closed (and also seem to have the side effect of capitalizing certain
+    # strings within them, e.g. "parse_lat"->"PARSE_LAT" and
+    # "jumpTo('tlg...')"→"jumpTo('TLG...')").
+    for elem in soup.find_all("font", size=True):
         elem.unwrap()
     # Get rid of empty anchors.
     for elem in soup.find_all("a"):
