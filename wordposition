@@ -7,17 +7,17 @@ import sys
 from bs4 import BeautifulSoup
 
 TLG_MAP = {
-    "0001": "Ap.Rh.",
-    "0012": "Ody.",
-    "0013": "Hymns",
-    "0020": "Theog.",
-    "0653": "Arat",
+    "0001:001": "Ap.Rh.",
+    "0012:002": "Ody.",
+    "0013:002": "Hymns",
+    "0020:001": "Theog.",
+    "0653:001": "Arat",
 }
 
 def parse_jumpto(s):
-    m = re.match(r'^jumpTo\(\'tlg,(\w+),([\w:]+)\'\);$', s)
+    m = re.match(r'^jumpTo\(\'tlg,(\w+),(\w+)(:?[\w:]+)\'\);$', s)
     assert m is not None
-    return m.group(1), m.group(2).split(":")
+    return m.group(1) + ":" + m.group(2), m.group(3)
 
 def parse(soup):
     # Get rid of empty anchors.
