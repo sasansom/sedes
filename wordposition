@@ -8,9 +8,12 @@ from bs4 import BeautifulSoup
 
 TLG_MAP = {
     "0001:001": "Ap.Rh.",
+    "0012:001": "Iliad",
     "0012:002": "Ody.",
     "0013:002": "Hymns",
     "0020:001": "Theog.",
+    "0020:003": "Shield",
+    "0020:004": "Fr.",
     "0653:001": "Arat",
 }
 
