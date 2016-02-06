@@ -22,6 +22,20 @@ TLG_MAP = {
     "0653:001": "Arat",
 }
 
+# The results are flat siblings separated by hr elements. Take the pieces
+# between each pair of hr elements (including notional ones at the beginning and
+# end) and wrap them in section elements.
+def split_sections(soup, container):
+    section = soup.new_tag("section")
+    for elem in list(container.contents):
+        elem = elem.extract()
+        if elem.name == "hr":
+            container.append(section)
+            section = soup.new_tag("section")
+        else:
+            section.append(elem)
+    container.append(section)
+
 def parse_jumpto(s):
     m = re.match(r'^jumpTo\(\'(?:tlg|TLG),(\w+),(\w+):?([\w:]+)\'\);$', s)
     assert m is not None
@@ -52,19 +66,21 @@ def parse(soup):
     for string in strings:
         string.replace_with(str(string).replace(u"\u0093", u"\u201c").replace(u"\u0094", u"\u201d"))
 
-    elem = soup.find(id="main_window").hr.next_sibling
-    while True:
-        end = elem.find_next_sibling("p", string="Go to Context")
-        if end is None:
-            break
+    main_window = soup.find(id="main_window")
+    split_sections(soup, main_window)
+    # First section is a header/summary.
+    # Penultimate section is a count of incidences.
+    # Final section is a footer.
+    sections = main_window.find_all("section")[1:-2]
 
+    for section in sections:
         marked_offset = None
         marked_form = None
         marked_line = None
         saw_marked = False
         line = []
         offset = 0
-        while elem != end:
+        for elem in section.children:
             if elem.name == "br":
                 if saw_marked:
                     marked_line = u"".join(line).strip()
@@ -72,7 +88,7 @@ def parse(soup):
                 line = []
                 offset = 0
             elif elem.name == "a":
-                if elem.font:
+                if elem.find("font", color="red"):
                     saw_marked = True
                     marked_offset = offset
                     marked_form = elem.get_text()
@@ -81,12 +97,11 @@ def parse(soup):
                 line.append(elem.get_text())
             except AttributeError:
                 line.append(str(elem))
-            elem = elem.next_sibling
 
-        work, pos = parse_jumpto(end.a["onclick"])
+        context_link = section.find("p", string="Go to Context", recursive=False)
+        assert context_link is not None, "no context found in %s" % section
+        work, pos = parse_jumpto(context_link.a["onclick"])
         print(TLG_MAP.get(work, work), pos, marked_offset + 1, marked_form, marked_line, sep='\t')
-
-        elem = elem.find_next_sibling("hr").next_sibling
 
 _, args = getopt.gnu_getopt(sys.argv[1:], "")
 if args:
