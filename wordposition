@@ -22,6 +22,32 @@ TLG_MAP = {
     "0653:001": "Arat",
 }
 
+# Apply various cleanup functions to the document tree for easier parsing.
+def fixup(soup):
+    # Unwrap spacer elements. The tags are not closed in the input, so they
+    # technically introduce an extra level of hierarchy wherever they are used.
+    for elem in soup.find_all("spacer"):
+        elem.unwrap()
+    # Similarly unwrap <font size="..."></font> elements. The size="-1" ones are
+    # not closed (and also seem to have the side effect of capitalizing certain
+    # strings within them, e.g. "parse_lat"->"PARSE_LAT" and
+    # "jumpTo('tlg...')"→"jumpTo('TLG...')").
+    for elem in soup.find_all("font", size=True):
+        elem.unwrap()
+    # Get rid of empty anchors.
+    for elem in soup.find_all("a"):
+        if not elem.contents:
+            elem.decompose()
+    # Get rid of basefont spam.
+    for elem in soup.find_all("basefont"):
+        elem.decompose()
+    # Replace Windows-1252 quotation marks.
+    strings = []
+    for string in soup.strings:
+        strings.append(string)
+    for string in strings:
+        string.replace_with(str(string).replace(u"\u0093", u"\u201c").replace(u"\u0094", u"\u201d"))
+
 # The results are flat siblings separated by hr elements. Take the pieces
 # between each pair of hr elements (including notional ones at the beginning and
 # end) and wrap them in section elements.
@@ -51,72 +77,55 @@ def parse_jumpto(s):
     assert m is not None
     return m.group(1) + ":" + m.group(2), m.group(3)
 
-def parse(soup):
-    # Unwrap spacer elements. The tags are not closed in the input, so they
-    # technically introduce an extra level of hierarchy wherever they are used.
-    for elem in soup.find_all("spacer"):
-        elem.unwrap()
-    # Similarly unwrap <font size="..."></font> elements. The size="-1" ones are
-    # not closed (and also seem to have the side effect of capitalizing certain
-    # strings within them, e.g. "parse_lat"->"PARSE_LAT" and
-    # "jumpTo('tlg...')"→"jumpTo('TLG...')").
-    for elem in soup.find_all("font", size=True):
-        elem.unwrap()
-    # Get rid of empty anchors.
-    for elem in soup.find_all("a"):
-        if not elem.contents:
-            elem.decompose()
-    # Get rid of basefont spam.
-    for elem in soup.find_all("basefont"):
-        elem.decompose()
-    # Replace Windows-1252 quotation marks.
-    strings = []
-    for string in soup.strings:
-        strings.append(string)
-    for string in strings:
-        string.replace_with(str(string).replace(u"\u0093", u"\u201c").replace(u"\u0094", u"\u201d"))
+def process_section(section):
+    marked_offset = None
+    marked_form = None
+    marked_line = None
+    saw_marked = False
+    line = []
+    offset = 0
+    # Walk each element, treating <br> as the end of a line. Note when we've
+    # seen a word with <font color="red">.
+    for elem in section.children:
+        if elem.name == "br":
+            if saw_marked:
+                marked_line = u"".join(line).strip()
+            saw_marked = False
+            line = []
+            offset = 0
+        elif elem.name == "a":
+            if elem.find("font", color="red"):
+                saw_marked = True
+                marked_offset = offset
+                marked_form = elem.get_text()
+            offset += 1
+        try:
+            line.append(elem.get_text())
+        except AttributeError:
+            line.append(str(elem))
+
+    context_link = section.find("p", string="Go to Context", recursive=False)
+    assert context_link is not None, "no context found in %s" % section
+    work, pos = parse_jumpto(context_link.a["onclick"])
+    print(TLG_MAP.get(work, work), pos, marked_offset + 1, marked_form, marked_line, sep='\t')
+
+def process(soup):
+    fixup(soup)
 
     main_window = soup.find(id="main_window")
     split_sections(soup, main_window)
+    sections = main_window.find_all("section")
+
     # First section is a header/summary.
     # Penultimate section is a count of incidences.
     # Final section is a footer.
-    sections = main_window.find_all("section")[1:-2]
-
-    for section in sections:
-        marked_offset = None
-        marked_form = None
-        marked_line = None
-        saw_marked = False
-        line = []
-        offset = 0
-        for elem in section.children:
-            if elem.name == "br":
-                if saw_marked:
-                    marked_line = u"".join(line).strip()
-                saw_marked = False
-                line = []
-                offset = 0
-            elif elem.name == "a":
-                if elem.find("font", color="red"):
-                    saw_marked = True
-                    marked_offset = offset
-                    marked_form = elem.get_text()
-                offset += 1
-            try:
-                line.append(elem.get_text())
-            except AttributeError:
-                line.append(str(elem))
-
-        context_link = section.find("p", string="Go to Context", recursive=False)
-        assert context_link is not None, "no context found in %s" % section
-        work, pos = parse_jumpto(context_link.a["onclick"])
-        print(TLG_MAP.get(work, work), pos, marked_offset + 1, marked_form, marked_line, sep='\t')
+    for section in sections[1:-2]:
+        process_section(section)
 
 _, args = getopt.gnu_getopt(sys.argv[1:], "")
 if args:
     for filename in args:
         with open(filename) as f:
-            parse(BeautifulSoup(f, "lxml"))
+            process(BeautifulSoup(f, "lxml"))
 else:
-    parse(BeautifulSoup(sys.stdin, "lxml"))
+    process(BeautifulSoup(sys.stdin, "lxml"))
