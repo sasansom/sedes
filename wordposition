@@ -10,10 +10,15 @@ TLG_MAP = {
     "0001:001": "Ap.Rh.",
     "0012:001": "Iliad",
     "0012:002": "Ody.",
-    "0013:002": "Hymns",
+    "0013:002": "Hymns", # "Hymni Homerici, In Cererem"
+    "0013:003": "Hymns", # "Hymni Homerici, In Apollinem"
+    "0013:004": "Hymns", # "Hymni Homerici, In Mercurium"
+    "0013:005": "Hymns", # "Hymni Homerici, In Venerem"
     "0020:001": "Theog.",
+    "0020:002": "WD",
     "0020:003": "Shield",
-    "0020:004": "Fr.",
+    "0020:004": "Fr.", # ??? "Fragmenta"
+    "0020:006": "Fr.", # ??? "Fragmenta astronomica"
     "0653:001": "Arat",
 }
 
