@@ -83,8 +83,8 @@ def parse(soup):
                 line.append(str(elem))
             elem = elem.next_sibling
 
-        work, _ = parse_jumpto(end.a["onclick"])
-        print(TLG_MAP.get(work, work), marked_offset + 1, marked_form, marked_line, sep='\t')
+        work, pos = parse_jumpto(end.a["onclick"])
+        print(TLG_MAP.get(work, work), pos, marked_offset + 1, marked_form, marked_line, sep='\t')
 
         elem = elem.find_next_sibling("hr").next_sibling
 
