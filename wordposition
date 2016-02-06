@@ -23,6 +23,10 @@ def parse_jumpto(s):
     return m.group(1) + ":" + m.group(2), m.group(3)
 
 def parse(soup):
+    # Unwrap spacer elements. The tags are not closed in the input, so they
+    # technically introduce an extra level of hierarchy wherever they are used.
+    for elem in soup.find_all("spacer"):
+        elem.unwrap()
     # Get rid of empty anchors.
     for elem in soup.find_all("a"):
         if not elem.contents:
