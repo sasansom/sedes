@@ -6,6 +6,8 @@ import sys
 
 from bs4 import BeautifulSoup
 
+import hexameter.scan
+
 TLG_MAP = {
     "0001:001": "Ap.Rh.",
     "0012:001": "Iliad",
@@ -83,6 +85,27 @@ def get_counts(elem):
     m = re.search(r'\bIncidence of all words as reported by word list: (\d+)\nPassages containing those words reported by Diogenes: (\d+)\n', elem.get_text())
     return int(m.group(1)), int(m.group(2))
 
+def find_metrical_position(scansion, offset):
+    # word = []
+    # for c, _, s in scansion:
+    #     if " " in c:
+    #         word.append(c)
+    #     elif s != "|":
+    #         word.append(s)
+    # print(scansion)
+    # print("".join(word), offset)
+    pos = 0
+    for c, _, s in scansion:
+        if offset == 0:
+            break
+        if " " in c:
+            offset -= 1
+        elif s == "+":
+            pos += 1
+        elif s == "-":
+            pos += 0.5
+    return pos + 1
+
 def process_section(section):
     marked_offset = None
     marked_form = None
@@ -113,7 +136,16 @@ def process_section(section):
     context_link = section.find("p", string="Go to Context", recursive=False)
     assert context_link is not None, "no context found in %s" % section
     work, pos = parse_jumpto(context_link.a["onclick"])
-    print(TLG_MAP.get(work, work), pos, marked_offset + 1, marked_form, marked_line, sep='\t')
+
+    metrical_positions = []
+    scansions = hexameter.scan.analyze_line_metrical(marked_line)
+    if not scansions:
+        # Unable to scan.
+        metrical_positions.append("?")
+    for scansion in scansions:
+        metrical_positions.append("%g" % find_metrical_position(scansion, marked_offset))
+
+    print(TLG_MAP.get(work, work), pos, "/".join(metrical_positions), marked_form, marked_line, sep='\t')
 
 def process(soup):
     fixup(soup)
