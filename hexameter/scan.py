@@ -415,6 +415,17 @@ def analyze_line(line):
         result.append((scansion, line_parts))
     return result
 
+def analyze_line_metrical(line):
+    '''Like analyze_line, but returns the intermediate metrical analysis instead
+    of the final scansion in order to allow for recovering word boundaries.'''
+    metrical_analysis = _local_metrical_analysis(line)
+    scansions = _scan(metrical_analysis)
+    result = []
+    for scansion in scansions:
+        merge = _merge_scansion(metrical_analysis, scansion)
+        result.append(merge)
+    return result
+
 ###
 ### file/stream processing
 ###
