@@ -4,7 +4,7 @@ import re
 import unicodedata
 from xml.etree import ElementTree
 
-import hexameter
+from . import hexameter
 
 ###
 ### constants and handy definitions
