@@ -77,6 +77,12 @@ def parse_jumpto(s):
     assert m is not None
     return m.group(1) + ":" + m.group(2), m.group(3)
 
+# Return a 2-tuple of "Incidence of all words as reported by word list" and
+# "Passages containing those words reported by Diogenes".
+def get_counts(elem):
+    m = re.search(r'\bIncidence of all words as reported by word list: (\d+)\nPassages containing those words reported by Diogenes: (\d+)\n', elem.get_text())
+    return int(m.group(1)), int(m.group(2))
+
 def process_section(section):
     marked_offset = None
     marked_form = None
@@ -121,6 +127,9 @@ def process(soup):
     # Final section is a footer.
     for section in sections[1:-2]:
         process_section(section)
+
+    incidence_count, passage_count = get_counts(sections[-2])
+    assert passage_count == len(sections)-3, "expected %d passages, found %d" % (passage_count, len(sections)-3)
 
 _, args = getopt.gnu_getopt(sys.argv[1:], "")
 if args:
