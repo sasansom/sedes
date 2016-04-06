@@ -78,7 +78,14 @@ def parse_jumpto(s):
     # </font>
     m = re.match(r'^jumpTo\(\'(?:tlg|TLG),(\w+),(\w+):?([\w:]+)\'\);$', s)
     assert m is not None
-    return m.group(1) + ":" + m.group(2), m.group(3)
+    if m.group(1) == "0013":
+        # 0013 is a special case for the Homeric Hymns; the second number
+        # indicates which hymn it is. We still want TLG_MAP to map the first two
+        # numbers to the string "Hymns", but we want to give an indication of
+        # which hymn along with the line number.
+        return m.group(1) + ":" + m.group(2), m.group(2).lstrip("0") + ":" + m.group(3)
+    else:
+        return m.group(1) + ":" + m.group(2), m.group(3)
 
 # Return a 2-tuple of "Incidence of all words as reported by word list" and
 # "Passages containing those words reported by Diogenes".
