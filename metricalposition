@@ -138,6 +138,9 @@ def process_section(section):
     assert context_link is not None, "no context found in %s" % section
     work, pos = parse_jumpto(context_link.a["onclick"])
 
+    # Some lines start with '>'; remove it.
+    marked_line = re.sub(r'^\s*>\s*', "", marked_line)
+
     metrical_positions = []
     scansions = hexameter.scan.analyze_line_metrical(marked_line)
     if not scansions:
