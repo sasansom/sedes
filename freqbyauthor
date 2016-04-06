@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+
+import getopt
+import sys
+
+AUTHOR_MAP = {
+    "Iliad": "Homer",
+    "Ody.": "Homer",
+    "Hymns": "Homer",
+    "Theog.": "Hesiod",
+    "WD": "Hesiod",
+}
+
+COUNTS = {}
+
+POS = None
+
+def usage(f=sys.stderr):
+    sys.stdout.write("""\
+Usage: %s POS [FILENAME...]
+
+Outputs counts of authors for words appearing at a given metrical
+position POS. POS is a string like "2.5" or "6".
+""" % sys.argv[0])
+
+def process(f):
+    for line in f:
+        title, lineno, positions, _, _ = line.strip().split("\t")
+        positions = set(positions.split("/"))
+        author = AUTHOR_MAP.get(title, title+"?")
+        if POS in positions:
+            COUNTS.setdefault(author, 0)
+            COUNTS[author] += 1
+
+_, args = getopt.gnu_getopt(sys.argv[1:], "")
+
+try:
+    POS, filenames = args[0], args[1:]
+except IndexError:
+    usage(sys.stderr)
+    sys.exit(1)
+
+if filenames:
+    for filename in filenames:
+        with open(filename) as f:
+            process(f)
+else:
+    process(sys.stdin)
+
+for author, count in sorted(COUNTS.items(), key=lambda x: x[1]):
+    print("\t".join([author, str(count)]))
