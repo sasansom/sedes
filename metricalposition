@@ -10,6 +10,7 @@ import hexameter.scan
 
 TLG_MAP = {
     "0001:001": "Ap.Rh.",
+    "0005:001": "Theoc.",
     "0012:001": "Iliad",
     "0012:002": "Ody.",
     "0013:002": "Hymns", # "Hymni Homerici, In Cererem"
