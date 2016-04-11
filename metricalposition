@@ -66,6 +66,10 @@ def split_sections(soup, container):
     container.append(section)
 
 def parse_jumpto(s):
+    # Extract work ID and line number from a Diogenese HTML jumpTo reference, as
+    # found in the onlick attribute of links. The links look like:
+    #   <a onclick="jumpTo('tlg,0001,001:2:394');">
+    #
     # "tlg" is normally lowercase, but it was once uppercase in this context:
     # <a onclick="parse_lat('Georg')">Georg.</a>
     # <font size="-1">
