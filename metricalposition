@@ -81,7 +81,7 @@ def parse_jumpto(s):
     #   <hr>
     # </font>
     m = re.match(r'^jumpTo\(\'(?:tlg|TLG),(\w+),(\w+):?([\w:]+)\'\);$', s)
-    assert m is not None
+    assert m is not None, repr(s)
     if m.group(1) == "0013":
         # 0013 is a special case for the Homeric Hymns; the second number
         # indicates which hymn it is. We still want TLG_MAP to map the first two
