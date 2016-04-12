@@ -118,6 +118,13 @@ def find_metrical_position(scansion, offset):
             pos += 0.5
     return pos + 1
 
+def unique(a):
+    result = []
+    for x in a:
+        if x not in result:
+            result.append(x)
+    return result
+
 def process_section(section):
     marked_offset = None
     marked_form = None
@@ -160,6 +167,7 @@ def process_section(section):
     for scansion in scansions:
         metrical_positions.append("%g" % find_metrical_position(scansion, marked_offset))
 
+    metrical_positions = unique(metrical_positions)
     print(TLG_MAP.get(work, work), pos, "/".join(metrical_positions), marked_form, marked_line, sep='\t')
 
 def process(soup):
