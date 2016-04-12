@@ -80,7 +80,7 @@ def parse_jumpto(s):
     #   </p>
     #   <hr>
     # </font>
-    m = re.match(r'^jumpTo\(\'(?:tlg|TLG),(\w+),(\w+):?([\w:]+)\'\);$', s)
+    m = re.match(r'^jumpTo\(\'(?:tlg|TLG),(\w+),(\w+):?([\w():]+)\'\);$', s)
     assert m is not None, repr(s)
     if m.group(1) == "0013":
         # 0013 is a special case for the Homeric Hymns; the second number
