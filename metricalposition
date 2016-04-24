@@ -208,7 +208,7 @@ def process_word(ref, line, form, offset):
     metrical_positions = unique(metrical_positions)
 
     work_str = ref.author_work()
-    print(TLG_MAP.get(work_str, work_str), ref.location(), "/".join(metrical_positions), form, fixup_line(line), sep='\t')
+    print(TLG_MAP.get(work_str, work_str), ref.location(), "/".join(metrical_positions), form, line, sep='\t')
 
 def process_section(soup, section):
     context_link = section.find("p", string="Go to Context", recursive=False)
