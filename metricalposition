@@ -25,6 +25,37 @@ TLG_MAP = {
     "0653:001": "Arat",
 }
 
+# Represents a TLG location reference.
+class Ref(object):
+    def __init__(self):
+        self.author_id = None
+        self.work_id = None
+        self.book_id = None
+        self.lineno = None
+
+    def __str__(self):
+        s = self.author_id + ","+ self.work_id
+        if self.book_id is not None:
+            s += ":" + self.book_id
+        s += ":" + str(self.lineno)
+        return s
+
+    def author_work(self):
+        return self.author_id + ":" + self.work_id
+
+    def location(self):
+        book_id = self.book_id
+        if self.author_id == "0013":
+            # author_id==0013 is a special case for the Homeric Hymns; the work_id
+            # indicates which hymn it is. We assign the work_id to the book_id as
+            # well, for the sake of having the humn number next to each line number.
+            assert book_id is None
+            book_id = self.work_id
+        if book_id is not None:
+            return book_id.lstrip("0") + ":" + str(self.lineno)
+        else:
+            return str(self.lineno)
+
 # Apply various cleanup functions to the document tree for easier parsing.
 def fixup(soup):
     # Unwrap spacer elements. The tags are not closed in the input, so they
@@ -65,12 +96,33 @@ def split_sections(soup, container):
             section.append(elem)
     container.append(section)
 
+# Return elements between br elements as a list of span elements. A trailing br
+# is ignored, as if br were a '\n' line terminator.
+def split_lines(soup, container):
+    result = []
+    span = soup.new_tag("span")
+    for elem in list(container.contents):
+        if elem.name == "br":
+            result.append(span)
+            span = soup.new_tag("span")
+        else:
+            span.append(elem)
+    if span.get_text().strip():
+        result.append(span)
+    return result
+
 def parse_jumpto(s):
-    # Extract work ID and line number from a Diogenese HTML jumpTo reference, as
-    # found in the onlick attribute of links. The links look like:
+    # Extract a Ref from a Diogenese HTML jumpTo reference, as found in the
+    # onlick attribute of links. The links have the form:
+    #   <a onclick="jumpTo('tlg,[author],[work]:[book]:[lineno]');">
+    # or
+    #   <a onclick="jumpTo('tlg,[author],[work]:[lineno]');">
+    # for example,
     #   <a onclick="jumpTo('tlg,0001,001:2:394');">
+    #   <a onclick="jumpTo('tlg,0020,002:89');">
     #
-    # "tlg" is normally lowercase, but it was once uppercase in this context:
+    # "tlg" is normally lowercase, but it can be uppercase, for example in this
+    # context:
     # <a onclick="parse_lat('Georg')">Georg.</a>
     # <font size="-1">
     #   <a onclick="PARSE_LAT('I')">I.</a>
@@ -80,16 +132,23 @@ def parse_jumpto(s):
     #   </p>
     #   <hr>
     # </font>
-    m = re.match(r'^jumpTo\(\'(?:tlg|TLG),(\w+),(\w+):?([\w():]+)\'\);$', s)
+    m = re.match(r'^jumpTo\(\'tlg,(\w+),([\w():]+)\'\);$', s, flags=re.I)
     assert m is not None, repr(s)
-    if m.group(1) == "0013":
-        # 0013 is a special case for the Homeric Hymns; the second number
-        # indicates which hymn it is. We still want TLG_MAP to map the first two
-        # numbers to the string "Hymns", but we want to give an indication of
-        # which hymn along with the line number.
-        return m.group(1) + ":" + m.group(2), m.group(2).lstrip("0") + ":" + m.group(3)
-    else:
-        return m.group(1) + ":" + m.group(2), m.group(3)
+
+    author_id = m.group(1)
+    parts = m.group(2).split(":")
+    try:
+        work_id, book_id, lineno = parts
+    except ValueError:
+        work_id, lineno = parts
+        book_id = None
+
+    ref = Ref()
+    ref.author_id = author_id
+    ref.work_id = work_id
+    ref.book_id = book_id
+    ref.lineno = int(lineno)
+    return ref
 
 # Return a 2-tuple of "Incidence of all words as reported by word list" and
 # "Passages containing those words reported by Diogenes".
@@ -125,50 +184,56 @@ def unique(a):
             result.append(x)
     return result
 
-def process_section(section):
-    marked_offset = None
-    marked_form = None
-    marked_line = None
-    saw_marked = False
-    line = []
-    offset = 0
-    # Walk each element, treating <br> as the end of a line. Note when we've
-    # seen a word with <font color="red">.
-    for elem in section.children:
-        if elem.name == "br":
-            if saw_marked:
-                marked_line = u"".join(line).strip()
-            saw_marked = False
-            line = []
-            offset = 0
-        elif elem.name == "a":
-            if elem.find("font", color="red"):
-                saw_marked = True
-                marked_offset = offset
-                marked_form = elem.get_text()
-            offset += 1
-        try:
-            line.append(elem.get_text())
-        except AttributeError:
-            line.append(str(elem))
-
-    context_link = section.find("p", string="Go to Context", recursive=False)
-    assert context_link is not None, "no context found in %s" % section
-    work, pos = parse_jumpto(context_link.a["onclick"])
-
+def fixup_line(line):
     # Some lines start with weird symbols; remove them.
-    marked_line = re.sub(r'^\s*[>—⸖※]\s*', "", marked_line)
+    return re.sub(r'^\s*[>—⸖※]\s*', "", line)
 
+def process_word(ref, line, form, offset):
     metrical_positions = []
-    scansions = hexameter.scan.analyze_line_metrical(marked_line)
+    scansions = hexameter.scan.analyze_line_metrical(fixup_line(line))
     if not scansions:
         # Unable to scan.
         metrical_positions.append("?")
     for scansion in scansions:
-        metrical_positions.append("%g" % find_metrical_position(scansion, marked_offset))
-
+        metrical_positions.append("%g" % find_metrical_position(scansion, offset))
     metrical_positions = unique(metrical_positions)
-    print(TLG_MAP.get(work, work), pos, "/".join(metrical_positions), marked_form, marked_line, sep='\t')
+
+    work_str = ref.author_work()
+    print(TLG_MAP.get(work_str, work_str), ref.location(), "/".join(metrical_positions), form, fixup_line(line), sep='\t')
+
+def process_section(soup, section):
+    context_link = section.find("p", string="Go to Context", recursive=False)
+    context_link = context_link.extract()
+    ref = parse_jumpto(context_link.a["onclick"])
+
+    # lines will contain also the section header (with the author, title, etc.).
+    # It's okay because we only really start paying attention once we see the
+    # first highlighted word, which can only appear inside the lines of the
+    # actual quotation.
+    lines = split_lines(soup, section)
+
+    # Skip lines until we find the first one with a highlighted word; that's the
+    # one the ref refers to.
+    for i in range(len(lines)):
+        line = lines[i]
+        if line.find("font", color="red"):
+            break
+    else:
+        raise ValueError("no highlighted words in %s" % ref)
+
+    for i in range(i, len(lines)):
+        line = lines[i]
+        text = line.get_text().strip()
+        # Output all the highlighted words on this line.
+        offset = 0
+        for elem in line.children:
+            if elem.name == "a":
+                if elem.find("font", color="red"):
+                    process_word(ref, text, elem.get_text(), offset)
+                offset += 1
+        # There may be further highlighted words on following lines; increment
+        # the line number.
+        ref.lineno += 1
 
 def process(soup):
     fixup(soup)
@@ -183,7 +248,7 @@ def process(soup):
     sections = sections[1:-2]
 
     for section in sections:
-        process_section(section)
+        process_section(soup, section)
 
     assert passage_count == len(sections), "expected %d passages, found %d" % (passage_count, len(sections))
 
