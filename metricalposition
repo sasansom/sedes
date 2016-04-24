@@ -25,6 +25,12 @@ TLG_MAP = {
     "0653:001": "Arat",
 }
 
+# This is a hack to avoid duplicate erroneous output lines when Diogenes outputs
+# overlapping fragments. We keep track of the refs we have already output, and
+# ignore an entire fragment whenever we supposedly come across one we've already
+# seen.
+SEEN = set()
+
 # Represents a TLG location reference.
 class Ref(object):
     def __init__(self):
@@ -39,6 +45,9 @@ class Ref(object):
             s += ":" + self.book_id
         s += ":" + str(self.lineno)
         return s
+
+    def key(self):
+        return (self.author_id, self.work_id, self.book_id, self.lineno)
 
     def author_work(self):
         return self.author_id + ":" + self.work_id
@@ -206,6 +215,10 @@ def process_section(soup, section):
     context_link = context_link.extract()
     ref = parse_jumpto(context_link.a["onclick"])
 
+    if ref.key() in SEEN:
+        print("%s already seen; ignoring this section" % ref, file=sys.stderr)
+        return
+
     # lines will contain also the section header (with the author, title, etc.).
     # It's okay because we only really start paying attention once we see the
     # first highlighted word, which can only appear inside the lines of the
@@ -230,6 +243,7 @@ def process_section(soup, section):
             if elem.name == "a":
                 if elem.find("font", color="red"):
                     process_word(ref, text, elem.get_text(), offset)
+                    SEEN.add(ref.key())
                 offset += 1
         # There may be further highlighted words on following lines; increment
         # the line number.
