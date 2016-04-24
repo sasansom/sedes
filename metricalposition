@@ -176,15 +176,16 @@ def process(soup):
     main_window = soup.find(id="main_window")
     split_sections(soup, main_window)
     sections = main_window.find_all("section")
-
     # First section is a header/summary.
     # Penultimate section is a count of incidences.
     # Final section is a footer.
-    for section in sections[1:-2]:
+    incidence_count, passage_count = get_counts(sections[-2])
+    sections = sections[1:-2]
+
+    for section in sections:
         process_section(section)
 
-    incidence_count, passage_count = get_counts(sections[-2])
-    assert passage_count == len(sections)-3, "expected %d passages, found %d" % (passage_count, len(sections)-3)
+    assert passage_count == len(sections), "expected %d passages, found %d" % (passage_count, len(sections))
 
 _, args = getopt.gnu_getopt(sys.argv[1:], "")
 if args:
