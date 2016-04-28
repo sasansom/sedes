@@ -13,15 +13,53 @@ TLG_MAP = {
     "0005:001": "Theoc.",
     "0012:001": "Iliad",
     "0012:002": "Ody.",
+    "0013:001": "Hymns", # "Hymni Homerici, in Bacchum"
     "0013:002": "Hymns", # "Hymni Homerici, In Cererem"
     "0013:003": "Hymns", # "Hymni Homerici, In Apollinem"
     "0013:004": "Hymns", # "Hymni Homerici, In Mercurium"
     "0013:005": "Hymns", # "Hymni Homerici, In Venerem"
+    "0013:006": "Hymns", # "Hymni Homerici, In Venerem"
+    "0013:007": "Hymns", # "Hymni Homerici, In Bacchum"
+    "0013:008": "Hymns", # "Hymni Homerici, In Martem"
+    "0013:009": "Hymns", # "Hymni Homerici, In Dianam"
+    "0013:010": "Hymns", # "Hymni Homerici, In Venerem"
+    "0013:011": "Hymns", # "Hymni Homerici, In Minervam"
+    "0013:012": "Hymns", # "Hymni Homerici, In Junonem"
+    "0013:013": "Hymns", # "Hymni Homerici, In Cererem"
+    "0013:014": "Hymns", # "Hymni Homerici, In matrem deorum"
+    "0013:015": "Hymns", # "Hymni Homerici, In Herculem"
+    "0013:016": "Hymns", # "Hymni Homerici, In Aesculapium"
+    "0013:017": "Hymns", # "Hymni Homerici, In Dioscuros"
+    "0013:018": "Hymns", # "Hymni Homerici, In Mercurium"
+    "0013:019": "Hymns", # "Hymni Homerici, In Pana"
+    "0013:020": "Hymns", # "Hymni Homerici, In Volcanum"
+    "0013:021": "Hymns", # "Hymni Homerici, In Apollinem"
+    "0013:022": "Hymns", # "Hymni Homerici, In Neptunum"
+    "0013:023": "Hymns", # "Hymni Homerici, In Jovem"
+    "0013:024": "Hymns", # "Hymni Homerici, In Vestam"
+    "0013:025": "Hymns", # "Hymni Homerici, In Musas et Apollinem"
+    "0013:026": "Hymns", # "Hymni Homerici, In Bacchum"
+    "0013:027": "Hymns", # "Hymni Homerici, In Dianam"
+    "0013:028": "Hymns", # "Hymni Homerici, In Minervam"
+    "0013:029": "Hymns", # "Hymni Homerici, In Vestam"
+    "0013:030": "Hymns", # "Hymni Homerici, In Tellurem matrem omnium"
+    "0013:031": "Hymns", # "Hymni Homerici, In Solem"
+    "0013:032": "Hymns", # "Hymni Homerici, In Lunam"
+    "0013:033": "Hymns", # "Hymni Homerici, In Dioscuros"
+    "0013:034": "Hymns", # "Hymni Homerici, Εἰς ξένους"
     "0020:001": "Theog.",
     "0020:002": "WD",
     "0020:003": "Shield",
     "0020:004": "Fr.", # ??? "Fragmenta"
+    "0020:005": "Fr.", # ??? "Testimonia"
     "0020:006": "Fr.", # ??? "Fragmenta astronomica"
+    "0020:007": "Fr.", # ??? "Fragmenta"
+    "0533:009": "Call.", # "Hecala"
+    "0533:015": "Call.", # "In Jovem"
+    "0533:016": "Call.", # "In Apollinem"
+    "0533:017": "Call.", # "In Dianam"
+    "0533:018": "Call.", # "In Delum"
+    "0533:020": "Call.", # "In Cererem"
     "0653:001": "Arat",
 }
 
