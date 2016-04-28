@@ -76,16 +76,19 @@ class Ref(object):
         self.work_id = None
         self.book_id = None
         self.lineno = None
+        # lineno_junk is annotations that may come after the line number, such
+        # as an asterisk.
+        self.lineno_junk = ""
 
     def __str__(self):
         s = self.author_id + ","+ self.work_id
         if self.book_id is not None:
             s += ":" + self.book_id
-        s += ":" + str(self.lineno)
+        s += ":" + str(self.lineno) + self.lineno_junk
         return s
 
     def key(self):
-        return (self.author_id, self.work_id, self.book_id, self.lineno)
+        return (self.author_id, self.work_id, self.book_id, self.lineno, self.lineno_junk)
 
     def author_work(self):
         return self.author_id + ":" + self.work_id
@@ -99,9 +102,9 @@ class Ref(object):
             assert book_id is None
             book_id = self.work_id
         if book_id is not None:
-            return book_id.lstrip("0") + ":" + str(self.lineno)
+            return book_id.lstrip("0") + ":" + str(self.lineno) + self.lineno_junk
         else:
-            return str(self.lineno)
+            return str(self.lineno) + self.lineno_junk
 
 # Apply various cleanup functions to the document tree for easier parsing.
 def fixup(soup):
@@ -167,6 +170,8 @@ def parse_jumpto(s):
     # for example,
     #   <a onclick="jumpTo('tlg,0001,001:2:394');">
     #   <a onclick="jumpTo('tlg,0020,002:89');">
+    # There may be extra junk after the line number:
+    #   <a onclick="jumpTo('tlg,0001,001:1:1250*');">
     #
     # "tlg" is normally lowercase, but it can be uppercase, for example in this
     # context:
@@ -179,7 +184,7 @@ def parse_jumpto(s):
     #   </p>
     #   <hr>
     # </font>
-    m = re.match(r'^jumpTo\(\'tlg,(\w+),([\w():]+)\'\);$', s, flags=re.I)
+    m = re.match(r'^jumpTo\(\'tlg,(\w+),([\w():*]+)\'\);$', s, flags=re.I)
     assert m is not None, repr(s)
 
     author_id = m.group(1)
@@ -189,12 +194,16 @@ def parse_jumpto(s):
     except ValueError:
         work_id, lineno = parts
         book_id = None
+    m = re.match(r'^([0-9]+)(.*)$', lineno)
+    lineno = int(m.group(1))
+    lineno_junk = m.group(2)
 
     ref = Ref()
     ref.author_id = author_id
     ref.work_id = work_id
     ref.book_id = book_id
-    ref.lineno = int(lineno)
+    ref.lineno = lineno
+    ref.lineno_junk = lineno_junk
     return ref
 
 # Return a 2-tuple of "Incidence of all words as reported by word list" and
@@ -302,6 +311,7 @@ def process_section(soup, section):
         # There may be further highlighted words on following lines; increment
         # the line number.
         ref.lineno += 1
+        ref.lineno_junk = ""
 
 def process(soup):
     fixup(soup)
