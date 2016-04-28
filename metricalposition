@@ -246,7 +246,7 @@ def unique(a):
 
 def fixup_line(line):
     # Some lines start with weird symbols; remove them.
-    return re.sub(r'^\s*[>—⸖※]\s*', "", line)
+    return re.sub(r'^\s*[>—⸖※]*\s*', "", line)
 
 def process_word(ref, line, form, offset):
     metrical_positions = []
