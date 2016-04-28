@@ -198,9 +198,12 @@ def parse_jumpto(s):
     return ref
 
 # Return a 2-tuple of "Incidence of all words as reported by word list" and
-# "Passages containing those words reported by Diogenes".
+# "Passages containing those words reported by Diogenes". Raises ValueError in
+# case of error.
 def get_counts(elem):
     m = re.search(r'\bIncidence of all words as reported by word list: (\d+)\nPassages containing those words reported by Diogenes: (\d+)\n', elem.get_text())
+    if m is None:
+        raise ValueError("no summary found")
     return int(m.group(1)), int(m.group(2))
 
 def find_metrical_position(scansion, offset):
@@ -309,14 +312,19 @@ def process(soup):
     # First section is a header/summary.
     # Penultimate section is a count of incidences.
     # Final section is a footer.
-    incidence_count, passage_count = get_counts(sections[-2])
-    sections = sections[1:-2]
+    try:
+        incidence_count, passage_count = get_counts(sections[-2])
+        sections = sections[1:-2]
+    except ValueError:
+        # But some files lack the final two sections.
+        incidence_count, passage_count = None, None
+        sections = sections[1:]
 
     for section in sections:
         process_section(soup, section)
 
-    # assert incidence_count == len(SEEN), "expected %d incidences, found %d" % (incidence_count, len(SEEN))
-    assert passage_count == len(sections), "expected %d passages, found %d" % (passage_count, len(sections))
+    # assert incidence_count is None or incidence_count == len(SEEN), "expected %d incidences, found %d" % (incidence_count, len(SEEN))
+    assert passage_count is None or passage_count == len(sections), "expected %d passages, found %d" % (passage_count, len(sections))
 
 _, args = getopt.gnu_getopt(sys.argv[1:], "")
 if args:
