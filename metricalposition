@@ -315,7 +315,7 @@ def process(soup):
     for section in sections:
         process_section(soup, section)
 
-    assert incidence_count == len(SEEN), "expected %d incidences, found %d" % (incidence_count, len(SEEN))
+    # assert incidence_count == len(SEEN), "expected %d incidences, found %d" % (incidence_count, len(SEEN))
     assert passage_count == len(sections), "expected %d passages, found %d" % (passage_count, len(sections))
 
 _, args = getopt.gnu_getopt(sys.argv[1:], "")
