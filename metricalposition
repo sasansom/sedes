@@ -222,10 +222,15 @@ def find_metrical_position(scansion, offset):
                 pos += 1
             elif s == "-":
                 pos += 0.5
-    # Now consume one more syllable.
-    if words[offset][0] == "+":
+    # Now consume one more syllable. We seek ahead to the first scansion element
+    # that is not '', because some words (like "δ'") have no metrical value on
+    # their own, but inherit that of the following word.
+    i = offset
+    while not words[i]:
+        i += 1
+    if words[i][0] == "+":
         pos += 1
-    elif words[offset][0] == "-":
+    elif words[i][0] == "-":
         pos += 0.5
     else:
         assert False
