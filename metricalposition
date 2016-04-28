@@ -204,25 +204,33 @@ def get_counts(elem):
     return int(m.group(1)), int(m.group(2))
 
 def find_metrical_position(scansion, offset):
-    # word = []
-    # for c, _, s in scansion:
-    #     if " " in c:
-    #         word.append(c)
-    #     elif s != "|":
-    #         word.append(s)
-    # print(scansion)
-    # print("".join(word), offset)
-    pos = 0
+    words = []
+    word = []
     for c, _, s in scansion:
-        if offset == 0:
-            break
         if " " in c:
-            offset -= 1
-        elif s == "+":
-            pos += 1
-        elif s == "-":
-            pos += 0.5
-    return pos + 1
+            words.append("".join(word))
+            word = []
+        elif s == "+" or s == "-":
+            word.append(s)
+    if word:
+        words.append("".join(word))
+
+    pos = 0
+    for i in range(0, offset):
+        for s in words[i]:
+            if s == "+":
+                pos += 1
+            elif s == "-":
+                pos += 0.5
+    # Now consume one more syllable.
+    if words[offset][0] == "+":
+        pos += 1
+    elif words[offset][0] == "-":
+        pos += 0.5
+    else:
+        assert False
+
+    return pos
 
 def unique(a):
     result = []
