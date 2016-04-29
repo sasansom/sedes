@@ -275,6 +275,8 @@ def process_word(ref, line, form, offset):
 
 def process_section(soup, section):
     context_link = section.find("p", string="Go to Context", recursive=False)
+    if context_link is None:
+        raise ValueError("can't find context link: " + str(section))
     context_link = context_link.extract()
     ref = parse_jumpto(context_link.a["onclick"])
 
@@ -326,9 +328,11 @@ def process(soup):
         incidence_count, passage_count = get_counts(sections[-2])
         sections = sections[1:-2]
     except ValueError:
-        # But some files lack the final two sections.
+        # But some files lack the footer, and instead have a final empty
+        # section.
         incidence_count, passage_count = None, None
-        sections = sections[1:]
+        assert sections[-1].get_text().strip() == ""
+        sections = sections[1:-1]
 
     for section in sections:
         process_section(soup, section)
