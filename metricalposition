@@ -195,6 +195,8 @@ def parse_jumpto(s):
         work_id, lineno = parts
         book_id = None
     m = re.match(r'^([0-9]+)(.*)$', lineno)
+    if m is None:
+        raise ValueError("cannot parse line number %r" % lineno)
     lineno = int(m.group(1))
     lineno_junk = m.group(2)
 
