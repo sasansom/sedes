@@ -146,11 +146,29 @@ def split_sections(soup, container):
             section.append(elem)
     container.append(section)
 
+# Get rid of <p><b></b></p> markup of headings.
+#
+# For example,
+# <p><b>
+#   <a onclick="parse_grk('%2Ae%2Ar%2Ag%2Aa')"><font color="red"><b><u>ΕΡΓΑ</u></b></font></a>
+#   <a onclick="parse_grk('%2Ak%2Aa%2Ai')">ΚΑΙ</a>
+#   <a onclick="parse_grk('%2Ah%2Am%2Ae%2Ar%2Aa%2Ai')">ΗΜΕΡΑΙ</a></font>
+# </b></p>
+def unwrap_container(container):
+    changed = True
+    while changed:
+        changed = False
+        for elem in container.children:
+            if elem.name in ("p", "b"):
+                elem.unwrap()
+                changed = True
+
 # Return elements between br elements as a list of span elements. A trailing br
 # is ignored, as if br were a '\n' line terminator.
 def split_lines(soup, container):
     result = []
     span = soup.new_tag("span")
+    unwrap_container(container)
     for elem in list(container.contents):
         if elem.name == "br":
             result.append(span)
