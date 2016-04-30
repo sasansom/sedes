@@ -285,6 +285,10 @@ def fixup_line(line):
     return re.sub(r'^\s*[>—⸖※]*\s*', "", line)
 
 def process_word(ref, line, form, offset):
+    if ref.lineno == 0:
+        # A lineno of 0 indicates a title heading.
+        return
+
     metrical_positions = []
     scansions = hexameter.scan.analyze_line_metrical(fixup_line(line))
     if not scansions:
