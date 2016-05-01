@@ -74,37 +74,29 @@ class Ref(object):
     def __init__(self):
         self.author_id = None
         self.work_id = None
-        self.book_id = None
+        # A list of more specific locator references, e.g. [], [book], or [book, epigram].
+        self.refs = None
         self.lineno = None
         # lineno_junk is annotations that may come after the line number, such
         # as an asterisk.
         self.lineno_junk = ""
 
     def __str__(self):
-        s = self.author_id + ","+ self.work_id
-        if self.book_id is not None:
-            s += ":" + self.book_id
-        s += ":" + str(self.lineno) + self.lineno_junk
-        return s
+        return self.author_id + "," + ":".join([self.work_id] + self.refs + [str(self.lineno) + self.lineno_junk])
 
     def key(self):
-        return (self.author_id, self.work_id, self.book_id, self.lineno, self.lineno_junk)
+        return tuple([self.author_id, self.work_id] + self.refs + [self.lineno, self.lineno_junk])
 
     def author_work(self):
         return self.author_id + ":" + self.work_id
 
     def location(self):
-        book_id = self.book_id
+        refs = self.refs
         if self.author_id == "0013":
-            # author_id==0013 is a special case for the Homeric Hymns; the work_id
-            # indicates which hymn it is. We assign the work_id to the book_id as
-            # well, for the sake of having the humn number next to each line number.
-            assert book_id is None
-            book_id = self.work_id
-        if book_id is not None:
-            return book_id.lstrip("0") + ":" + str(self.lineno) + self.lineno_junk
-        else:
-            return str(self.lineno) + self.lineno_junk
+            # author_id==0013 is a special case for the Homeric Hymns; the
+            # work_id indicates which hymn it is.
+            refs = [self.work_id.lstrip("0")]
+        return ":".join(refs + [str(self.lineno) + self.lineno_junk])
 
 # Apply various cleanup functions to the document tree for easier parsing.
 def fixup(soup):
@@ -182,14 +174,20 @@ def split_lines(soup, container):
 def parse_jumpto(s):
     # Extract a Ref from a Diogenese HTML jumpTo reference, as found in the
     # onlick attribute of links. The links have the form:
+    #   <a onclick="jumpTo('tlg,[author],[work]:[book]:[epigram]:[lineno]');">
+    # or
     #   <a onclick="jumpTo('tlg,[author],[work]:[book]:[lineno]');">
     # or
     #   <a onclick="jumpTo('tlg,[author],[work]:[lineno]');">
     # for example,
+    #   <a onclick="jumpTo('tlg,0012,003:7:153:1');">
     #   <a onclick="jumpTo('tlg,0001,001:2:394');">
     #   <a onclick="jumpTo('tlg,0020,002:89');">
     # There may be extra junk after the line number:
     #   <a onclick="jumpTo('tlg,0001,001:1:1250*');">
+    #
+    # In general, we stick everything between [work] and [lineno] into the
+    # Ref.refs field.
     #
     # "tlg" is normally lowercase, but it can be uppercase, for example in this
     # context:
@@ -207,11 +205,7 @@ def parse_jumpto(s):
 
     author_id = m.group(1)
     parts = m.group(2).split(":")
-    try:
-        work_id, book_id, lineno = parts
-    except ValueError:
-        work_id, lineno = parts
-        book_id = None
+    work_id, refs, lineno = parts[0], parts[1:-1], parts[-1]
     m = re.match(r'^(t|[0-9]+)(.*)$', lineno)
     if m is None:
         raise ValueError("cannot parse line number %r" % lineno)
@@ -225,7 +219,7 @@ def parse_jumpto(s):
     ref = Ref()
     ref.author_id = author_id
     ref.work_id = work_id
-    ref.book_id = book_id
+    ref.refs = refs
     ref.lineno = lineno
     ref.lineno_junk = lineno_junk
     return ref
