@@ -332,7 +332,15 @@ def process_section(soup, section):
         ref.lineno_junk = ""
 
 def process(f):
-    soup = BeautifulSoup(f, "lxml")
+    data = f.read()
+    # Diogenes HTML output contains a lot of unclosed spacer elements. They each
+    # introduce an extra layer of hierarchy and so the fixup function unwraps
+    # all of them. But the unwrap operation is slow because the elements are so
+    # numerous and deep. Here we do a prefilter to erase them before converting
+    # the document to soup.
+    data = re.sub(r'<spacer type="horizontal" size="\d+">', "", data)
+
+    soup = BeautifulSoup(data, "lxml")
 
     fixup(soup)
 
