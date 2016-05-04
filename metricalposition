@@ -331,7 +331,9 @@ def process_section(soup, section):
         ref.lineno += 1
         ref.lineno_junk = ""
 
-def process(soup):
+def process(f):
+    soup = BeautifulSoup(f, "lxml")
+
     fixup(soup)
 
     main_window = soup.find(id="main_window")
@@ -360,6 +362,6 @@ _, args = getopt.gnu_getopt(sys.argv[1:], "")
 if args:
     for filename in args:
         with open(filename) as f:
-            process(BeautifulSoup(f, "lxml"))
+            process(f)
 else:
-    process(BeautifulSoup(sys.stdin, "lxml"))
+    process(sys.stdin)
