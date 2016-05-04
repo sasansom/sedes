@@ -333,12 +333,12 @@ def process_section(soup, section):
 
 def process(f):
     data = f.read()
-    # Diogenes HTML output contains a lot of unclosed spacer elements. They each
-    # introduce an extra layer of hierarchy and so the fixup function unwraps
-    # all of them. But the unwrap operation is slow because the elements are so
-    # numerous and deep. Here we do a prefilter to erase them before converting
-    # the document to soup.
-    data = re.sub(r'<spacer type="horizontal" size="\d+">', "", data)
+    # Diogenes HTML output contains a lot of unclosed and empty elements. The
+    # fixup function unwraps or decomposes all of them in order to simplify
+    # parsing. But because the elements are so numerous and deep, operating on
+    # them in the tree is slow. Here we prefilter to erase them from the HTML
+    # text before converting the document to soup.
+    data = re.sub(r'<spacer type="horizontal" size="\d+">|<basefont>|<a onclick="parse_(?:grk|lat)\(\'\'\)"></a>', "", data)
 
     soup = BeautifulSoup(data, "lxml")
 
