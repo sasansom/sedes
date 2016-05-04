@@ -117,12 +117,6 @@ def fixup(soup):
     # Get rid of basefont spam.
     for elem in soup.find_all("basefont"):
         elem.decompose()
-    # Replace Windows-1252 quotation marks.
-    strings = []
-    for string in soup.strings:
-        strings.append(string)
-    for string in strings:
-        string.replace_with(str(string).replace(u"\u0093", u"\u201c").replace(u"\u0094", u"\u201d"))
 
 # The results are flat siblings separated by hr elements. Take the pieces
 # between each pair of hr elements (including notional ones at the beginning and
