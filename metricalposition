@@ -309,7 +309,7 @@ def extract_words(line):
     return "".join(s).strip()
 
 def isascii(s):
-    return all(ord(c) <= 127 for c in "s")
+    return all(ord(c) <= 127 for c in s)
 
 def process_section(soup, section):
     context_link = section.find("p", string="Go to Context", recursive=False)
