@@ -308,6 +308,9 @@ def extract_words(line):
                 s.append(elem.string)
     return "".join(s).strip()
 
+def isascii(s):
+    return all(ord(c) <= 127 for c in "s")
+
 def process_section(soup, section):
     context_link = section.find("p", string="Go to Context", recursive=False)
     if context_link is None:
@@ -344,7 +347,11 @@ def process_section(soup, section):
                 if elem.find("font", color="red"):
                     process_word(ref, text, collapse_newlines(elem.get_text()), offset)
                     SEEN.add(ref.key())
-                offset += 1
+                # Diogenes can give some junk non-Greek "words" when there are
+                # annotations or errors in the text. Ignore them so we are more
+                # likely to match hexameter.scan's offsets.
+                if not isascii(elem.get_text()):
+                    offset += 1
         # There may be further highlighted words on following lines; increment
         # the line number.
         ref.lineno += 1
