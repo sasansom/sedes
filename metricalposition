@@ -200,11 +200,11 @@ def parse_jumpto(s):
     author_id = m.group(1)
     parts = m.group(2).split(":")
     work_id, refs, lineno = parts[0], parts[1:-1], parts[-1]
-    m = re.match(r'^(t|[0-9]+)(.*)$', lineno)
+    m = re.match(r'^(p1|t|[0-9]+)(.*)$', lineno)
     if m is None:
         raise ValueError("cannot parse line number %r" % lineno)
     lineno = m.group(1)
-    if lineno == "t":
+    if lineno == "t" or lineno == "p1":
         lineno = 0
     else:
         lineno = int(lineno)
