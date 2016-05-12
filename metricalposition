@@ -120,6 +120,10 @@ class Lineno(object):
         self.offset += n
         self.junk = ""
 
+    def should_ignore(self):
+        # A lineno of 0 indicates a title heading.
+        return self.lineno == 0 and self.offset == 0
+
     def __str__(self):
         if isinstance(self.lineno, str):
             if self.offset == 0:
@@ -295,8 +299,7 @@ def fixup_line(line):
     return re.sub(r'^\s*[>—⸖※]*\s*', "", line)
 
 def process_word(ref, line, form, offset):
-    if ref.lineno.lineno == 0 and ref.lineno.offset == 0:
-        # A lineno of 0 indicates a title heading.
+    if ref.lineno.should_ignore():
         return
 
     metrical_positions = []
