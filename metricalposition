@@ -77,15 +77,12 @@ class Ref(object):
         # A list of more specific locator references, e.g. [], [book], or [book, epigram].
         self.refs = None
         self.lineno = None
-        # lineno_junk is annotations that may come after the line number, such
-        # as an asterisk.
-        self.lineno_junk = ""
 
     def __str__(self):
-        return self.author_id + "," + ":".join([self.work_id] + self.refs + [str(self.lineno) + self.lineno_junk])
+        return self.author_id + "," + ":".join([self.work_id] + self.refs + [str(self.lineno)])
 
     def key(self):
-        return tuple([self.author_id, self.work_id] + self.refs + [self.lineno, self.lineno_junk])
+        return tuple([self.author_id, self.work_id] + self.refs + [str(self.lineno)])
 
     def author_work(self):
         return self.author_id + ":" + self.work_id
@@ -96,7 +93,41 @@ class Ref(object):
             # author_id==0013 is a special case for the Homeric Hymns; the
             # work_id indicates which hymn it is.
             refs = [self.work_id.lstrip("0")]
-        return ":".join(refs + [str(self.lineno) + self.lineno_junk])
+        return ":".join(refs + [str(self.lineno)])
+
+class Lineno(object):
+    def __init__(self, lineno):
+        self.offset = 0
+        # junk is annotations that may come after the line number, such as an
+        # asterisk.
+        self.junk = ""
+
+        if lineno in ("p1", "t"):
+            # These values indicate titles so we call them line 0.
+            self.lineno = 0
+        elif lineno in ("n1",):
+            # We'll track these linenos as opaque strings.
+            self.lineno = lineno
+        else:
+            # Otherwise we parse as an integer, with possible junk at the end.
+            m = re.match(r'^([0-9]+)(.*)$', lineno)
+            if m is None:
+                raise ValueError("cannot parse line number %r" % lineno)
+            self.lineno = int(m.group(1))
+            self.junk = m.group(2)
+
+    def increment(self, n):
+        self.offset += n
+        self.junk = ""
+
+    def __str__(self):
+        if isinstance(self.lineno, str):
+            if self.offset == 0:
+                return self.lineno + self.junk
+            else:
+                return "%s+%d" % (self.lineno + self.junk, self.offset)
+        else:
+            return str(self.lineno + self.offset) + self.junk
 
 # Apply various cleanup functions to the document tree for easier parsing.
 def fixup(soup):
@@ -200,22 +231,13 @@ def parse_jumpto(s):
     author_id = m.group(1)
     parts = m.group(2).split(":")
     work_id, refs, lineno = parts[0], parts[1:-1], parts[-1]
-    m = re.match(r'^(p1|t|[0-9]+)(.*)$', lineno)
-    if m is None:
-        raise ValueError("cannot parse line number %r" % lineno)
-    lineno = m.group(1)
-    if lineno == "t" or lineno == "p1":
-        lineno = 0
-    else:
-        lineno = int(lineno)
-    lineno_junk = m.group(2)
+    lineno = Lineno(lineno)
 
     ref = Ref()
     ref.author_id = author_id
     ref.work_id = work_id
     ref.refs = refs
     ref.lineno = lineno
-    ref.lineno_junk = lineno_junk
     return ref
 
 # Return a 2-tuple of "Incidence of all words as reported by word list" and
@@ -273,7 +295,7 @@ def fixup_line(line):
     return re.sub(r'^\s*[>—⸖※]*\s*', "", line)
 
 def process_word(ref, line, form, offset):
-    if ref.lineno == 0:
+    if ref.lineno.lineno == 0 and ref.lineno.offset == 0:
         # A lineno of 0 indicates a title heading.
         return
 
@@ -354,8 +376,7 @@ def process_section(soup, section):
                     offset += 1
         # There may be further highlighted words on following lines; increment
         # the line number.
-        ref.lineno += 1
-        ref.lineno_junk = ""
+        ref.lineno.increment(1)
 
 def process(f):
     data = f.read()
