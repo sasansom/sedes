@@ -16,6 +16,8 @@ Usage: %s POS [FILENAME...]
 
 Outputs counts of authors for words appearing at a given metrical
 position POS. POS is a string like "2.5" or "6".
+
+Use "." for POS to get a total of counts in any position.
 """ % sys.argv[0])
 
 def process(f):
@@ -26,7 +28,7 @@ def process(f):
             raise ValueError("cannot parse line %r" % line)
         positions = set(positions.split("/"))
         author = AUTHOR_MAP.get(title, title+"?")
-        if POS in positions:
+        if POS == "." or POS in positions:
             COUNTS.setdefault(author, 0)
             COUNTS[author] += 1
 
