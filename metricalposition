@@ -122,7 +122,8 @@ class Lineno(object):
 
     def should_ignore(self):
         # A lineno of 0 indicates a title heading.
-        return self.lineno == 0 and self.offset == 0
+        # # A lineno starting with "n" is a description by a later author.
+        return (self.lineno == 0 or (isinstance(self.lineno, str) and self.lineno.startswith("n"))) and self.offset == 0
 
     def __str__(self):
         if isinstance(self.lineno, str):
