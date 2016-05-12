@@ -14,7 +14,7 @@ x <- read.table("n1.out", sep="\t", quote="",
 	colClasses=c(work="factor", ref="character", pos="factor", form="character", text="character"))
 x <- x[!grepl("/", x$pos), ]
 x <- droplevels(x)
-levels(x$pos) <- levels(x$pos)[order(as.numeric(levels(x$pos)))]
+x$pos <- factor(x$pos, levels=levels(x$pos)[order(as.numeric(levels(x$pos)))])
 
 p <- ggplot(x, aes(pos, group=work))
 p <- p + geom_bar(aes(y=..prop..))
