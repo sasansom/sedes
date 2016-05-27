@@ -105,16 +105,15 @@ class Lineno(object):
         if lineno in ("p1", "t"):
             # These values indicate titles so we call them line 0.
             self.lineno = 0
-        elif lineno in ("n1",):
-            # We'll track these linenos as opaque strings.
-            self.lineno = lineno
         else:
-            # Otherwise we parse as an integer, with possible junk at the end.
+            # Otherwise try to parse as an integer, with possible junk at the end.
             m = re.match(r'^([0-9]+)(.*)$', lineno)
-            if m is None:
-                raise ValueError("cannot parse line number %r" % lineno)
-            self.lineno = int(m.group(1))
-            self.junk = m.group(2)
+            if m is not None:
+                self.lineno = int(m.group(1))
+                self.junk = m.group(2)
+            else:
+                # Track it as an opaque string.
+                self.lineno = lineno
 
     def increment(self, n):
         self.offset += n
@@ -123,7 +122,7 @@ class Lineno(object):
     def should_ignore(self):
         # A lineno of 0 indicates a title heading.
         # # A lineno starting with "n" is a description by a later author.
-        return (self.lineno == 0 or (isinstance(self.lineno, str) and self.lineno.startswith("n"))) and self.offset == 0
+        return (self.lineno == 0 or (isinstance(self.lineno, str) and (self.lineno.startswith("n") or self.lineno.startswith("p")))) and self.offset == 0
 
     def __str__(self):
         if isinstance(self.lineno, str):
