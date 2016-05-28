@@ -296,7 +296,10 @@ def unique(a):
 
 def fixup_line(line):
     # Some lines start with weird symbols; remove them.
-    return re.sub(r'^\s*[>—⸖※]*\s*', "", line)
+    line = re.sub(r'^\s*[>—⸖※]*\s*', "", line)
+    # Convert non-breaking space to space.
+    line = re.sub("\xa0", " ", line)
+    return line
 
 def process_word(ref, line, form, offset):
     if ref.lineno.should_ignore():
