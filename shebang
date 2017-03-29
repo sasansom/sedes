@@ -2,6 +2,7 @@
 
 import csv
 import getopt
+import os.path
 import re
 import subprocess
 import sys
@@ -62,7 +63,7 @@ def metricalposition(filename):
     return p.stdout
 
 def process(filename):
-    m = re.match(r'^(\d+)(.+)\.html$', filename)
+    m = re.match(r'^(\d+)(.+)\.html$', os.path.basename(filename))
     line_num = int(m.group(1))
     word = m.group(2)
     row = {
