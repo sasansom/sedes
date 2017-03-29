@@ -11,8 +11,8 @@ import hexameter.scan
 TLG_MAP = {
     "0001:001": "Ap.Rh.",
     "0005:001": "Theoc.",
-    "0012:001": "Iliad",
-    "0012:002": "Ody.",
+    "0012:001": "Il.",
+    "0012:002": "Od.",
     "0013:001": "Hymns", # "Hymni Homerici, in Bacchum"
     "0013:002": "Hymns", # "Hymni Homerici, In Cererem"
     "0013:003": "Hymns", # "Hymni Homerici, In Apollinem"
@@ -60,7 +60,7 @@ TLG_MAP = {
     "0533:017": "Call.", # "In Dianam"
     "0533:018": "Call.", # "In Delum"
     "0533:020": "Call.", # "In Cererem"
-    "0653:001": "Arat",
+    "0653:001": "Aratus",
 }
 
 # This is a hack to avoid duplicate erroneous output lines when Diogenes outputs
