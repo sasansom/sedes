@@ -32,7 +32,11 @@ def process(f):
             COUNTS.setdefault(author, 0)
             COUNTS[author] += 1
 
-_, args = getopt.gnu_getopt(sys.argv[1:], "")
+opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
+for o, a in opts:
+    if o == "-h" or o == "--help":
+        usage()
+        sys.exit()
 
 try:
     POS, filenames = args[0], args[1:]
