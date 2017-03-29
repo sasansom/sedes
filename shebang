@@ -104,6 +104,7 @@ def process(filename):
         row[work + " total"] = count
 
     csv_writer.writerow(row)
+    sys.stdout.flush()
 
 opts, filenames = getopt.gnu_getopt(sys.argv[1:], "-h", ["help"])
 for o, a in opts:
