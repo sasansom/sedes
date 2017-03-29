@@ -43,23 +43,12 @@ csv_writer = csv.DictWriter(sys.stdout, fieldnames=(
     "Call.",
     "Aratus",
     "Notes",
+    "Fixed for '?'",
 ))
 
 def metricalposition(filename):
     p = subprocess.Popen(["./metricalposition", filename], stdout=subprocess.PIPE)
     return p.stdout
-
-# pos==None means any pos.
-def freqbywork(filename, pos):
-    counts = {}
-    for work in WORKS:
-        counts.setdefault(work, 0)
-    for line in metricalposition(filename):
-        work, lineno, positions, _, _ = line.decode("utf-8").strip().split("\t")
-        positions = set(positions.split("/"))
-        if pos is None or pos in positions:
-            counts[work] += 1
-    return counts
 
 def process(filename):
     m = re.match(r'^(\d+)(.+)\.html$', filename)
@@ -68,11 +57,35 @@ def process(filename):
     row = {
         "Line #": line_num,
         "Word": word,
+        "Fixed for '?'": "Yes",
     }
+    for work in WORKS:
+        row.setdefault(work, 0)
 
-    freqs = freqbywork(filename, "7.5")
-    for work, count in freqs.items():
-        row[work] = count
+    possible_sedes = set()
+
+    position_counts = {}
+    total_counts = {}
+    for line in metricalposition(filename):
+        work, lineno, positions, _, _ = line.decode("utf-8").strip().split("\t")
+        positions = set(positions.split("/"))
+        total_counts.setdefault(work, 0)
+        total_counts[work] += 1
+        for pos in positions:
+            if pos == "?":
+                row["Fixed for '?'"] = "No"
+            position_counts.setdefault(pos, {})
+            position_counts[pos].setdefault(work, 0)
+            position_counts[pos][work] += 1
+
+            if work == "Shield" and lineno == str(line_num):
+                possible_sedes.add(pos)
+
+    if len(possible_sedes) == 1:
+        sedes = possible_sedes.pop()
+        row["Sedes"] = sedes
+        for work, count in position_counts[sedes].items():
+            row[work] = count
 
     csv_writer.writerow(row)
 
