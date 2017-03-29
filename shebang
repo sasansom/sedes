@@ -44,6 +44,17 @@ csv_writer = csv.DictWriter(sys.stdout, fieldnames=(
     "Aratus",
     "Notes",
     "Fixed for '?'",
+    "Il. total",
+    "Od. total",
+    "Hymns total",
+    "Theog. total",
+    "WD total",
+    "Shield total",
+    "Fr. total",
+    "Ap.Rh. total",
+    "Theoc. total",
+    "Call. total",
+    "Aratus total",
 ))
 
 def metricalposition(filename):
@@ -61,6 +72,7 @@ def process(filename):
     }
     for work in WORKS:
         row.setdefault(work, 0)
+        row.setdefault(work + " total", 0)
 
     possible_sedes = set()
 
@@ -86,6 +98,9 @@ def process(filename):
         row["Sedes"] = sedes
         for work, count in position_counts[sedes].items():
             row[work] = count
+
+    for work, count in total_counts.items():
+        row[work + " total"] = count
 
     csv_writer.writerow(row)
 
