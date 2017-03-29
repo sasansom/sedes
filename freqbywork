@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+
+import getopt
+import sys
+
+COUNTS = {}
+
+POS = None
+
+def usage(f=sys.stderr):
+    sys.stdout.write("""\
+Usage: %s POS [FILENAME...]
+
+Outputs counts of works for words appearing at a given metrical
+position POS. POS is a string like "2.5" or "6".
+
+Use "." for POS to get a total of counts in any position.
+""" % sys.argv[0])
+
+def process(f):
+    for line in f:
+        try:
+            work, lineno, positions, _, _ = line.strip().split("\t")
+        except ValueError:
+            raise ValueError("cannot parse line %r" % line)
+        positions = set(positions.split("/"))
+        if POS == "." or POS in positions:
+            COUNTS.setdefault(work, 0)
+            COUNTS[work] += 1
+
+opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
+for o, a in opts:
+    if o == "-h" or o == "--help":
+        usage()
+        sys.exit()
+
+try:
+    POS, filenames = args[0], args[1:]
+except IndexError:
+    usage(sys.stderr)
+    sys.exit(1)
+
+if filenames:
+    for filename in filenames:
+        with open(filename) as f:
+            process(f)
+else:
+    process(sys.stdin)
+
+for work, count in sorted(COUNTS.items(), key=lambda x: x[1]):
+    print("\t".join([work, str(count)]))
