@@ -3,6 +3,25 @@
 import getopt
 import sys
 
+def make_index_order(l):
+    map = {}
+    for i, x in enumerate(l):
+        map[x] = i
+    return map
+WORK_SORT_ORDER = make_index_order([
+    "Il.",
+    "Od.",
+    "Hymns",
+    "Theog.",
+    "WD",
+    "Shield",
+    "Fr.",
+    "Ap.Rh.",
+    "Theoc.",
+    "Call.",
+    "Aratus",
+])
+
 COUNTS = {}
 
 POS = None
@@ -47,5 +66,5 @@ if filenames:
 else:
     process(sys.stdin)
 
-for work, count in sorted(COUNTS.items(), key=lambda x: x[1]):
+for work, count in sorted(COUNTS.items(), key=lambda x: WORK_SORT_ORDER[x[0]]):
     print("\t".join([work, str(count)]))
