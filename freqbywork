@@ -23,6 +23,8 @@ WORK_SORT_ORDER = make_index_order([
 ])
 
 COUNTS = {}
+for work in WORK_SORT_ORDER:
+    COUNTS.setdefault(work, 0)
 
 POS = None
 
@@ -44,7 +46,6 @@ def process(f):
             raise ValueError("cannot parse line %r" % line)
         positions = set(positions.split("/"))
         if POS == "." or POS in positions:
-            COUNTS.setdefault(work, 0)
             COUNTS[work] += 1
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
