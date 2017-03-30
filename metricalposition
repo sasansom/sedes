@@ -347,7 +347,8 @@ def process_section(soup, section):
     ref = parse_jumpto(context_link.a["onclick"])
 
     if ref.key() in SEEN:
-        print("%s already seen; ignoring this section" % ref, file=sys.stderr)
+        if VERBOSE:
+            print("%s already seen; ignoring this section" % ref, file=sys.stderr)
         return
 
     # lines will contain also the section header (with the author, title, etc.).
@@ -419,7 +420,13 @@ def process(f):
     # assert incidence_count is None or incidence_count == len(SEEN), "expected %d incidences, found %d" % (incidence_count, len(SEEN))
     assert passage_count is None or passage_count == len(sections), "expected %d passages, found %d" % (passage_count, len(sections))
 
-_, args = getopt.gnu_getopt(sys.argv[1:], "")
+VERBOSE = False
+
+opts, args = getopt.gnu_getopt(sys.argv[1:], "v", ["verbose"])
+for o, a in opts:
+    if o == "-v" or o == "--verbose":
+        VERBOSE = True
+
 if args:
     for filename in args:
         with open(filename) as f:
