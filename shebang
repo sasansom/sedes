@@ -31,7 +31,7 @@ csv_writer = csv.DictWriter(sys.stdout, fieldnames=(
     "Word",
     "TLG search",
     "Sedes",
-    "Total (Diogenes)",
+    "Total (Diogenes word list)",
     "Il.",
     "Od.",
     "Hymns",
@@ -61,6 +61,8 @@ csv_writer = csv.DictWriter(sys.stdout, fieldnames=(
 def metricalposition(filename):
     p = subprocess.Popen(["./metricalposition", filename], stdout=subprocess.PIPE)
     return p.stdout
+
+INCIDENCE_REGEX = re.compile("^<a onclick=\"parse_lat\\('Incidence'\\)\">Incidence</a> <a onclick=\"parse_lat\\('of'\\)\">of</a> <a onclick=\"parse_lat\\('all'\\)\">all</a> <a onclick=\"parse_lat\\('words'\\)\">words</a> <a onclick=\"parse_lat\\('as'\\)\">as</a> <a onclick=\"parse_lat\\('reported'\\)\">reported</a> <a onclick=\"parse_lat\\('by'\\)\">by</a> <a onclick=\"parse_lat\\('word'\\)\">word</a> <a onclick=\"parse_lat\\('list'\\)\">list:</a> (\d+)<br>$")
 
 def process(filename):
     m = re.match(r'^(\d+)(.+)\.html$', os.path.basename(filename))
@@ -102,6 +104,18 @@ def process(filename):
 
     for work, count in total_counts.items():
         row[work + " total"] = count
+
+    diogenes_total = None
+    with open(filename) as f:
+        for line in f:
+            if not line.startswith("<a onclick=\"parse_lat('Incidence')\">Incidence</a>"):
+                continue
+            m = INCIDENCE_REGEX.match(line)
+            if m is None:
+                continue
+            diogenes_total = int(m.group(1))
+    assert diogenes_total is not None, "missing \"Incidence\" line"
+    row["Total (Diogenes word list)"] = diogenes_total
 
     csv_writer.writerow(row)
     sys.stdout.flush()
