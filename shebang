@@ -59,7 +59,7 @@ csv_writer = csv.DictWriter(sys.stdout, fieldnames=(
 ))
 
 def metricalposition(filename):
-    p = subprocess.Popen(["./metricalposition", filename], stdout=subprocess.PIPE)
+    p = subprocess.Popen(["./metricalposition", "--", filename], stdout=subprocess.PIPE)
     return p.stdout
 
 INCIDENCE_REGEX = re.compile("^<a onclick=\"parse_lat\\('Incidence'\\)\">Incidence</a> <a onclick=\"parse_lat\\('of'\\)\">of</a> <a onclick=\"parse_lat\\('all'\\)\">all</a> <a onclick=\"parse_lat\\('words'\\)\">words</a> <a onclick=\"parse_lat\\('as'\\)\">as</a> <a onclick=\"parse_lat\\('reported'\\)\">reported</a> <a onclick=\"parse_lat\\('by'\\)\">by</a> <a onclick=\"parse_lat\\('word'\\)\">word</a> <a onclick=\"parse_lat\\('list'\\)\">list:</a> (\d+)<br>$")
