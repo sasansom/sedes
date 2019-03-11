@@ -89,9 +89,9 @@ class Ref(object):
 
     def location(self):
         refs = self.refs
-        if self.author_id == "0013":
-            # author_id==0013 is a special case for the Homeric Hymns; the
-            # work_id indicates which hymn it is.
+        if self.author_id in ("0013", "0533"):
+            # author_id==0013 (Homeric Hymns) and author_id==0533 (Callimachus'
+            # Hymns) are special cases: the work_id indicates which hymn it is.
             refs = [self.work_id.lstrip("0")]
         return ":".join(refs + [str(self.lineno)])
 
