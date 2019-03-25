@@ -20,6 +20,7 @@ WORK_SORT_ORDER = make_index_order([
     "Theoc.",
     "Call.",
     "Aratus",
+    "Epi.",
 ])
 
 COUNTS = {}
