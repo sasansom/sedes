@@ -13,6 +13,7 @@ TLG_MAP = {
     "0005:001": "Theoc.",
     "0012:001": "Il.",
     "0012:002": "Od.",
+    "0012:003": "Epi.",
     "0013:001": "Hymns", # "Hymni Homerici, in Bacchum"
     "0013:002": "Hymns", # "Hymni Homerici, In Cererem"
     "0013:003": "Hymns", # "Hymni Homerici, In Apollinem"
