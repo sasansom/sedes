@@ -5,22 +5,85 @@ import getopt
 import re
 import sys
 
+import hexameter.scan
 import tei
 
-def split_line(s):
-    return re.findall("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323]+", s)
+def assign_sedes(scansion):
+    """From a metrical scansion (sequence of (character cluster, preliminary
+    metrical analysis, final metrical analysis) tuples as output by
+    hexameter.scan.analyze_line_metrical), produce a sequence of (word, sedes)
+    tuples."""
+    # Output list of tuples.
+    result = []
+    # List of character cluster making up the current word.
+    word = []
+    # Sedes of the current word -- the first sedes seen after a word break.
+    word_sedes = None
+    # Buffer of words seen up until a sedes after a word break. This is needed
+    # for sequences like "δ’ ἐτελείετο", where the "δ’" inherits the sedes of
+    # the following word.
+    words = []
+    sedes = 0.0
+
+    # Append a dummy word break at the end of the line, as a sentinel to output
+    # the final group of words sharing a sedes.
+    if len(scansion) < 1 or " " not in scansion[-1][0]:
+        scansion += ((" ", "", ""),)
+
+    for c, _, value in scansion:
+        assert not c.strip().startswith(" ")
+        word.append(c.strip())
+        if " " in c:
+            assert value == "", value
+            assert word, word
+            # Append the current word to the list of words that share the
+            # current sedes.
+            words.append("".join(word))
+            if word_sedes is not None:
+                # Once we know the sedes, output all the words seen since the
+                # last time we saw a sedes.
+                for w in words:
+                    result.append((w, "{:g}".format(word_sedes)))
+                words = []
+            word = []
+            word_sedes = None
+
+        # If it's a vowel with a sedes value, advance the sedes counter.
+        if value == "-":
+            sedes += 0.5
+        elif value == "+":
+            sedes += 1.0
+        if (value == "-" or value == "+") and word_sedes is None:
+            # The first vowel in a word, remember the sedes for the whole word.
+            word_sedes = sedes
+    assert sedes == 12.0, sedes
+    assert not word, word
+    assert not words, words
+    assert word_sedes is None, word_sedes
+    return tuple(result)
+
+def assign_sedes_for_line(line):
+    """From a line, return a sequence of (word, sedes, num_scansions) tuples.
+    sedes will be non-blank if and only if num_scansions is equal to 1."""
+    scansions = hexameter.scan.analyze_line_metrical(line)
+    if len(scansions) == 1:
+        return tuple((word, sedes, len(scansions)) for (word, sedes) in assign_sedes(scansions[0]))
+    else:
+        # If no scansions or multiple scansions, output "".
+        return tuple((word, "", len(scansions)) for word in re.findall("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323]+", line))
 
 def process(f):
     global csv_w
     doc = tei.TEI(f)
     for line in doc.lines():
-        for word_n, word in enumerate(split_line(line.text)):
-            if not word:
-                continue
+        for word_n, entry in enumerate(assign_sedes_for_line(line.text)):
+            word, sedes, num_scansions = entry
             csv_w.writerow({
                 "line_n": line.n,
                 "word_n": word_n + 1,
                 "word": word,
+                "num_scansions": num_scansions,
+                "sedes": sedes,
             })
 
 def input_files(args):
@@ -31,7 +94,7 @@ def input_files(args):
         with open(arg) as f:
             yield f
 
-csv_w = csv.DictWriter(sys.stdout, ["line_n", "word_n", "word"])
+csv_w = csv.DictWriter(sys.stdout, ["work", "book_n", "line_n", "word_n", "word", "num_scansions", "sedes"])
 csv_w.writeheader()
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "")
