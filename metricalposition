@@ -202,7 +202,7 @@ def split_lines(soup, container):
     return result
 
 def parse_jumpto(s):
-    # Extract a Ref from a Diogenese HTML jumpTo reference, as found in the
+    # Extract a Ref from a Diogenes HTML jumpTo reference, as found in the
     # onlick attribute of links. The links have the form:
     #   <a onclick="jumpTo('tlg,[author],[work]:[book]:[epigram]:[lineno]');">
     # or
