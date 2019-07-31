@@ -31,8 +31,11 @@ def assign_sedes(scansion):
         scansion += ((" ", "", ""),)
 
     for c, _, value in scansion:
-        assert not c.strip().startswith(" ")
-        word.append(c.strip())
+        # Single quotation marks (used for elision) should be considered
+        # part of the previous word.
+        while c.startswith("’"):
+            word.append(c[:1])
+            c = c[1:]
         if " " in c:
             assert value == "", value
             assert word, word
@@ -47,6 +50,8 @@ def assign_sedes(scansion):
                 words = []
             word = []
             word_sedes = None
+        else:
+            word.append(c)
 
         # If it's a vowel with a sedes value, advance the sedes counter.
         if value == "-":
@@ -70,7 +75,7 @@ def assign_sedes_for_line(line):
         return tuple((word, sedes, len(scansions)) for (word, sedes) in assign_sedes(scansions[0]))
     else:
         # If no scansions or multiple scansions, output "".
-        return tuple((word, "", len(scansions)) for word in re.findall("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323]+", line))
+        return tuple((word, "", len(scansions)) for word in re.findall("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", line))
 
 def process(f):
     global csv_w
