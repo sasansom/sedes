@@ -100,6 +100,8 @@ class TEI:
                             # If no line number is provided, guess based on the
                             # previous line number.
                             line_n = line_n.successor()
+                    elif elem.name == "div1" and elem.get("type") == "Book":
+                        line_n = NullLocator()
 
                     if elem.name in ("milestone", "head", "gap"):
                         pass
