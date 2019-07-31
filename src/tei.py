@@ -19,6 +19,9 @@ class NullLocator:
     def __str__(self):
         return "0"
 
+    def __repr__(self):
+        return repr(str(self))
+
 class Locator:
     def __init__(self, number, letter):
         self.number = number
@@ -46,6 +49,9 @@ class Locator:
 
     def __str__(self):
         return "{}{}".format(self.number, self.letter)
+
+    def __repr__(self):
+        return repr(str(self))
 
 class Line:
     def __init__(self, n, text):
@@ -94,7 +100,7 @@ class TEI:
                             # against the previous line.
                             new_n = Locator.parse(n)
                             if not line_n.may_precede(new_n):
-                                warn("after line {}, expected {}, got {!r}".format(line_n, line_n.successor(), n))
+                                warn("after line {!r}, expected {!r}, got {!r}".format(line_n, line_n.successor(), n))
                             line_n = new_n
                         else:
                             # If no line number is provided, guess based on the
