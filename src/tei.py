@@ -125,7 +125,7 @@ class TEI:
                             # previous line number.
                             loc = loc.successor()
                     elif elem.name == "div1":
-                        assert elem.get("type") == "Book"
+                        assert elem.get("type") in ("Book", "Hymn")
                         # Start counting from 1 at the beginning of a new book.
                         loc = Locator(book_n=elem.get("n"))
 
