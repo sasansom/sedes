@@ -9,53 +9,66 @@ import betacode
 def warn(msg):
     print("warning: {}".format(msg), file=sys.stderr)
 
-class NullLocator:
-    def successor(self):
-        return Locator(1, "")
-
-    def may_succeed(self, other):
-        return False
-
-    def __str__(self):
-        return "0"
-
-    def __repr__(self):
-        return repr(str(self))
+def split_line_n(line_n):
+    """Split a line number string into an (integer, everything else) pair. A
+    line_n of None is treated as an empty string."""
+    m = re.match(r'^(\d*)(.*)$', line_n or "", flags=re.ASCII)
+    assert m is not None, line_n
+    number, extra = m.groups()
+    return int(number), extra
 
 class Locator:
-    def __init__(self, number, letter):
-        self.number = number
-        self.letter = letter
-
-    @staticmethod
-    def parse(s):
-        m = re.match(r'^(\d+)(\w*)$', s, flags=re.ASCII)
-        if not m:
-            raise ValueError("cannot parse line number {!r}".format(s))
-        number, letter = m.groups()
-        try:
-            number = int(number)
-        except ValueError:
-            raise ValueError("cannot parse line number {!r}".format(s))
-        return Locator(number, letter)
+    def __init__(self, book_n=None, line_n=None):
+        self.book_n = book_n
+        self.line_n = line_n
 
     def successor(self):
-        return Locator(self.number + 1, "")
+        if self.line_n is None:
+            number = ""
+        else:
+            m = re.match(r'^(\d*).*$', self.line_n, flags=re.ASCII)
+            assert m is not None, self.line_n
+            number = m.group(1)
+        if not number:
+            number = "0"
+        number = str(int(number) + 1)
+        return Locator(book_n=self.book_n, line_n=number)
 
     def may_precede(self, other):
-        return (other.number == self.number + 1 and (other.letter == "" or other.letter == "a")) \
-            or (other.number == self.number and self.letter == "" and other.letter == "a") \
-            or (other.number == self.number and self.letter != "" and other.letter == chr(ord(self.letter) + 1))
+        """Is other a plausible line number to follow self?"""
+        self_book = self.book_n
+        self_number, self_extra = split_line_n(self.line_n)
+
+        other_book = other.book_n
+        other_number, other_extra = split_line_n(other.line_n)
+
+        if self_book != other_book:
+            # A new book means we start over at line "1" or "1a".
+            # Could additionally check that other_book == self_book + 1, in the
+            # case where both other_book and self_book represent integers.
+            return other_number == 1 and other_extra in ("", "a")
+        if self_number != other_number:
+            # Within the same book, line n should be followed by line n+1 or
+            # n+1"a".
+            return other_number == self_number + 1 and other_extra in ("", "a")
+        if self_extra == "":
+            # Line n may be followed by line n"a".
+            return other_extra == "a"
+        return len(self_extra) == 1 and len(other_extra) == 1 and other_extra == chr(ord(self_extra) + 1)
 
     def __str__(self):
-        return "{}{}".format(self.number, self.letter)
+        if self.book_n is None:
+            return "{}".format(self.line_n)
+        else:
+            return "{}.{}".format(self.book_n, self.line_n)
 
     def __repr__(self):
         return repr(str(self))
 
 class Line:
-    def __init__(self, n, text):
-        self.n = n
+    def __init__(self, loc, text):
+        self.book_n = loc.book_n
+        self.line_n = loc.line_n
         self.text = text
 
     def __str__(self):
@@ -74,18 +87,18 @@ class TEI:
         return self.soup.teiHeader.fileDesc.titleStmt.author.get_text()
 
     def lines(self):
-        line_n = NullLocator()
+        loc = Locator()
         partial = []
 
         def flush():
-            nonlocal line_n, partial
+            nonlocal loc, partial
             text = "".join(partial).strip()
             partial = []
             if text:
-                yield Line(line_n, text)
+                yield Line(loc, text)
 
         def do_elem(root):
-            nonlocal line_n, partial
+            nonlocal loc, partial
             for elem in root.children:
                 if type(elem) == bs4.element.Comment:
                     pass
@@ -103,16 +116,18 @@ class TEI:
                         if n is not None:
                             # If new new line is marked with a number, check it
                             # against the previous line.
-                            new_n = Locator.parse(n)
-                            if not line_n.may_precede(new_n):
-                                warn("after line {!r}, expected {!r}, got {!r}".format(line_n, line_n.successor(), n))
-                            line_n = new_n
+                            new_loc = Locator(book_n=loc.book_n, line_n=n)
+                            if not loc.may_precede(new_loc):
+                                warn("after line {!r}, expected {!r}, got {!r}".format(loc, loc.successor(), new_loc))
+                            loc = new_loc
                         else:
                             # If no line number is provided, guess based on the
                             # previous line number.
-                            line_n = line_n.successor()
-                    elif elem.name == "div1" and elem.get("type") == "Book":
-                        line_n = NullLocator()
+                            loc = loc.successor()
+                    elif elem.name == "div1":
+                        assert elem.get("type") == "Book"
+                        # Start counting from 1 at the beginning of a new book.
+                        loc = Locator(book_n=elem.get("n"))
 
                     if elem.name in ("milestone", "head", "gap"):
                         pass
@@ -121,6 +136,10 @@ class TEI:
                             yield x
                     else:
                         raise ValueError("don't understand element {!r}".format(elem.name))
+
+                    if elem.name == "div1":
+                        # At the end of a book, reset the counter to be safe.
+                        loc = Locator()
                 else:
                     partial.append(betacode.decode(elem))
             for x in flush():

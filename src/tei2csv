@@ -84,7 +84,8 @@ def process(f):
         for word_n, entry in enumerate(assign_sedes_for_line(line.text)):
             word, sedes, num_scansions = entry
             csv_w.writerow({
-                "line_n": line.n,
+                "book_n": line.book_n,
+                "line_n": line.line_n,
                 "word_n": word_n + 1,
                 "word": word,
                 "num_scansions": num_scansions,
