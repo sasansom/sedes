@@ -78,12 +78,13 @@ def assign_sedes_for_line(line):
         return tuple((word, "", len(scansions)) for word in re.findall("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", line))
 
 def process(f):
-    global csv_w
+    global csv_w, work_identifier
     doc = tei.TEI(f)
     for line in doc.lines():
         for word_n, entry in enumerate(assign_sedes_for_line(line.text)):
             word, sedes, num_scansions = entry
             csv_w.writerow({
+                "work": work_identifier,
                 "book_n": line.book_n,
                 "line_n": line.line_n,
                 "word_n": word_n + 1,
@@ -92,17 +93,16 @@ def process(f):
                 "sedes": sedes,
             })
 
-def input_files(args):
-    if len(args) == 0:
-        yield sys.stdin
-        return
-    for arg in args:
-        with open(arg) as f:
-            yield f
-
 csv_w = csv.DictWriter(sys.stdout, ["work", "book_n", "line_n", "word_n", "word", "num_scansions", "sedes"])
 csv_w.writeheader()
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "")
-for f in input_files(args):
+
+try:
+    work_identifier, input_filename = args
+except ValueError:
+    print("error: usage error", file=sys.stderr)
+    sys.exit(1)
+
+with open(input_filename) as f:
     process(f)
