@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+# Extracts words and their sedes from a TEI XML document and writes the words to
+# standard output as CSV, one row per word.
+#
+# Usage:
+#   tei2csv IDENTIFIER FILENAME.xml > FILENAME.csv
+# IDENTIFIER is a short text identifier for the work that will be copied to the
+# output; e.g., "Il.". FILENAME.xml is the name of the XML document containing
+# the text of the work.
+
 import csv
 import getopt
 import re
@@ -7,6 +16,14 @@ import sys
 
 import hexameter.scan
 import tei
+
+def usage(file=sys.stdout):
+    print("""\
+Usage: {} IDENTIFIER FILENAME.xml > FILENAME.csv
+
+IDENTIFIER is a short text identifier for the work; e.g., "Il.".
+FILENAME.XML is a TEI XML document containing the text of the work.
+""".format(sys.argv[0]), end="", file=file)
 
 def assign_sedes(scansion):
     """From a metrical scansion (sequence of (character cluster, preliminary
@@ -93,12 +110,18 @@ def process(f):
                 "sedes": sedes,
             })
 
-opts, args = getopt.gnu_getopt(sys.argv[1:], "")
+opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
+for o, a in opts:
+    if o in ("-h", "--help"):
+        usage()
+        sys.exit(0)
 
 try:
     work_identifier, input_filename = args
 except ValueError:
     print("error: usage error", file=sys.stderr)
+    print(file=sys.stderr)
+    usage(sys.stderr)
     sys.exit(1)
 
 csv_w = csv.DictWriter(sys.stdout, ["work", "book_n", "line_n", "word_n", "word", "num_scansions", "sedes"])

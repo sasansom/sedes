@@ -1,3 +1,5 @@
+# Extraction of lines and limited metadata from TEI (Text Encoding Initiative)
+# XML files.
 # https://tei-c.org/release/doc/tei-p5-doc/en/html/index.html
 
 import bs4
@@ -18,11 +20,14 @@ def split_line_n(line_n):
     return int(number), extra
 
 class Locator:
+    """A combination of a book (div1) number and a line number."""
+
     def __init__(self, book_n=None, line_n=None):
         self.book_n = book_n
         self.line_n = line_n
 
     def successor(self):
+        """Guess a line number to follow this one. Returns a new object."""
         if self.line_n is None:
             number = ""
         else:
@@ -66,6 +71,8 @@ class Locator:
         return repr(str(self))
 
 class Line:
+    """Line is a container for (book number, line number, text of line)."""
+
     def __init__(self, loc, text):
         self.book_n = loc.book_n
         self.line_n = loc.line_n
@@ -75,6 +82,8 @@ class Line:
         return "{} {!r}".format(self.n, self.text)
 
 class TEI:
+    """TEI represents a TEI document read from a file stream."""
+
     def __init__(self, f):
         self.soup = bs4.BeautifulSoup(f, "xml")
 
@@ -87,6 +96,14 @@ class TEI:
         return self.soup.teiHeader.fileDesc.titleStmt.author.get_text()
 
     def lines(self):
+        """Return an iterator over Lines extracted from the text of the TEI
+        document."""
+
+        # Internally this function works using recursion in the do_elem
+        # function. The current line number (loc), and the partial contents of
+        # the current line (partial) are shared in the environment common to all
+        # recursive class. The flush function is called at the end of a line to
+        # yield a line to the caller.
         loc = Locator()
         partial = []
 
