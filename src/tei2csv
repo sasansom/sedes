@@ -93,9 +93,6 @@ def process(f):
                 "sedes": sedes,
             })
 
-csv_w = csv.DictWriter(sys.stdout, ["work", "book_n", "line_n", "word_n", "word", "num_scansions", "sedes"])
-csv_w.writeheader()
-
 opts, args = getopt.gnu_getopt(sys.argv[1:], "")
 
 try:
@@ -104,5 +101,7 @@ except ValueError:
     print("error: usage error", file=sys.stderr)
     sys.exit(1)
 
+csv_w = csv.DictWriter(sys.stdout, ["work", "book_n", "line_n", "word_n", "word", "num_scansions", "sedes"])
+csv_w.writeheader()
 with open(input_filename) as f:
     process(f)
