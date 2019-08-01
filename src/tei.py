@@ -90,6 +90,11 @@ class TEI:
                 if type(elem) == bs4.element.Comment:
                     pass
                 elif type(elem) == bs4.element.Tag:
+                    # Lines may be marked up as
+                    #   <l>text text text</l>
+                    #   <lb/>text text text
+                    # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
+                    # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
                     if elem.name in ("l", "lb"):
                         # Output previous line.
                         for x in flush():
