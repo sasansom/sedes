@@ -8,7 +8,10 @@ Metrical position in Greek hexameter.
 The "src" subdirectory contains a `tei2csv` program
 that processes a TEI-encoded XML document as downloaded from Perseus
 and produces a CSV file that annotates every word with
-its line number and sedes.
+its line number and sedes. For example:
+```
+./src/tei2csv "Il." corpus/iliad.xml > corpus/iliad.csv
+```
 
 The "src/hexameter" subdirectory contains a Python module
 that we use for metrical analysis.
@@ -33,8 +36,8 @@ make
 The above command will produce a file `all.csv` that contains
 every word in every work, annotated with its work, line number, and sedes.
 
-If you do not have GNU Make, you can analyze texts into separate CSV files.
-For example:
+If you do not have GNU Make, the script `make.sh` runs the
+same commands as `make` would:
 ```
-./src/tei2csv Il. corpus/iliad.xml > corpus/iliad.csv
+./make.sh
 ```
