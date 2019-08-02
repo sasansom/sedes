@@ -14,5 +14,5 @@ src/tei2csv "Theog." corpus/theogony.xml > corpus/theogony.csv
 src/tei2csv "WD" corpus/worksanddays.xml > corpus/worksanddays.csv
 
 WORKS_CSV="$(for work in $WORKS; do echo "corpus/$work.csv"; done)"
-(sed -n -e '1p' corpus/homerichymns.csv; sed -e '1d' $WORKS_CSV) > all.csv
+(sed -n -e '1p' corpus/homerichymns.csv; for x in $WORKS_CSV; do sed -e '1d' $x; done) > all.csv
 rm -f $(for work in $WORKS; do echo "corpus/$work.csv"; done)
