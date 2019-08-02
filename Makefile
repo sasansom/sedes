@@ -9,7 +9,7 @@ WORKS = \
 WORKS_CSV = $(addprefix corpus/,$(addsuffix .csv,$(WORKS)))
 
 all.csv: $(WORKS_CSV)
-	(head -q -n 1 "$<"; tail -q -n +2 $^) > "$@"
+	(sed -n -e '1p' "$<"; sed -e '1d' $^) > "$@"
 
 corpus/homerichymns.csv: WORK_IDENTIFIER = Hymns
 corpus/iliad.csv:        WORK_IDENTIFIER = Il.
