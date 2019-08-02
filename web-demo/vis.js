@@ -7,6 +7,7 @@ const ALL_STYLES = [
 
 const BOOL_GRID = document.getElementById("bool-grid");
 const GROUP_STYLE = document.getElementById("group-style");
+const GRID_MARKERS = document.getElementById("gridmarkers");
 const TEXT = document.getElementById("text");
 
 function setClass(elem, className, cond) {
@@ -19,8 +20,10 @@ function setClass(elem, className, cond) {
 
 BOOL_GRID.addEventListener("change", event => {
   setClass(TEXT, "grid", event.target.checked);
+  setClass(GRID_MARKERS, "visible", event.target.checked);
 });
 setClass(TEXT, "grid", BOOL_GRID.checked);
+setClass(GRID_MARKERS, "visible", BOOL_GRID.checked);
 
 GROUP_STYLE.addEventListener("change", event => {
   TEXT.classList.remove(...ALL_STYLES);
