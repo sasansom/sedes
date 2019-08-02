@@ -48,17 +48,16 @@ def assign_sedes(scansion):
         scansion += ((" ", "", ""),)
 
     for c, _, value in scansion:
-        # Single quotation marks (used for elision) should be considered
-        # part of the previous word.
-        while c.startswith("’"):
-            word.append(c[:1])
-            c = c[1:]
+        word.append(c)
         if " " in c:
             assert value == "", value
             assert word, word
-            # Append the current word to the list of words that share the
-            # current sedes.
-            words.append("".join(word))
+            # Trim punctuation and spaces from the current word and append it to
+            # the list of words that share the current sedes.
+            word = "".join(word)
+            word = re.sub("^[^\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]*", "", word)
+            word = re.sub("[^\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]*$", "", word)
+            words.append(word)
             if word_sedes is not None:
                 # Once we know the sedes, output all the words seen since the
                 # last time we saw a sedes.
@@ -67,8 +66,6 @@ def assign_sedes(scansion):
                 words = []
             word = []
             word_sedes = None
-        else:
-            word.append(c)
 
         # If it's a vowel with a sedes value, advance the sedes counter.
         if value == "-":
