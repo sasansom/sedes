@@ -81,6 +81,9 @@ def assign_sedes(scansion):
     assert word_sedes is None, word_sedes
     return tuple(result)
 
+def extract_words(s):
+    return re.findall("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", s)
+
 def assign_sedes_for_line(line):
     """From a line, return a sequence of (word, sedes, num_scansions) tuples.
     sedes will be non-blank if and only if num_scansions is equal to 1."""
@@ -89,7 +92,7 @@ def assign_sedes_for_line(line):
         return tuple((word, sedes, len(scansions)) for (word, sedes) in assign_sedes(scansions[0]))
     else:
         # If no scansions or multiple scansions, output "".
-        return tuple((word, "", len(scansions)) for word in re.findall("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", line))
+        return tuple((word, "", len(scansions)) for word in extract_words(line))
 
 def process(f):
     global csv_w, work_identifier
