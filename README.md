@@ -41,3 +41,29 @@ same commands as `make` would:
 ```
 ./make.sh
 ```
+
+
+## Data format
+
+The output of `tei2csv` is
+[CSV](https://en.wikipedia.org/wiki/Comma-separated_values)
+that may be imported into a spreadsheet or further processed
+by another program.
+
+Greek text is represented as UTF-8 Unicode text.
+Characters are stored in decomposed form using
+[Normalization Form D (NFD)](https://jktauber.com/articles/python-unicode-ancient-greek/#normalization);
+this means that diacritics are separate
+combining characters.
+For example, the word ἀοιδή is stored as the sequence of characters
+```
+U+03B1 GREEK SMALL LETTER ALPHA
+U+0313 COMBINING COMMA ABOVE
+U+03BF GREEK SMALL LETTER OMICRON
+U+03B9 GREEK SMALL LETTER IOTA
+U+03B4 GREEK SMALL LETTER DELTA
+U+03B7 GREEK SMALL LETTER ETA
+U+0301 COMBINING ACUTE ACCENT
+```
+After UTF-8 encoding, this sequence is
+`\xce\xb1\xcc\x93\xce\xbf\xce\xb9\xce\xb4\xce\xb7\xcc\x81`.
