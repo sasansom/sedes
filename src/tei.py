@@ -3,6 +3,7 @@
 # https://tei-c.org/release/doc/tei-p5-doc/en/html/index.html
 
 import bs4
+import copy
 import re
 import sys
 
@@ -73,13 +74,22 @@ class Locator:
 class Line:
     """Line is a container for (book number, line number, text of line)."""
 
-    def __init__(self, loc, text):
-        self.book_n = loc.book_n
-        self.line_n = loc.line_n
+    def __init__(self, env, line_n, text):
+        self.book_n = env.book_n
+        self.line_n = line_n
         self.text = text
 
     def __str__(self):
         return "{} {!r}".format(Locator(self.book_n, self.line_n), self.text)
+
+class Environment:
+    """Environment represents the context of a call to TEI.do_elem."""
+
+    def __init__(self):
+        self.book_n = None
+
+    def copy(self):
+        return copy.copy(self)
 
 class TEI:
     """TEI represents a TEI document read from a file stream."""
@@ -100,23 +110,34 @@ class TEI:
         document."""
 
         # Internally this function works using recursion in the do_elem
-        # function. The current line number (loc), and the partial contents of
-        # the current line (partial) are shared in the environment common to all
-        # recursive class. The flush function is called at the end of a line to
-        # yield a line to the caller.
-        loc = Locator()
+        # function. The current line number (line_n), and the partial contents
+        # of the current line (partial) are shared in common across all calls,
+        # in contrast to the Environment (env), which belongs to one call. The
+        # flush function is called at the end of a line to yield a line to the
+        # caller.
+        line_n = None
         partial = []
 
-        def flush():
-            nonlocal loc, partial
-            text = "".join(partial).strip()
-            partial = []
-            if text:
-                yield Line(loc, text)
+        def flush(env):
+            """Yield the lines represented by the current partial list and clear
+            the list."""
+            nonlocal line_n, partial
 
-        def do_elem(root):
-            nonlocal loc, partial
+            text = "".join(partial).strip()
+            partial.clear()
+            if text:
+                yield Line(env, line_n, text)
+
+        def do_elem(root, env):
+            nonlocal line_n, partial
+
             for elem in root.children:
+                # Make a copy of the environment to pass to recursive calls to
+                # do_elem. This allows them to know, for example, what book_n
+                # they're in, while enabling us to remember the environment
+                # before the call.
+                sub_env = env.copy()
+
                 if type(elem) == bs4.element.Comment:
                     pass
                 elif type(elem) == bs4.element.Tag:
@@ -127,40 +148,43 @@ class TEI:
                     # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
                     if elem.name in ("l", "lb"):
                         # Output previous line.
-                        for x in flush():
+                        for x in flush(env):
                             yield x
+                        cur_loc = Locator(env.book_n, line_n)
                         n = elem.get("n")
                         if n is not None:
                             # If the new line is marked with a number, check it
                             # against the previous line.
-                            new_loc = Locator(book_n=loc.book_n, line_n=n)
-                            if not loc.may_precede(new_loc):
-                                warn("after line {!r}, expected {!r}, got {!r}".format(loc, loc.successor(), new_loc))
-                            loc = new_loc
+                            new_loc = Locator(env.book_n, n)
+                            if not cur_loc.may_precede(new_loc):
+                                warn("after line {!r}, expected {!r}, got {!r}".format(cur_loc, cur_loc.successor(), new_loc))
                         else:
                             # If no line number is provided, guess based on the
                             # previous line number.
-                            loc = loc.successor()
+                            new_loc = cur_loc.successor()
+                        assert env.book_n == new_loc.book_n
+                        line_n = new_loc.line_n
                     elif elem.name == "div1":
                         assert elem.get("type") in ("Book", "Hymn")
-                        # Start counting from 1 at the beginning of a new book.
-                        loc = Locator(book_n=elem.get("n"))
+                        sub_env.book_n = elem.get("n")
+                        # Reset the line counter at the beginning of a new book.
+                        line_n = None
 
                     if elem.name in ("milestone", "head", "gap"):
                         pass
                     elif elem.name in ("div1", "div2", "l", "lb", "p", "q", "sp", "add", "del"):
-                        for x in do_elem(elem):
+                        for x in do_elem(elem, sub_env):
                             yield x
                     else:
                         raise ValueError("don't understand element {!r}".format(elem.name))
 
                     if elem.name == "div1":
-                        # At the end of a book, reset the counter to be safe.
-                        loc = Locator()
+                        # At the end of a book, reset the line counter to be safe.
+                        line_n = None
                 else:
                     partial.append(betacode.decode(elem))
-            for x in flush():
+            for x in flush(env):
                 yield x
 
-        for x in do_elem(self.soup.find("text").body):
+        for x in do_elem(self.soup.find("text").body, Environment()):
             yield x
