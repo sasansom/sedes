@@ -79,7 +79,7 @@ class Line:
         self.text = text
 
     def __str__(self):
-        return "{} {!r}".format(self.n, self.text)
+        return "{} {!r}".format(Locator(self.book_n, self.line_n), self.text)
 
 class TEI:
     """TEI represents a TEI document read from a file stream."""
