@@ -131,7 +131,7 @@ class TEI:
                             yield x
                         n = elem.get("n")
                         if n is not None:
-                            # If new new line is marked with a number, check it
+                            # If the new line is marked with a number, check it
                             # against the previous line.
                             new_loc = Locator(book_n=loc.book_n, line_n=n)
                             if not loc.may_precede(new_loc):
