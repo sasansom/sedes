@@ -43,7 +43,7 @@
 .shade-text span.sedes span.word.t81 { color: hsl(0, 0%, 93%); }
 .shade-text span.sedes span.word.t82 { color: hsl(0, 0%, 94%); }
 .shade-text span.sedes span.word.t83 { color: hsl(0, 0%, 95%); }
-.shade-text span.sedes span.word.tunknown { color: hsl(0, 0%, 50%); }
+.shade-text span.sedes span.word.tunknown { color: firebrick; }
 
 .shade-bubbles span.word {
 	--r: 2.5rem; /* radius of 100% circle */
@@ -97,7 +97,7 @@
 .shade-bubbles span.sedes span.word.t81::before { background-color: hsl(0, 0%, 98%); }
 .shade-bubbles span.sedes span.word.t82::before { background-color: hsl(0, 0%, 99%); }
 .shade-bubbles span.sedes span.word.t83::before { background-color: hsl(0, 0%, 100%); }
-.shade-bubbles span.sedes span.word.tunknown::before { background-color: hsl(0, 0%, 50%); }
+.shade-bubbles span.sedes span.word.tunknown::before { background-color: firebrick; }
 .shade-bubbles span.word::before {
 	--s: 1.5rem;
 	position: absolute;
@@ -163,7 +163,7 @@
 .size-bubbles span.sedes span.word.t81::before { --s: calc(var(--r) * 0.220); }
 .size-bubbles span.sedes span.word.t82::before { --s: calc(var(--r) * 0.160); }
 .size-bubbles span.sedes span.word.t83::before { --s: calc(var(--r) * 0.052); }
-.size-bubbles span.sedes span.word.tunknown::before { --s: calc(var(--r) * 0.707); }
+.size-bubbles span.sedes span.word.tunknown::before { --s: calc(var(--r) * 0.707); background-color: firebrick; }
 .size-bubbles span.word::before {
 	position: absolute;
 	background-color: orange;
