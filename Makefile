@@ -21,4 +21,22 @@ corpus/worksanddays.csv: WORK_IDENTIFIER = WD
 	src/tei2csv "$(WORK_IDENTIFIER)" "$<" > "$@"
 .INTERMEDIATE: $(WORKS_CSV)
 
+.PHONY: fonts
+fonts: \
+	web-demo/fonts/SIL\ Open\ Font\ License.txt \
+	web-demo/fonts/Cardo-Regular.woff \
+	web-demo/fonts/Cardo-Italic.woff \
+	web-demo/fonts/Cardo-Bold.woff
+
+web-demo/fonts/SIL\ Open\ Font\ License.txt: fonts/cardo.zip
+	unzip -D -o "$<" "$(notdir $@)"
+	mv -f "$(notdir $@)" "$@"
+
+%.ttf: fonts/cardo.zip
+	unzip -D -o "$<" "$(notdir $@)"
+
+web-demo/fonts/%.woff: %.ttf
+	mkdir -p web-demo/fonts
+	fontforge -lang ff -script fonts/subset-greek.ff "$<" "$@"
+
 .DELETE_ON_ERROR:

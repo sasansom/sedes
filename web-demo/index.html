@@ -18,7 +18,32 @@ body {
 	background-color: papayawhip;
 	margin-bottom: 0.5rem;
 }
+@font-face {
+	font-family: "Cardo";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: local("Cardo Regular"), local("Cardo-Regular"), url(fonts/Cardo-Regular.woff) format("woff2");
+	unicode-range: U+0370-03FF, U+1F00-1FFF;
+}
+@font-face {
+	font-family: "Cardo";
+	font-style: italic;
+	font-weight: 400;
+	font-display: swap;
+	src: local("Cardo Italic"), local("Cardo-Italic"), url(fonts/Cardo-Italic.woff) format("woff2");
+	unicode-range: U+0370-03FF, U+1F00-1FFF;
+}
+@font-face {
+	font-family: "Cardo";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: local("Cardo Bold"), local("Cardo-Bold"), url(fonts/Cardo-Bold.woff) format("woff2");
+	unicode-range: U+0370-03FF, U+1F00-1FFF;
+}
 #text {
+	font-family: "Cardo";
 	margin-top: 3rem;
 	margin-bottom: 3rem;
 	white-space: nowrap;
@@ -26,7 +51,6 @@ body {
 #text, #gridmarkers {
 	font-size: 120%;
 	line-height: 140%;
-	font-weight: bold;
 }
 #gridmarkers {
 	color: gray;

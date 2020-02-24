@@ -1,0 +1,10 @@
+# Subset a font to Greek letters.
+# fontforge -lang ff -script subset-greek.ff input.ttf output.woff
+Open($1)
+SelectNone();
+SelectMore(0u0370, 0u03ff); # Greek and Coptic
+SelectMore(0u1f00, 0u1fff); # Greek Extended
+SelectInvert();
+DetachAndRemoveGlyphs();
+Generate($2);
+Quit(0);
