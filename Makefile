@@ -25,7 +25,7 @@ PYTHON = python3
 
 .PHONY: test
 test:
-	(cd src && "$(PYTHON)" -m unittest betacode)
+	(cd src && "$(PYTHON)" -m unittest)
 
 .PHONY: fonts
 fonts: \
