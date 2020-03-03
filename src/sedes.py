@@ -20,7 +20,7 @@ def assign(scansion):
     words = []
     # Buffer of metrical shapes seen up until a sedes after a word break.
     shapes = []
-    sedes = 0.0
+    sedes = 1.0
 
     # Append a dummy word break at the end of the line, as a sentinel to output
     # the final group of words sharing a sedes.
@@ -53,15 +53,16 @@ def assign(scansion):
             shape = []
             word_sedes = None
 
+        if (value == "-" or value == "+") and word_sedes is None:
+            # The first vowel in a word, remember the sedes for the whole word.
+            word_sedes = sedes
         # If it's a vowel with a sedes value, advance the sedes counter.
         if value == "-":
             sedes += 0.5
         elif value == "+":
             sedes += 1.0
-        if (value == "-" or value == "+") and word_sedes is None:
-            # The first vowel in a word, remember the sedes for the whole word.
-            word_sedes = sedes
-    assert sedes == 12.0, sedes
+
+    assert sedes == 13.0, sedes
     assert not word, word
     assert not words, words
     assert word_sedes is None, word_sedes
