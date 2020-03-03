@@ -21,6 +21,12 @@ corpus/worksanddays.csv: WORK_IDENTIFIER = WD
 	src/tei2csv "$(WORK_IDENTIFIER)" "$<" > "$@"
 .INTERMEDIATE: $(WORKS_CSV)
 
+PYTHON = python3
+
+.PHONY: test
+test:
+	(cd src && "$(PYTHON)" -m unittest betacode)
+
 .PHONY: fonts
 fonts: \
 	web-demo/fonts/SIL\ Open\ Font\ License.txt \
