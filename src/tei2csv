@@ -34,17 +34,17 @@ def assign_sedes_for_line(line):
     sedes will be non-blank if and only if num_scansions is equal to 1."""
     scansions = hexameter.scan.analyze_line_metrical(line)
     if len(scansions) == 1:
-        return tuple((word, sedes, len(scansions)) for (word, sedes) in sedes.assign(scansions[0]))
+        return tuple((word, sedes, shape, len(scansions)) for (word, sedes, shape) in sedes.assign(scansions[0]))
     else:
         # If no scansions or multiple scansions, output "".
-        return tuple((word, "", len(scansions)) for word in extract_words(line))
+        return tuple((word, "", "", len(scansions)) for word in extract_words(line))
 
 def process(f):
     global csv_w, work_identifier
     doc = tei.TEI(f)
     for line in doc.lines():
         for word_n, entry in enumerate(assign_sedes_for_line(line.text)):
-            word, sedes, num_scansions = entry
+            word, sedes, shape, num_scansions = entry
             csv_w.writerow({
                 "work": work_identifier,
                 "book_n": line.book_n,
@@ -53,6 +53,7 @@ def process(f):
                 "word": word,
                 "num_scansions": num_scansions,
                 "sedes": sedes,
+                "metrical_shape": shape,
             })
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
@@ -71,7 +72,7 @@ except ValueError:
 
 csv_w = csv.DictWriter(
     sys.stdout,
-    ["work", "book_n", "line_n", "word_n", "word", "num_scansions", "sedes"],
+    ["work", "book_n", "line_n", "word_n", "word", "num_scansions", "sedes", "metrical_shape"],
     lineterminator="\n",
 )
 csv_w.writeheader()
