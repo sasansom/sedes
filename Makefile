@@ -17,6 +17,7 @@ corpus/callimachushymns.csv: WORK_IDENTIFIER = Callim. Hymn
 corpus/homerichymns.csv: WORK_IDENTIFIER = Hymns
 corpus/iliad.csv:        WORK_IDENTIFIER = Il.
 corpus/odyssey.csv:      WORK_IDENTIFIER = Od.
+corpus/quintussmyrnaeus  WORK_IDENTIFIER = Quint. Smyrn.
 corpus/shield.csv:       WORK_IDENTIFIER = Shield
 corpus/theogony.csv:     WORK_IDENTIFIER = Theog.
 corpus/theocritus.csv:   WORK_IDENTIFIER = Theoc.
