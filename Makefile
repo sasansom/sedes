@@ -18,6 +18,7 @@ corpus/iliad.csv:        WORK_IDENTIFIER = Il.
 corpus/odyssey.csv:      WORK_IDENTIFIER = Od.
 corpus/shield.csv:       WORK_IDENTIFIER = Shield
 corpus/theogony.csv:     WORK_IDENTIFIER = Theog.
+corpus/theocritus.csv:   WORK_IDENTIFIER = Theoc.
 corpus/worksanddays.csv: WORK_IDENTIFIER = WD
 %.csv: %.xml
 	src/tei2csv "$(WORK_IDENTIFIER)" "$<" > "$@"
