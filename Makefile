@@ -12,6 +12,7 @@ all.csv: $(WORKS_CSV)
 	(sed -n -e '1p' "$<"; for x in $^; do sed -e '1d' $$x; done) > "$@"
 
 corpus/argonautica.csv:  WORK_IDENTIFIER = Argon.
+corpus/callimachushymns.csv: WORK_IDENTIFIER = Callim. Hymn
 corpus/homerichymns.csv: WORK_IDENTIFIER = Hymns
 corpus/iliad.csv:        WORK_IDENTIFIER = Il.
 corpus/odyssey.csv:      WORK_IDENTIFIER = Od.
