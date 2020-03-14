@@ -165,7 +165,7 @@ class TEI:
                         assert env.book_n == new_loc.book_n
                         line_n = new_loc.line_n
                     elif elem.name == "div1":
-                        assert elem.get("type") in ("Book", "Hymn")
+                        assert elem.get("type").lower() in ("book", "hymn"), elem.get("type")
                         sub_env.book_n = elem.get("n")
                         # Reset the line counter at the beginning of a new book.
                         line_n = None
