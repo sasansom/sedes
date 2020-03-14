@@ -15,6 +15,8 @@ def warn(msg):
 def split_line_n(line_n):
     """Split a line number string into an (integer, everything else) pair. A
     line_n of None is treated as an empty string."""
+    if line_n is None:
+        return None, None
     m = re.match(r'^(\d*)(.*)$', line_n or "", flags=re.ASCII)
     assert m is not None, line_n
     number, extra = m.groups()
@@ -48,11 +50,11 @@ class Locator:
         other_book = other.book_n
         other_number, other_extra = split_line_n(other.line_n)
 
-        if self_book != other_book:
+        if self_number is None or self_book != other_book:
             # A new book means we start over at line "1" or "1a".
             # Could additionally check that other_book == self_book + 1, in the
             # case where both other_book and self_book represent integers.
-            return other_number == 1 and other_extra in ("", "a")
+            return other_number is None or (other_number == 1 and other_extra in ("", "a"))
         if self_number != other_number:
             # Within the same book, line n should be followed by line n+1 or
             # n+1"a".
