@@ -184,6 +184,8 @@ class TEI:
                         # At the end of a book, reset the line counter to be safe.
                         line_n = None
                 else:
+                    if "?" in elem:
+                        raise ValueError("\"?\" not allowed in beta code; see https://github.com/sasansom/sedes/issues/11")
                     partial.append(betacode.decode(elem))
             for x in flush(env):
                 yield x
