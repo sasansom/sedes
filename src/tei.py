@@ -172,7 +172,7 @@ class TEI:
                         # Reset the line counter at the beginning of a new book.
                         line_n = None
 
-                    if elem.name in ("milestone", "head", "gap", "pb", "note"):
+                    if elem.name in ("milestone", "head", "gap", "pb", "note", "speaker"):
                         pass
                     elif elem.name in ("div1", "div2", "l", "lb", "p", "q", "sp", "add", "del", "name"):
                         for x in do_elem(elem, sub_env):
