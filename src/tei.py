@@ -15,6 +15,8 @@ def warn(msg):
 def split_line_n(line_n):
     """Split a line number string into an (integer, everything else) pair. A
     line_n of None is treated as an empty string."""
+    if line_n is None:
+        return None, None
     m = re.match(r'^(\d*)(.*)$', line_n or "", flags=re.ASCII)
     assert m is not None, line_n
     number, extra = m.groups()
@@ -48,11 +50,11 @@ class Locator:
         other_book = other.book_n
         other_number, other_extra = split_line_n(other.line_n)
 
-        if self_book != other_book:
+        if self_number is None or self_book != other_book:
             # A new book means we start over at line "1" or "1a".
             # Could additionally check that other_book == self_book + 1, in the
             # case where both other_book and self_book represent integers.
-            return other_number == 1 and other_extra in ("", "a")
+            return other_number is None or (other_number == 1 and other_extra in ("", "a"))
         if self_number != other_number:
             # Within the same book, line n should be followed by line n+1 or
             # n+1"a".
@@ -165,14 +167,14 @@ class TEI:
                         assert env.book_n == new_loc.book_n
                         line_n = new_loc.line_n
                     elif elem.name == "div1":
-                        assert elem.get("type") in ("Book", "Hymn")
+                        assert elem.get("type").lower() in ("book", "hymn"), elem.get("type")
                         sub_env.book_n = elem.get("n")
                         # Reset the line counter at the beginning of a new book.
                         line_n = None
 
-                    if elem.name in ("milestone", "head", "gap"):
+                    if elem.name in ("milestone", "head", "gap", "pb", "note"):
                         pass
-                    elif elem.name in ("div1", "div2", "l", "lb", "p", "q", "sp", "add", "del"):
+                    elif elem.name in ("div1", "div2", "l", "lb", "p", "q", "sp", "add", "del", "name"):
                         for x in do_elem(elem, sub_env):
                             yield x
                     else:
@@ -182,6 +184,8 @@ class TEI:
                         # At the end of a book, reset the line counter to be safe.
                         line_n = None
                 else:
+                    if "?" in elem:
+                        raise ValueError("\"?\" not allowed in beta code; see https://github.com/sasansom/sedes/issues/11")
                     partial.append(betacode.decode(elem))
             for x in flush(env):
                 yield x
