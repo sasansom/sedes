@@ -1,8 +1,14 @@
 WORKS = \
+	aratus \
+	argonautica \
+	callimachushymns \
 	homerichymns \
  	iliad \
+	nonnusdionysiaca \
  	odyssey \
+	quintussmyrnaeus \
  	shield \
+	theocritus \
  	theogony \
  	worksanddays \
 
@@ -20,8 +26,8 @@ corpus/nonnusdionysiaca.csv: WORK_IDENTIFIER = Dion.
 corpus/odyssey.csv:      WORK_IDENTIFIER = Od.
 corpus/quintussmyrnaeus.csv: WORK_IDENTIFIER = Quint. Smyrn.
 corpus/shield.csv:       WORK_IDENTIFIER = Shield
-corpus/theogony.csv:     WORK_IDENTIFIER = Theog.
 corpus/theocritus.csv:   WORK_IDENTIFIER = Theoc.
+corpus/theogony.csv:     WORK_IDENTIFIER = Theog.
 corpus/worksanddays.csv: WORK_IDENTIFIER = WD
 %.csv: %.xml
 	src/tei2csv "$(WORK_IDENTIFIER)" "$<" > "$@"
