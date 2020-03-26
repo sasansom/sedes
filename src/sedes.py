@@ -1,4 +1,17 @@
 import re
+import unicodedata
+
+import hexameter.scan
+
+from known import KNOWN_SCANSIONS
+# Normalize Unicode in KNOWN_SCANSIONS.
+KNOWN_SCANSIONS = dict(
+    (
+        unicodedata.normalize("NFD", key),
+        tuple((unicodedata.normalize("NFD", word), shape) for (word, shape) in value),
+    )
+    for key, value in KNOWN_SCANSIONS.items()
+)
 
 def assign(scansion):
     """From a metrical scansion (sequence of (character cluster, preliminary
@@ -68,5 +81,24 @@ def assign(scansion):
     assert word_sedes is None, word_sedes
     return tuple(result)
 
+def recover_known(known):
+    """Recovers a sequence of (word, sedes, shape) from a sequence of (word,
+    shape)."""
+    sedes = 1.0
+    result = []
+    for (word, shape) in known:
+        result.append((word, "{:g}".format(sedes), shape))
+        for value in shape:
+            if value == "-":
+                sedes += 0.5
+            elif value == "+":
+                sedes += 1.0
+    return tuple(result)
+
 def analyze(text):
+    # First check if this is a hard-coded override.
+    known = KNOWN_SCANSIONS.get(text)
+    if known is not None:
+        return (recover_known(known),)
+    # Otherwise analyze it.
     return tuple(assign(scansion) for scansion in hexameter.scan.analyze_line_metrical(text))
