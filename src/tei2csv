@@ -14,7 +14,6 @@ import getopt
 import re
 import sys
 
-import hexameter.scan
 import sedes
 import tei
 
@@ -32,12 +31,12 @@ def extract_words(s):
 def assign_sedes_for_line(line):
     """From a line, return a sequence of (word, sedes, num_scansions) tuples.
     sedes will be non-blank if and only if num_scansions is equal to 1."""
-    scansions = hexameter.scan.analyze_line_metrical(line)
-    if len(scansions) == 1:
-        return tuple((word, sedes, shape, len(scansions)) for (word, sedes, shape) in sedes.assign(scansions[0]))
+    assignments = sedes.analyze(line)
+    if len(assignments) == 1:
+        return tuple((word, sedes, shape, len(assignments)) for (word, sedes, shape) in assignments[0])
     else:
         # If no scansions or multiple scansions, output "".
-        return tuple((word, "", "", len(scansions)) for word in extract_words(line))
+        return tuple((word, "", "", len(assignments)) for word in extract_words(line))
 
 def process(f):
     global csv_w, work_identifier

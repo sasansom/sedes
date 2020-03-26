@@ -67,3 +67,6 @@ def assign(scansion):
     assert not words, words
     assert word_sedes is None, word_sedes
     return tuple(result)
+
+def analyze(text):
+    return tuple(assign(scansion) for scansion in hexameter.scan.analyze_line_metrical(text))
