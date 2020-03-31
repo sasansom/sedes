@@ -19,12 +19,12 @@ all.csv: $(WORKS_CSV)
 
 corpus/aratus.csv:       WORK_IDENTIFIER = Aratus
 corpus/argonautica.csv:  WORK_IDENTIFIER = Argon.
-corpus/callimachushymns.csv: WORK_IDENTIFIER = Callim. Hymn
-corpus/homerichymns.csv: WORK_IDENTIFIER = Hymns
+corpus/callimachushymns.csv: WORK_IDENTIFIER = Callim.Hymn
+corpus/homerichymns.csv: WORK_IDENTIFIER = Hom.Hymn
 corpus/iliad.csv:        WORK_IDENTIFIER = Il.
 corpus/nonnusdionysiaca.csv: WORK_IDENTIFIER = Dion.
 corpus/odyssey.csv:      WORK_IDENTIFIER = Od.
-corpus/quintussmyrnaeus.csv: WORK_IDENTIFIER = Quint. Smyrn.
+corpus/quintussmyrnaeus.csv: WORK_IDENTIFIER = Quint.Smyrn.
 corpus/shield.csv:       WORK_IDENTIFIER = Shield
 corpus/theocritus.csv:   WORK_IDENTIFIER = Theoc.
 corpus/theogony.csv:     WORK_IDENTIFIER = Theog.
