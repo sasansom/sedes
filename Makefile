@@ -24,11 +24,11 @@ corpus/homerichymns.csv: WORK_IDENTIFIER = Hom.Hymn
 corpus/iliad.csv:        WORK_IDENTIFIER = Il.
 corpus/nonnusdionysiaca.csv: WORK_IDENTIFIER = Dion.
 corpus/odyssey.csv:      WORK_IDENTIFIER = Od.
-corpus/quintussmyrnaeus.csv: WORK_IDENTIFIER = QS
-corpus/shield.csv:       WORK_IDENTIFIER = Shield
+corpus/quintussmyrnaeus.csv: WORK_IDENTIFIER = Q.S.
+corpus/shield.csv:       WORK_IDENTIFIER = Sh.
 corpus/theocritus.csv:   WORK_IDENTIFIER = Theoc.
 corpus/theogony.csv:     WORK_IDENTIFIER = Theog.
-corpus/worksanddays.csv: WORK_IDENTIFIER = WD
+corpus/worksanddays.csv: WORK_IDENTIFIER = W.D.
 %.csv: %.xml
 	src/tei2csv "$(WORK_IDENTIFIER)" "$<" > "$@"
 .INTERMEDIATE: $(WORKS_CSV)
