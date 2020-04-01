@@ -17,7 +17,7 @@ WORKS_CSV = $(addprefix corpus/,$(addsuffix .csv,$(WORKS)))
 all.csv: $(WORKS_CSV)
 	(sed -n -e '1p' "$<"; for x in $^; do sed -e '1d' $$x; done) > "$@"
 
-corpus/aratus.csv:       WORK_IDENTIFIER = Aratus
+corpus/aratus.csv:       WORK_IDENTIFIER = Phaen.
 corpus/argonautica.csv:  WORK_IDENTIFIER = Argon.
 corpus/callimachushymns.csv: WORK_IDENTIFIER = Callim.Hymn
 corpus/homerichymns.csv: WORK_IDENTIFIER = Hom.Hymn
