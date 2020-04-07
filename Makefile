@@ -12,25 +12,26 @@ WORKS = \
  	theogony \
  	worksanddays \
 
+WORK_IDENTIFIER_aratus           = Phaen.
+WORK_IDENTIFIER_argonautica      = Argon.
+WORK_IDENTIFIER_callimachushymns = Callim.Hymn
+WORK_IDENTIFIER_homerichymns     = Hom.Hymn
+WORK_IDENTIFIER_iliad            = Il.
+WORK_IDENTIFIER_nonnusdionysiaca = Dion.
+WORK_IDENTIFIER_odyssey          = Od.
+WORK_IDENTIFIER_quintussmyrnaeus = Q.S.
+WORK_IDENTIFIER_shield           = Sh.
+WORK_IDENTIFIER_theocritus       = Theoc.
+WORK_IDENTIFIER_theogony         = Theog.
+WORK_IDENTIFIER_worksanddays     = W.D.
+
 WORKS_CSV = $(addprefix corpus/,$(addsuffix .csv,$(WORKS)))
 
 all.csv: $(WORKS_CSV)
 	(sed -n -e '1p' "$<"; for x in $^; do sed -e '1d' $$x; done) > "$@"
 
-corpus/aratus.csv:       WORK_IDENTIFIER = Phaen.
-corpus/argonautica.csv:  WORK_IDENTIFIER = Argon.
-corpus/callimachushymns.csv: WORK_IDENTIFIER = Callim.Hymn
-corpus/homerichymns.csv: WORK_IDENTIFIER = Hom.Hymn
-corpus/iliad.csv:        WORK_IDENTIFIER = Il.
-corpus/nonnusdionysiaca.csv: WORK_IDENTIFIER = Dion.
-corpus/odyssey.csv:      WORK_IDENTIFIER = Od.
-corpus/quintussmyrnaeus.csv: WORK_IDENTIFIER = Q.S.
-corpus/shield.csv:       WORK_IDENTIFIER = Sh.
-corpus/theocritus.csv:   WORK_IDENTIFIER = Theoc.
-corpus/theogony.csv:     WORK_IDENTIFIER = Theog.
-corpus/worksanddays.csv: WORK_IDENTIFIER = W.D.
-%.csv: %.xml
-	src/tei2csv "$(WORK_IDENTIFIER)" "$<" > "$@"
+corpus/%.csv: corpus/%.xml
+	src/tei2csv "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
 .INTERMEDIATE: $(WORKS_CSV)
 
 PYTHON = python3

@@ -181,14 +181,14 @@ class TEI:
                         raise ValueError("don't understand element {!r}".format(elem.name))
 
                     if elem.name == "div1":
+                        for x in flush(sub_env):
+                            yield x
                         # At the end of a book, reset the line counter to be safe.
                         line_n = None
                 else:
                     if "?" in elem:
                         raise ValueError("\"?\" not allowed in beta code; see https://github.com/sasansom/sedes/issues/11")
                     partial.append(betacode.decode(elem))
-            for x in flush(env):
-                yield x
 
         for x in do_elem(self.soup.find("text").body, Environment()):
             yield x
