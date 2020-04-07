@@ -22,7 +22,7 @@ FILENAME.XML is a TEI XML document containing the text of the work.
 """.format(sys.argv[0]), end="", file=file)
 
 def process(f):
-    global csv_w, work_identifier
+    global work_identifier
     doc = tei.TEI(f)
     for line in doc.lines():
         assignments = sedes.analyze(line.text)
