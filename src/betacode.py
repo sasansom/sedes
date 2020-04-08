@@ -186,3 +186,17 @@ def decode(beta):
                 state = STATE_INIT
 
     return unicodedata.normalize("NFD", "".join(output))
+
+# Run this module as a command to decode beta code from the command line.
+# python3 betacode.py 'a)oido/s'
+if __name__ == "__main__":
+    import sys
+    error = False
+    for arg in sys.argv[1:]:
+        try:
+            print("{}\t{}".format(arg, decode(arg)))
+        except ValueError as err:
+            error = True
+            print("{}\terror: {}".format(arg, err))
+    if error:
+        sys.exit(1)
