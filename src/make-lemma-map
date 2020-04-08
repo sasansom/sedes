@@ -3,12 +3,12 @@
 # Produces a word—lemma mapping from a CLTK-format JSON file.
 #
 # Usage:
-#   make-lemma-map greek-analyses*.json > lemma-map
+#   make-lemma-map greek-lemmata.txt > lemma-map
 #   gzip -9 --rsyncable lemma-map
 #
-# The input format is JSON as found at
+# The input format is a text file as found at
 # https://github.com/cltk/greek_lexica_perseus/tree/f370a7e07d0705824b31b1e561ba34cde61b0a45.
-# Those JSON files are produced, I believe, by scraping the
+# The text file is produced, I believe, by scraping the
 # https://www.perseus.tufts.edu/hopper/morph web interface to Morpheus (see the
 # scraper.py program in the greek_lexica_perseus repository). The Morpheus
 # program is from https://github.com/PerseusDL/morpheus.
@@ -22,22 +22,41 @@
 #
 # This program is similar to
 # https://github.com/cltk/greek_lexica_perseus/blob/f370a7e07d0705824b31b1e561ba34cde61b0a45/transform_lemmata.py
-# except that it takes input from JSON files instead of text files, and outputs
-# a text-based file format instead of a Python dict literal.
+# except that it outputs a text-based file format instead of a Python dict
+# literal.
 
 import getopt
-import json
 import sys
-import unicodedata
 
 import betacode
 
 def usage(file=sys.stdout):
     print("""\
-Usage: {} greek-analyses*.json > lemma-map
+Usage: {} greek-lemmata.txt > lemma-map
 
-greek-analyses*.json are from https://github.com/cltk/greek_lexica_perseus.
+greek-lemmata.txt is from https://github.com/cltk/greek_lexica_perseus.
 """.format(sys.argv[0]), end="", file=file)
+
+def betacode_decode(beta):
+    # Strip hyphens before decoding. I don't believe this is specified anywhere
+    # by beta code; hyphen should be ordinary punctuation. greek-lemmata.txt
+    # seems to use hyphen as an affix separator, meant to be ignored, in lemmata
+    # like
+    #   a)mfi/-boa/w
+    #   a)na/-a)lloio/w
+    # Alternatively, it may be preferable to strip such affixes.
+    #
+    # CLTK strips the hyphens, not only in the transform_lemmata.py script, but
+    # in its global beta code decoder:
+    # https://github.com/cltk/cltk/blob/36b35f463f27028ae015bbaea3e2bafbfeb7ddb3/cltk/corpus/greek/beta_to_unicode.py#L388
+    #
+    # Certain other oddities are not handled here; for example greek-lemmata.txt
+    # may have what look like additional affixes set off by commas:
+    # https://github.com/cltk/greek_lexica_perseus/issues/8
+    # And a number of lemmata end in a numeral, which seems to indicate
+    # alternatives, rather than being distinct beta code words:
+    # https://github.com/cltk/greek_lexica_perseus/issues/9
+    return betacode.decode(beta.replace("-", ""))
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
 for o, a in opts:
@@ -48,18 +67,24 @@ for o, a in opts:
 MAP = {}
 for filename in args:
     with open(filename) as f:
-        data = json.load(f)
-        for word, entries in data.items():
+        for line in f:
+            parts = line.strip("\n").split("\t")
+            lemma_beta = parts[0]
+            # parts[1] is lemma-id.
+            words_beta = [part.split(" ", 1)[0] for part in parts[2:]]
+
             try:
-                word = betacode.decode(word).lower()
+                lemma = betacode_decode(lemma_beta).lower()
             except ValueError as err:
-                print("warning: {}: ignoring unparseable beta code {!r}".format(filename, word), file=sys.stderr)
+                print("warning: {}: ignoring unparseable lemma {!r}".format(filename, lemma_beta), file=sys.stderr)
                 continue
 
-            if entries is None:
-                entries = []
-            for entry in entries:
-                lemma = unicodedata.normalize("NFD", entry["headword"].lower())
+            for word_beta in words_beta:
+                try:
+                    word = betacode_decode(word_beta).lower()
+                except ValueError as err:
+                    print("warning: {}: ignoring unparseable word {!r} under lemma {!r}".format(filename, word_beta, lemma_beta), file=sys.stderr)
+                    continue
                 MAP.setdefault(word, set())
                 MAP[word].add(lemma)
 
