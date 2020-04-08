@@ -76,7 +76,17 @@ except ValueError:
 
 csv_w = csv.DictWriter(
     sys.stdout,
-    ["work", "book_n", "line_n", "word_n", "word", "scanned", "num_scansions", "sedes", "metrical_shape"],
+    [
+        "work",
+        "book_n",
+        "line_n",
+        "word_n",
+        "word",
+        "scanned",
+        "num_scansions",
+        "sedes",
+        "metrical_shape",
+    ],
     lineterminator="\n",
 )
 csv_w.writeheader()

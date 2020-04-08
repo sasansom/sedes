@@ -134,7 +134,7 @@ def decode(beta):
                 state = STATE_DIGITS
                 c = next()
             elif c in BETA_DIACRITICAL_MAP:
-                raise ValueError("unexpected diacritical {!r}".format(c))
+                raise ValueError("unexpected diacritical {!r} {!r}".format(c, (beta[:i[0]], beta[i[0]:])))
             else:
                 # Not an alphabetic sequence, some other symbol or literal code
                 # point.
@@ -146,7 +146,7 @@ def decode(beta):
         if state == STATE_PREDIACRITICALS:
             if c is not None and c in BETA_DIACRITICAL_MAP:
                 if c in diacriticals:
-                    raise ValueError("duplicate {!r} diacritical".format(c))
+                    raise ValueError("duplicate {!r} diacritical {!r}".format(c, (beta[:i[0]], beta[i[0]:])))
                 diacriticals.append(c)
                 c = next()
             elif c is not None and c.isalpha():
@@ -154,7 +154,7 @@ def decode(beta):
                 state = STATE_DIGITS
                 c = next()
             else:
-                raise ValueError("expected diacritical or alphabetic")
+                raise ValueError("expected diacritical or alphabetic {!r}".format((beta[:i[0]], beta[i[0]:])))
         if state == STATE_DIGITS:
             if c is not None and c in "0123456789":
                 key += c
@@ -164,7 +164,7 @@ def decode(beta):
         if state == STATE_POSTDIACRITICALS:
             if c is not None and c in BETA_DIACRITICAL_MAP:
                 if c in diacriticals:
-                    raise ValueError("duplicate {!r} diacritical".format(c))
+                    raise ValueError("duplicate {!r} diacritical {!r}".format(c, (beta[:i[0]], beta[i[0]:])))
                 diacriticals.append(c)
                 c = next()
             else:
@@ -180,7 +180,7 @@ def decode(beta):
                 try:
                     output.append(BETA_LETTER_MAP[key])
                 except KeyError:
-                    raise ValueError("unknown Beta Code letter {!r}".format(key))
+                    raise ValueError("unknown Beta Code letter {!r} {!r}".format(key, (beta[:i[0]], beta[i[0]:])))
                 for diacritical in diacriticals:
                     output.append(BETA_DIACRITICAL_MAP[diacritical])
                 state = STATE_INIT
