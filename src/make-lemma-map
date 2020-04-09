@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+
+# Produces a word—lemma mapping from a CLTK-format JSON file.
+#
+# Usage:
+#   make-lemma-map greek-lemmata.txt > lemma-map
+#   gzip -9 --rsyncable lemma-map
+#
+# The input format is a text file as found at
+# https://github.com/cltk/greek_lexica_perseus/tree/f370a7e07d0705824b31b1e561ba34cde61b0a45.
+# The text file is produced, I believe, by scraping the
+# https://www.perseus.tufts.edu/hopper/morph web interface to Morpheus (see the
+# scraper.py program in the greek_lexica_perseus repository). The Morpheus
+# program is from https://github.com/PerseusDL/morpheus.
+#
+# The output format is tab-separated, with each line representing all the words
+# that map to a single lemma. All words and lemmata are in lower case.
+#   lemma\tword1\tword2\tword3...
+#
+# When there are multiple possible lemmata for a word, the most frequent one is
+# used, with ties broken arbitrarily.
+#
+# This program is similar to
+# https://github.com/cltk/greek_lexica_perseus/blob/f370a7e07d0705824b31b1e561ba34cde61b0a45/transform_lemmata.py
+# except that it outputs a text-based file format instead of a Python dict
+# literal.
+
+import getopt
+import sys
+
+import betacode
+
+def usage(file=sys.stdout):
+    print("""\
+Usage: {} greek-lemmata.txt > lemma-map
+
+greek-lemmata.txt is from https://github.com/cltk/greek_lexica_perseus.
+""".format(sys.argv[0]), end="", file=file)
+
+def betacode_decode(beta):
+    # Strip hyphens before decoding. I don't believe this is specified anywhere
+    # by beta code; hyphen should be ordinary punctuation. greek-lemmata.txt
+    # seems to use hyphen as an affix separator, meant to be ignored, in lemmata
+    # like
+    #   a)mfi/-boa/w
+    #   a)na/-a)lloio/w
+    # Alternatively, it may be preferable to strip such affixes.
+    #
+    # CLTK strips the hyphens, not only in the transform_lemmata.py script, but
+    # in its global beta code decoder:
+    # https://github.com/cltk/cltk/blob/36b35f463f27028ae015bbaea3e2bafbfeb7ddb3/cltk/corpus/greek/beta_to_unicode.py#L388
+    #
+    # Certain other oddities are not handled here; for example greek-lemmata.txt
+    # may have what look like additional affixes set off by commas:
+    # https://github.com/cltk/greek_lexica_perseus/issues/8
+    # And a number of lemmata end in a numeral, which seems to indicate
+    # alternatives, rather than being distinct beta code words:
+    # https://github.com/cltk/greek_lexica_perseus/issues/9
+    return betacode.decode(beta.replace("-", ""))
+
+opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
+for o, a in opts:
+    if o in ("-h", "--help"):
+        usage()
+        sys.exit(0)
+
+MAP = {}
+for filename in args:
+    with open(filename) as f:
+        for line in f:
+            parts = line.strip("\n").split("\t")
+            lemma_beta = parts[0]
+            # parts[1] is lemma-id.
+            words_beta = [part.split(" ", 1)[0] for part in parts[2:]]
+
+            try:
+                lemma = betacode_decode(lemma_beta).lower()
+            except ValueError as err:
+                print("warning: {}: ignoring unparseable lemma {!r}".format(filename, lemma_beta), file=sys.stderr)
+                continue
+
+            for word_beta in words_beta:
+                try:
+                    word = betacode_decode(word_beta).lower()
+                except ValueError as err:
+                    print("warning: {}: ignoring unparseable word {!r} under lemma {!r}".format(filename, word_beta, lemma_beta), file=sys.stderr)
+                    continue
+                MAP.setdefault(word, set())
+                MAP[word].add(lemma)
+
+LEMMA_COUNTS = {}
+for lemmata in MAP.values():
+    for lemma in lemmata:
+        LEMMA_COUNTS.setdefault(lemma, 0)
+        LEMMA_COUNTS[lemma] += 1
+
+OUTPUT_MAP = {}
+for word, lemmata in MAP.items():
+    if not lemmata:
+        continue
+    # Choose the most frequent lemma. Break ties with lexicographic ordering.
+    lemma = max(lemmata, key = lambda lemma: (LEMMA_COUNTS[lemma], lemma))
+    OUTPUT_MAP.setdefault(lemma, [])
+    OUTPUT_MAP[lemma].append(word)
+
+for lemma, words in sorted(OUTPUT_MAP.items()):
+    assert "\t" not in lemma, lemma
+    print(lemma, end="")
+    for word in sorted(words):
+        assert "\t" not in word, word
+        print("\t" + word, end="")
+    print()

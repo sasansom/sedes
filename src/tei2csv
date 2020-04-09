@@ -14,6 +14,7 @@ import getopt
 import re
 import sys
 
+import lemma
 import sedes
 import tei
 
@@ -58,6 +59,7 @@ def process(f):
                 "num_scansions": num_scansions,
                 "sedes": pos,
                 "metrical_shape": shape,
+                "lemma": lemma.lookup(word, ""),
             })
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
@@ -86,6 +88,7 @@ csv_w = csv.DictWriter(
         "num_scansions",
         "sedes",
         "metrical_shape",
+        "lemma",
     ],
     lineterminator="\n",
 )
