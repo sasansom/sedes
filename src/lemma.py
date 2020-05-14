@@ -7,6 +7,10 @@ import sys
 
 __all__ = ["lookup"]
 
+OVERRIDES = (
+    ("ἀοιδὴν", "a)oidh/"),
+)
+
 MAP = {}
 with gzip.GzipFile(os.path.join(sys.path[0], "lemma-map.gz"), "rb") as f:
     for line in f:
@@ -14,6 +18,8 @@ with gzip.GzipFile(os.path.join(sys.path[0], "lemma-map.gz"), "rb") as f:
         lemma, words = parts[0], parts[1:]
         for word in words:
             MAP[word] = lemma
+    for word, lemma in OVERRIDES:
+        MAP[word] = lemma
 
 def lookup(word, default=None):
     return MAP.get(word.lower(), default)
