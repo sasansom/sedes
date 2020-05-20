@@ -1,0 +1,191 @@
+#!/usr/bin/env python3
+
+# Usage:
+# tei2html Sh. corpus/shield.xml expectancy.hellenic+archaic.csv > shield.html
+
+import collections
+import csv
+import getopt
+import html
+import sys
+import re
+import unicodedata
+
+import tei
+
+def usage(file=sys.stdout):
+    print("""\
+Usage: {} IDENTIFIER WORK.xml STATS.csv > WORK.html
+
+IDENTIFIER is a short text identifier for the work; e.g., "Il.".
+WORK.XML is a TEI XML document containing the text of the work.
+STATS.csv is statistics on a corpus of text as produced by
+tei2csv and expectancy.R.
+""".format(sys.argv[0]), end="", file=file)
+
+class StatsEntry:
+    def __init__(self, row):
+        self.word = unicodedata.normalize("NFD", row["word"])
+        self.sedes = row["sedes"]
+        self.metrical_shape = row["metrical_shape"]
+        self.lemma = row["lemma"]
+        self.x = row["x"]
+        if row["z"] == "NA":
+            self.z = None
+        else:
+            self.z = float(row["z"])
+
+def parse_stats(f, work_identifier):
+    stats = {}
+    for row in csv.DictReader(f):
+        if row["work"] != work_identifier:
+            continue
+        key = (row["work"], row["book_n"], row["line_n"], row["word_n"])
+        if key in stats:
+            print("warning: ignoring duplicate work {work} book {book_n} line {line_n} word {word_n}".format(**row), file=sys.stderr)
+            continue
+        stats[key] = StatsEntry(row)
+    return stats
+
+def esc(v):
+    return html.escape(v, True)
+
+def extract_words_and_intermediates(s):
+    prev_end = 0
+    for m in re.finditer("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", s):
+        yield s[prev_end:m.start()], s[m.start():m.end()]
+        prev_end = m.end()
+    yield s[prev_end:], None
+
+def z_css(z):
+    return "{:+.8}".format(z).replace("+", "p").replace("-", "m").replace(".", "_")
+
+def process(f, stats, work_identifier):
+    doc = tei.TEI(f)
+
+    print("<!DOCTYPE html>")
+    print("<html>")
+    print("<head>")
+    print("<meta charset=utf-8>")
+    print("<title>{}</title>".format(esc(doc.title)))
+    print("<style>")
+    print(".line {")
+    print("    margin-left: 1.5rem;")
+    print("}")
+    print(".line::before {")
+    print("    content: attr(data-lineno);")
+    print("    display: inline-block;")
+    print("    width: 1.5rem;")
+    print("    margin-left: auto;")
+    print("    text-align: right;")
+    print("    margin-right: 1rem;")
+    print("    color: gray;")
+    print("    font-size: 80%;")
+    print("}")
+    print(".error {")
+    print("    color: firebrick;")
+    print("}")
+    print("</style>")
+    print("</head>")
+
+    print("<body>")
+    print("<article>")
+    print("<h1>{}</h1>".format(esc(doc.title)))
+
+    book_n = None
+    for line in doc.lines():
+        if line.book_n != book_n:
+            if book_n is not None:
+                print("</section>")
+            print()
+            print("<section id=\"book-{}\">".format(esc(line.book_n)))
+            print("<h2>{}</h2>".format(esc(line.book_n)))
+        book_n = line.book_n
+
+        print("<span id=\"line-{line_n}\" class=\"line\" data-lineno=\"{line_n}\">".format(line_n=esc(line.line_n)), end="")
+
+        sedes = None
+        for (word_n, (inter, word)) in enumerate(extract_words_and_intermediates(line.text)):
+            word_n = str(int(word_n) + 1)
+
+            if word is None:
+                print(esc(inter), end="")
+                continue
+
+            key = (work_identifier, line.book_n, line.line_n, word_n)
+            try:
+                stats_entry = stats[key]
+                if word.lower() != stats_entry.word:
+                    stats_entry = None
+            except KeyError:
+                stats_entry = None
+
+            word_attrs = collections.OrderedDict({
+                "id": "line-{}-word-{}".format(line.line_n, word_n),
+                "class": "word",
+            })
+            if stats_entry is not None:
+                if sedes == stats_entry.sedes:
+                    print(esc(inter), end="")
+                else:
+                    if sedes is not None:
+                        print("</span>", end="")
+                    print(esc(re.sub(r"\s+", "\n", inter)), end="")
+                    print("<span class=\"sedes s{}\">".format(esc(stats_entry.sedes)), end="")
+                sedes = stats_entry.sedes
+
+                word_attrs["data-x"] = str(stats_entry.x)
+                word_attrs["title"] = "x={}".format(stats_entry.x)
+                if stats_entry.z is not None:
+                    word_attrs["data-z"] = "{:.8}".format(stats_entry.z)
+                    word_attrs["class"] += " z_{}".format(z_css(stats_entry.z))
+                    word_attrs["title"] += " z={:.8}".format(stats_entry.z)
+                word_attrs["title"] += " shape={}".format(stats_entry.metrical_shape)
+                word_attrs["title"] += " lemma={}".format(stats_entry.lemma)
+            else:
+                if sedes is not None:
+                    print("</span>", end="")
+                sedes = None
+                print(esc(inter), end="")
+
+                print("warning: no stats for work {work} book {book_n} line {line_n} word {word_n}".format(
+                    work=work_identifier, book_n=line.book_n, line_n=line.line_n, word_n=word_n,
+                ), file=sys.stderr)
+                word_attrs["class"] += " error"
+
+            print("<span", end="")
+            for attr, value in word_attrs.items():
+                print(" {}=\"{}\"".format(esc(attr), esc(value)), end="")
+            print(">{}</span>".format(esc(word)), end="")
+        if sedes is not None:
+            print("</span>", end="")
+
+        print("</span>")
+        print("<br>")
+
+    if book_n is not None:
+        print("</section>")
+
+    print("</article>")
+    print("</body>")
+    print("</html>")
+
+opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
+for o, a in opts:
+    if o in ("-h", "--help"):
+        usage()
+        sys.exit(0)
+
+try:
+    work_identifier, tei_filename, csv_filename = args
+except ValueError:
+    print("error: usage error", file=sys.stderr)
+    print(file=sys.stderr)
+    usage(sys.stderr)
+    sys.exit(1)
+
+with open(csv_filename) as csv_file:
+    stats = parse_stats(csv_file, work_identifier)
+
+with open(tei_filename) as tei_file:
+    process(tei_file, stats, work_identifier)
