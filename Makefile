@@ -30,6 +30,12 @@ WORKS_CSV = $(addprefix corpus/,$(addsuffix .csv,$(WORKS)))
 all.csv: $(WORKS_CSV)
 	(sed -n -e '1p' "$<"; for x in $^; do sed -e '1d' $$x; done) > "$@"
 
+expectancy.all.csv: all.csv
+	Rscript src/expectancy.R $^ > "$@"
+
+expectancy.hellenic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/homerichymns.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv
+	Rscript src/expectancy.R $^ > "$@"
+
 corpus/%.csv: corpus/%.xml
 	src/tei2csv "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
 .INTERMEDIATE: $(WORKS_CSV)
