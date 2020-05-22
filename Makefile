@@ -27,6 +27,9 @@ WORK_IDENTIFIER_worksanddays     = W.D.
 
 WORKS_CSV = $(addprefix corpus/,$(addsuffix .csv,$(WORKS)))
 
+.PHONY: all
+all: all.csv expectancy.all.csv expectancy.hellenic+archaic.csv
+
 all.csv: $(WORKS_CSV)
 	(sed -n -e '1p' "$<"; for x in $^; do sed -e '1d' $$x; done) > "$@"
 
