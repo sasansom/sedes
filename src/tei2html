@@ -249,7 +249,7 @@ header {
     for n in range(101):
         r = n / 100.0
 
-        gamma = (0.1 + 0.8 * math.pow(r, 1/2.2));
+        gamma = 0.9 * math.pow(r, 1/2.2)
         print(".shade-text.z-weighted .sedes .z-weighted-{} {{ color: hsl(0, 0%, {:.1f}%); }}".format(n, 100 * gamma))
         print(".shade-text.z-unweighted .sedes .z-unweighted-{} {{ color: hsl(0, 0%, {:.1f}%); }}".format(n, 100 * gamma))
 
