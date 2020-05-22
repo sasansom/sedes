@@ -277,8 +277,8 @@ header {
 <option value=size-bubbles>Size bubbles</option>
 </select>
 <br>
-<label><input name=z-calculation type=radio value=weighted checked> Weighted z-score</label><br>
-<label><input name=z-calculation type=radio value=unweighted> Unweighted z-score</label>
+<label><input name=z-calculation type=radio value=weighted checked> Weighted <var>z</var>-score</label><br>
+<label><input name=z-calculation type=radio value=unweighted> Unweighted <var>z</var>-score</label>
 </form>
 </header>""")
 
