@@ -7,6 +7,7 @@ import collections
 import csv
 import getopt
 import html
+import math
 import sys
 import re
 import unicodedata
@@ -34,6 +35,10 @@ class StatsEntry:
             self.z = None
         else:
             self.z = float(row["z"])
+        if row["z.alt"] == "NA":
+            self.z_alt = None
+        else:
+            self.z_alt = float(row["z.alt"])
 
 def parse_stats(f, work_identifier):
     stats = {}
@@ -58,7 +63,16 @@ def extract_words_and_intermediates(s):
     yield s[prev_end:], None
 
 def z_css(z):
-    return "{:+.8}".format(z).replace("+", "p").replace("-", "m").replace(".", "_")
+    if z is None:
+        return "z-weighted-100"
+    else:
+        return "z-weighted-{}".format(int(100 * (0.5 + math.atan(z) / math.pi)))
+
+def z_css_unweighted(z):
+    if z is None:
+        return "z-unweighted-100"
+    else:
+        return "z-unweighted-{}".format(int(100 * (0.5 + math.atan(z) / math.pi)))
 
 def process(f, stats, work_identifier):
     doc = tei.TEI(f)
@@ -69,26 +83,205 @@ def process(f, stats, work_identifier):
     print("<meta charset=utf-8>")
     print("<title>{}</title>".format(esc(doc.title)))
     print("<style>")
-    print(".line {")
-    print("    margin-left: 1.5rem;")
-    print("}")
-    print(".line::before {")
-    print("    content: attr(data-lineno);")
-    print("    display: inline-block;")
-    print("    width: 1.5rem;")
-    print("    margin-left: auto;")
-    print("    text-align: right;")
-    print("    margin-right: 1rem;")
-    print("    color: gray;")
-    print("    font-size: 80%;")
-    print("}")
-    print(".error {")
-    print("    color: firebrick;")
-    print("}")
+    print("""\
+@font-face {
+    font-family: "Cardo";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: local("Cardo Regular"), local("Cardo-Regular"), url(fonts/Cardo-Regular.woff) format("woff2");
+    unicode-range: U+0370-03FF, U+1F00-1FFF;
+}
+@font-face {
+    font-family: "Cardo";
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: local("Cardo Italic"), local("Cardo-Italic"), url(fonts/Cardo-Italic.woff) format("woff2");
+    unicode-range: U+0370-03FF, U+1F00-1FFF;
+}
+@font-face {
+    font-family: "Cardo";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: local("Cardo Bold"), local("Cardo-Bold"), url(fonts/Cardo-Bold.woff) format("woff2");
+    unicode-range: U+0370-03FF, U+1F00-1FFF;
+}
+
+header {
+    background-color: ivory;
+    position: fixed;
+    display: inline-block;
+    top: 1em;
+    right: 1em;
+    z-index: 1;
+}
+
+.error {
+    color: firebrick;
+}
+
+/*
+.word, .word::before {
+    transition: all 0.3s;
+}
+*/
+
+.line, .grid-markers {
+    font-family: "Cardo";
+    font-size: 120%;
+    line-height: 140%;
+}
+
+.line::before {
+    content: attr(data-lineno);
+    display: inline-block;
+    position: absolute;
+    left: -4rem;
+    width: 3rem;
+    text-align: right;
+    color: gray;
+    font-size: 80%;
+}
+
+.text, .grid-markers {
+    margin-left: 4rem;
+    position: relative;
+}
+
+.grid-markers {
+    color: gray;
+    opacity: 0;
+    visibility: hidden;
+    transition-property: opacity, visibility;
+    transition-duration: 0.5s;
+    height: 2rem;
+}
+.grid-markers.visible {
+    opacity: 1;
+    visibility: visible;
+}
+.grid {
+    position: relative;
+}
+.grid .s1,
+.grid .s2,
+.grid .s2_5,
+.grid .s3,
+.grid .s4,
+.grid .s4_5,
+.grid .s5,
+.grid .s6,
+.grid .s6_5,
+.grid .s7,
+.grid .s8,
+.grid .s8_5,
+.grid .s9,
+.grid .s10,
+.grid .s10_5,
+.grid .s11,
+.grid .s12
+{
+    position: absolute;
+}
+.grid .s1 { left: 0; }
+.grid .s2 { left: 5ex; }
+.grid .s2_5 { left: 10ex; }
+.grid .s3 { left: 16ex; }
+.grid .s4 { left: 21ex; }
+.grid .s4_5 { left: 26ex; }
+.grid .s5 { left: 31ex; }
+.grid .s6 { left: 34ex; }
+.grid .s6_5 { left: 40ex; }
+.grid .s7 { left: 45ex; }
+.grid .s8 { left: 50ex; }
+.grid .s8_5 { left: 54ex; }
+.grid .s9 { left: 59ex; }
+.grid .s10 { left: 64ex; }
+.grid .s10_5 { left: 68ex; }
+.grid .s11 { left: 74ex; }
+.grid .s12 { left: 78ex; }
+""")
+
+    print("""\
+.shade-bubbles .word {
+    --r: 2.5rem; /* radius of 100% circle */
+    position: relative;
+}
+.shade-bubbles .word::before {
+    background-color: magenta; /* highlight any missing background-colors */
+}
+.shade-bubbles .word::before {
+    --s: 1.5rem;
+    position: absolute;
+    opacity: 0.5;
+    border-radius: 50%;
+    z-index: -1;
+    content: "";
+    width: var(--s);
+    height: var(--s);
+    bottom: calc(var(--s) / -2 + 1ex);
+    left: calc(var(--s) / -2 + 0.5rem);
+}
+
+.size-bubbles .word {
+    --r: 2.5rem; /* radius of 100% circle */
+    position: relative;
+}
+.size-bubbles .word::before {
+    background-color: magenta; /* highlight any missing background-colors */
+}
+.size-bubbles .word::before {
+    position: absolute;
+    background-color: orange;
+    opacity: 0.5;
+    border-radius: 50%;
+    z-index: -1;
+    content: "";
+    width: var(--s);
+    height: var(--s);
+    bottom: calc(var(--s) / -2 + 1ex);
+    left: calc(var(--s) / -2 + 0.5rem);
+}
+""")
+
+    for n in range(101):
+        r = n / 100.0
+
+        gamma = (0.1 + 0.8 * math.pow(r, 1/2.2));
+        print(".shade-text.z-weighted .sedes .z-weighted-{} {{ color: hsl(0, 0%, {:.1f}%); }}".format(n, 100 * gamma))
+        print(".shade-text.z-unweighted .sedes .z-unweighted-{} {{ color: hsl(0, 0%, {:.1f}%); }}".format(n, 100 * gamma))
+
+        print(".shade-bubbles.z-weighted .sedes .z-weighted-{}::before {{ background-color: hsl(0, 0%, {:.1f}%); }}".format(n, 100 * gamma))
+        print(".shade-bubbles.z-unweighted .sedes .z-unweighted-{}::before {{ background-color: hsl(0, 0%, {:.1f}%); }}".format(n, 100 * gamma))
+
+        area = math.sqrt(1.0 - r)
+        print(".size-bubbles.z-weighted .sedes .z-weighted-{}::before {{ --s: calc(var(--r) * {:.3f}); }}".format(n, area))
+        print(".size-bubbles.z-unweighted .sedes .z-unweighted-{}::before {{ --s: calc(var(--r) * {:.3f}); }}".format(n, area))
+
     print("</style>")
     print("</head>")
 
     print("<body>")
+
+    print("""\
+<header>
+<form id=controls>
+<label><input name=grid type=checkbox> Align to sedes grid</label>
+<br>
+<select name=style>
+<option value=>No highlighting</option>
+<option value=shade-text>Shade text</option>
+<option value=shade-bubbles>Shade bubbles</option>
+<option value=size-bubbles>Size bubbles</option>
+</select>
+<br>
+<label><input name=z-calculation type=radio value=weighted checked> Weighted z-score</label><br>
+<label><input name=z-calculation type=radio value=unweighted> Unweighted z-score</label>
+</form>
+</header>""")
+
     print("<article>")
     print("<h1>{}</h1>".format(esc(doc.title)))
 
@@ -96,10 +289,33 @@ def process(f, stats, work_identifier):
     for line in doc.lines():
         if line.book_n != book_n:
             if book_n is not None:
+                print("</div>")
                 print("</section>")
             print()
             print("<section id=\"book-{}\">".format(esc(line.book_n)))
             print("<h2>{}</h2>".format(esc(line.book_n)))
+
+            print("""\
+<div class="grid-markers grid">
+<span class="s1">1</span>
+<span class="s2">2</span>
+<span class="s2_5">2.5</span>
+<span class="s3">3</span>
+<span class="s4">4</span>
+<span class="s4_5">4.5</span>
+<span class="s5">5</span>
+<span class="s6">6</span>
+<span class="s6_5">6.5</span>
+<span class="s7">7</span>
+<span class="s8">8</span>
+<span class="s8_5">8.5</span>
+<span class="s9">9</span>
+<span class="s10">10</span>
+<span class="s10_5">10.5</span>
+<span class="s11">11</span>
+<span class="s12">12</span>
+</div>""")
+            print("<div class=text>")
         book_n = line.book_n
 
         print("<span id=\"line-{line_n}\" class=\"line\" data-lineno=\"{line_n}\">".format(line_n=esc(line.line_n)), end="")
@@ -128,18 +344,22 @@ def process(f, stats, work_identifier):
                 if sedes == stats_entry.sedes:
                     print(esc(inter), end="")
                 else:
+                    inters = re.sub(r"\s+", "\n", inter).split("\n")
                     if sedes is not None:
-                        print("</span>", end="")
-                    print(esc(re.sub(r"\s+", "\n", inter)), end="")
-                    print("<span class=\"sedes s{}\">".format(esc(stats_entry.sedes)), end="")
+                        print("{}</span>".format(esc(inters[0])))
+                    print(esc("\n".join(inters[1:])), end="")
+                    print("<span class=\"sedes s{}\">".format(esc(stats_entry.sedes.replace(".", "_"))), end="")
                 sedes = stats_entry.sedes
 
                 word_attrs["data-x"] = str(stats_entry.x)
                 word_attrs["title"] = "x={}".format(stats_entry.x)
+                word_attrs["class"] += " {}".format(esc(z_css(stats_entry.z)))
+                word_attrs["class"] += " {}".format(esc(z_css_unweighted(stats_entry.z_alt)))
                 if stats_entry.z is not None:
                     word_attrs["data-z"] = "{:.8}".format(stats_entry.z)
-                    word_attrs["class"] += " z_{}".format(z_css(stats_entry.z))
                     word_attrs["title"] += " z={:.8}".format(stats_entry.z)
+                if stats_entry.z_alt is not None:
+                    word_attrs["data-z-unweighted"] = "{:.8}".format(stats_entry.z_alt)
                 word_attrs["title"] += " shape={}".format(stats_entry.metrical_shape)
                 word_attrs["title"] += " lemma={}".format(stats_entry.lemma)
             else:
@@ -164,10 +384,52 @@ def process(f, stats, work_identifier):
         print("<br>")
 
     if book_n is not None:
+        print("</div>")
         print("</section>")
 
     print("</article>")
     print("</body>")
+    print("""
+<script>
+const ALL_STYLES = [
+    "shade-text",
+    "shade-bubbles",
+    "size-bubbles",
+];
+const CONTROLS = document.getElementById("controls");
+function setClass(elem, className, cond) {
+    if (cond) {
+        return elem.classList.add(className);
+    } else {
+        return elem.classList.remove(className);
+    }
+}
+CONTROLS["grid"].addEventListener("change", event => {
+    for (elem of document.querySelectorAll(".grid-markers")) {
+        setClass(elem, "visible", event.target.checked);
+    }
+    for (elem of document.querySelectorAll(".text")) {
+        setClass(elem, "grid", event.target.checked);
+    }
+});
+CONTROLS["style"].addEventListener("change", event => {
+    for (elem of document.querySelectorAll(".text")) {
+        elem.classList.remove(...ALL_STYLES);
+        if (event.target.value)
+            elem.classList.add(event.target.value);
+    }
+});
+CONTROLS["z-calculation"].forEach(elem => elem.addEventListener("change", event => {
+    for (elem of document.querySelectorAll(".text")) {
+        setClass(elem, "z-weighted", event.target.value == "weighted");
+        setClass(elem, "z-unweighted", event.target.value != "weighted");
+    }
+}));
+CONTROLS["grid"].dispatchEvent(new Event("change"));
+CONTROLS["style"].dispatchEvent(new Event("change"));
+CONTROLS["z-calculation"].forEach(elem => elem.dispatchEvent(new Event("change")));
+</script>
+""")
     print("</html>")
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
