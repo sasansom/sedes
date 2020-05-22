@@ -318,7 +318,7 @@ header {
             print("<div class=text>")
         book_n = line.book_n
 
-        print("<span id=\"line-{line_n}\" class=\"line\" data-lineno=\"{line_n}\">".format(line_n=esc(line.line_n)), end="")
+        print("<span id=\"book-{book_n}-line-{line_n}\" class=\"line\" data-lineno=\"{line_n}\">".format(book_n=esc(line.book_n), line_n=esc(line.line_n)), end="")
 
         sedes = None
         for (word_n, (inter, word)) in enumerate(extract_words_and_intermediates(line.text)):
@@ -337,7 +337,7 @@ header {
                 stats_entry = None
 
             word_attrs = collections.OrderedDict({
-                "id": "line-{}-word-{}".format(line.line_n, word_n),
+                "id": "book-{}-line-{}-word-{}".format(line.book_n, line.line_n, word_n),
                 "class": "word",
             })
             if stats_entry is not None:
