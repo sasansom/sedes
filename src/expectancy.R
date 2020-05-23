@@ -2,7 +2,6 @@
 # Write the augmented CSV to standard output.
 
 library(data.table)
-library(ggplot2)
 
 # Population standard deviation.
 sd_pop <- function(x) {
