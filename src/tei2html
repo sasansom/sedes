@@ -405,16 +405,16 @@ function setClass(elem, className, cond) {
     }
 }
 CONTROLS["grid"].addEventListener("change", event => {
-    for (elem of document.querySelectorAll(".grid-markers")) {
+    for (let elem of document.querySelectorAll(".grid-markers")) {
         setClass(elem, "visible", event.target.checked);
     }
-    for (elem of document.querySelectorAll(".text")) {
+    for (let elem of document.querySelectorAll(".text")) {
         setClass(elem, "grid", event.target.checked);
     }
 });
 CONTROLS["grid"].dispatchEvent(new Event("change"));
 CONTROLS["style"].addEventListener("change", event => {
-    for (elem of document.querySelectorAll(".text")) {
+    for (let elem of document.querySelectorAll(".text")) {
         elem.classList.remove(...ALL_STYLES);
         if (event.target.value)
             elem.classList.add(event.target.value);
@@ -424,7 +424,7 @@ CONTROLS["style"].dispatchEvent(new Event("change"));
 {
     const group = CONTROLS["z-calculation"];
     group.forEach(elem => elem.addEventListener("change", event => {
-        for (elem of document.querySelectorAll(".text")) {
+        for (let elem of document.querySelectorAll(".text")) {
             setClass(elem, "z-weighted", group.value == "weighted");
             setClass(elem, "z-unweighted", group.value == "unweighted");
         }
