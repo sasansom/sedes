@@ -412,6 +412,7 @@ CONTROLS["grid"].addEventListener("change", event => {
         setClass(elem, "grid", event.target.checked);
     }
 });
+CONTROLS["grid"].dispatchEvent(new Event("change"));
 CONTROLS["style"].addEventListener("change", event => {
     for (elem of document.querySelectorAll(".text")) {
         elem.classList.remove(...ALL_STYLES);
@@ -419,15 +420,18 @@ CONTROLS["style"].addEventListener("change", event => {
             elem.classList.add(event.target.value);
     }
 });
-CONTROLS["z-calculation"].forEach(elem => elem.addEventListener("change", event => {
-    for (elem of document.querySelectorAll(".text")) {
-        setClass(elem, "z-weighted", event.target.value == "weighted");
-        setClass(elem, "z-unweighted", event.target.value != "weighted");
-    }
-}));
-CONTROLS["grid"].dispatchEvent(new Event("change"));
 CONTROLS["style"].dispatchEvent(new Event("change"));
-CONTROLS["z-calculation"].forEach(elem => elem.dispatchEvent(new Event("change")));
+{
+    const group = CONTROLS["z-calculation"];
+    group.forEach(elem => elem.addEventListener("change", event => {
+        for (elem of document.querySelectorAll(".text")) {
+            setClass(elem, "z-weighted", group.value == "weighted");
+            setClass(elem, "z-unweighted", group.value == "unweighted");
+        }
+    }));
+    // Dispatch a "change" event to an arbitrary element of the radio group.
+    group[0].dispatchEvent(new Event("change"));
+}
 </script>
 """)
     print("</html>")
