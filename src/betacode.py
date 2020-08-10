@@ -72,6 +72,23 @@ BETA_LETTER_MAP = {
     "*z": "Ζ",
 }
 
+BETA_NONLETTER_MAP = {
+    ":": "·",
+    "'": "’",
+    "-": "‐",
+    "_": "—",
+
+     "[": "[",
+     "]": "]",
+    "[1": "(",
+    "]1": ")",
+
+    "\"": "\"",
+}
+
+BETA_MAP = BETA_LETTER_MAP.copy()
+BETA_MAP.update(BETA_NONLETTER_MAP)
+
 BETA_DIACRITICAL_MAP = {
     ")": "\u0313",
     "(": "\u0314",
@@ -83,18 +100,11 @@ BETA_DIACRITICAL_MAP = {
     "?": "\u0323",
 }
 
-BETA_NONLETTER_MAP = {
-    ":": "·",
-    "'": "’",
-    "-": "‐",
-    "_": "—",
-}
-
 def decode(beta):
     """Decode Beta Code to Unicode. The input Beta Code is itself a Unicode
     string; non–Beta Code code points are preserved in the result. The result is
     in NFD form."""
-    STATE_INIT, STATE_PREDIACRITICALS, STATE_DIGITS, STATE_POSTDIACRITICALS, STATE_DONE = range(5)
+    STATE_INIT, STATE_LETTER_PREDIACRITICALS, STATE_LETTER_DIGITS, STATE_NONLETTER_DIGITS, STATE_LETTER_POSTDIACRITICALS, STATE_EMIT, STATE_DONE = range(7)
 
     # Allow the next closure to modify this value.
     i = [0]
@@ -127,23 +137,27 @@ def decode(beta):
                 c = next()
             elif c == "*":
                 key += "*"
-                state = STATE_PREDIACRITICALS
+                state = STATE_LETTER_PREDIACRITICALS
                 c = next()
             elif c.isalpha():
                 key += c.lower()
-                state = STATE_DIGITS
+                state = STATE_LETTER_DIGITS
+                c = next()
+            elif c in ":'-_$&^@{<>\"[]%#":
+                key += c
+                state = STATE_NONLETTER_DIGITS
                 c = next()
             elif c in BETA_DIACRITICAL_MAP:
                 raise ValueError("unexpected diacritical {!r} {!r}".format(c, (beta[:i[0]], beta[i[0]:])))
             else:
-                # Not an alphabetic sequence, some other symbol or literal code
+                # Not an Beta Code sequence, some other symbol or literal code
                 # point.
                 prev_key = c
                 prev_basechar_index = len(output)
                 output.append(BETA_NONLETTER_MAP.get(c, c))
                 state = STATE_INIT
                 c = next()
-        if state == STATE_PREDIACRITICALS:
+        if state == STATE_LETTER_PREDIACRITICALS:
             if c is not None and c in BETA_DIACRITICAL_MAP:
                 if c in diacriticals:
                     raise ValueError("duplicate {!r} diacritical {!r}".format(c, (beta[:i[0]], beta[i[0]:])))
@@ -151,39 +165,47 @@ def decode(beta):
                 c = next()
             elif c is not None and c.isalpha():
                 key += c.lower()
-                state = STATE_DIGITS
+                state = STATE_LETTER_DIGITS
                 c = next()
             else:
                 raise ValueError("expected diacritical or alphabetic {!r}".format((beta[:i[0]], beta[i[0]:])))
-        if state == STATE_DIGITS:
+        if state == STATE_LETTER_DIGITS:
             if c is not None and c in "0123456789":
                 key += c
                 c = next()
             else:
-                state = STATE_POSTDIACRITICALS
-        if state == STATE_POSTDIACRITICALS:
+                state = STATE_LETTER_POSTDIACRITICALS
+        if state == STATE_NONLETTER_DIGITS:
+            if c is not None and c in "0123456789":
+                key += c
+                c = next()
+            else:
+                state = STATE_EMIT
+        if state == STATE_LETTER_POSTDIACRITICALS:
             if c is not None and c in BETA_DIACRITICAL_MAP:
                 if c in diacriticals:
                     raise ValueError("duplicate {!r} diacritical {!r}".format(c, (beta[:i[0]], beta[i[0]:])))
                 diacriticals.append(c)
                 c = next()
             else:
-                if prev_key == "s" and output[prev_basechar_index] == "ς":
-                    # Change previous character from final to medial sigma.
-                    output[prev_basechar_index] = "σ"
-                if prev_key not in BETA_LETTER_MAP and key == "s":
-                    # If previous character was not a letter, this sigma must be
-                    # medial.
-                    key = "s1"
-                prev_key = key
-                prev_basechar_index = len(output)
-                try:
-                    output.append(BETA_LETTER_MAP[key])
-                except KeyError:
-                    raise ValueError("unknown Beta Code letter {!r} {!r}".format(key, (beta[:i[0]], beta[i[0]:])))
-                for diacritical in diacriticals:
-                    output.append(BETA_DIACRITICAL_MAP[diacritical])
-                state = STATE_INIT
+                state = STATE_EMIT
+        if state == STATE_EMIT:
+            if prev_key == "s" and output[prev_basechar_index] == "ς" and key in BETA_LETTER_MAP:
+                # Change previous character from final to medial sigma.
+                output[prev_basechar_index] = "σ"
+            if prev_key not in BETA_LETTER_MAP and key == "s":
+                # If previous character was not a letter, this sigma must be
+                # medial.
+                key = "s1"
+            prev_key = key
+            prev_basechar_index = len(output)
+            try:
+                output.append(BETA_MAP[key])
+            except KeyError:
+                raise ValueError("unknown Beta Code character {!r} {!r}".format(key, (beta[:i[0]], beta[i[0]:])))
+            for diacritical in diacriticals:
+                output.append(BETA_DIACRITICAL_MAP[diacritical])
+            state = STATE_INIT
 
     return unicodedata.normalize("NFD", "".join(output))
 

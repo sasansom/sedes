@@ -127,10 +127,31 @@ class TestDecode(unittest.TestCase):
             ("s2toi=xos2", "ςτοῖχος"),
             ("s3toi=xos3", "ϲτοῖχοϲ"),
             ("*s3toi=xos3", "Ϲτοῖχοϲ"),
+            ("[gai/hs]", "[γαίης]"), # nonletters should not cause medial sigma
         ]
         for beta, expected in TESTS:
             self.assertEqual(betacode.decode(beta), expected)
             self.assertEqual(betacode.decode(beta.upper()), expected)
+
+    def test_nonletters(self):
+        TESTS = [
+            ("a[bg]d", "α[βγ]δ"),
+            ("a[1bg]1d", "α(βγ)δ"),
+            ("a\"bg\"d", "α\"βγ\"δ"),
+        ]
+        for beta, expected in TESTS:
+            self.assertEqual(betacode.decode(beta), expected, (bytes(betacode.decode(beta), "utf-8"), bytes(expected, "utf-8")))
+            self.assertEqual(betacode.decode(beta.upper()), expected)
+        TESTS = [
+            "a[2bg]3d", # We don't support most of the bracket codes.
+            "a[12bg]12d", # "[12" should not be parsed as "[1" + "2".
+        ]
+        for beta in TESTS:
+            try:
+                uni = betacode.decode(beta)
+            except ValueError:
+                continue
+            self.fail("{!r} did not raise ValueError; returned {!r}".format(beta, uni))
 
     def test_invalid(self):
         TESTS = [
