@@ -42,17 +42,17 @@ def assign_sedes_for_line(line):
 def process(f):
     global csv_w, work_identifier
     doc = tei.TEI(f)
-    for line in doc.lines():
-        if line.text in sedes.KNOWN_SCANSIONS:
+    for loc, text in doc.lines():
+        if text in sedes.KNOWN_SCANSIONS:
             scanned = "manual"
         else:
             scanned = "auto"
-        for word_n, entry in enumerate(assign_sedes_for_line(line.text)):
+        for word_n, entry in enumerate(assign_sedes_for_line(text)):
             word, pos, shape, num_scansions = entry
             csv_w.writerow({
                 "work": work_identifier,
-                "book_n": line.book_n,
-                "line_n": line.line_n,
+                "book_n": loc.book_n,
+                "line_n": loc.line_n,
                 "word_n": word_n + 1,
                 "word": word,
                 "scanned": scanned,

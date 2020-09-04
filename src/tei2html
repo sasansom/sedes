@@ -286,14 +286,14 @@ header {
     print("<h1>{}</h1>".format(esc(doc.title)))
 
     book_n = None
-    for line in doc.lines():
-        if line.book_n != book_n:
+    for loc, text in doc.lines():
+        if loc.book_n != book_n:
             if book_n is not None:
                 print("</div>")
                 print("</section>")
             print()
-            print("<section id=\"book-{}\">".format(esc(line.book_n)))
-            print("<h2>{}</h2>".format(esc(line.book_n)))
+            print("<section id=\"book-{}\">".format(esc(loc.book_n)))
+            print("<h2>{}</h2>".format(esc(loc.book_n)))
 
             print("""\
 <div class="grid-markers grid">
@@ -316,19 +316,19 @@ header {
 <span class="s12">12</span>
 </div>""")
             print("<div class=text>")
-        book_n = line.book_n
+        book_n = loc.book_n
 
-        print("<span id=\"book-{book_n}-line-{line_n}\" class=\"line\" data-lineno=\"{line_n}\">".format(book_n=esc(line.book_n), line_n=esc(line.line_n)), end="")
+        print("<span id=\"book-{book_n}-line-{line_n}\" class=\"line\" data-lineno=\"{line_n}\">".format(book_n=esc(loc.book_n), line_n=esc(loc.line_n)), end="")
 
         sedes = None
-        for (word_n, (inter, word)) in enumerate(extract_words_and_intermediates(line.text)):
+        for (word_n, (inter, word)) in enumerate(extract_words_and_intermediates(text)):
             word_n = str(int(word_n) + 1)
 
             if word is None:
                 print(esc(inter), end="")
                 continue
 
-            key = (work_identifier, line.book_n, line.line_n, word_n)
+            key = (work_identifier, loc.book_n, loc.line_n, word_n)
             try:
                 stats_entry = stats[key]
                 if word.lower() != stats_entry.word:
@@ -337,7 +337,7 @@ header {
                 stats_entry = None
 
             word_attrs = collections.OrderedDict({
-                "id": "book-{}-line-{}-word-{}".format(line.book_n, line.line_n, word_n),
+                "id": "book-{}-line-{}-word-{}".format(loc.book_n, loc.line_n, word_n),
                 "class": "word",
             })
             if stats_entry is not None:
@@ -369,7 +369,7 @@ header {
                 print(esc(inter), end="")
 
                 print("warning: no stats for work {work} book {book_n} line {line_n} word {word_n}".format(
-                    work=work_identifier, book_n=line.book_n, line_n=line.line_n, word_n=word_n,
+                    work=work_identifier, book_n=loc.book_n, line_n=loc.line_n, word_n=word_n,
                 ), file=sys.stderr)
                 word_attrs["class"] += " error"
 

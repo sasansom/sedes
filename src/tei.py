@@ -73,17 +73,6 @@ class Locator:
     def __repr__(self):
         return repr(str(self))
 
-class Line:
-    """Line is a container for (book number, line number, text of line)."""
-
-    def __init__(self, env, line_n, text):
-        self.book_n = env.book_n
-        self.line_n = line_n
-        self.text = text
-
-    def __str__(self):
-        return "{} {!r}".format(Locator(self.book_n, self.line_n), self.text)
-
 class Environment:
     """Environment represents the context of a call to TEI.do_elem."""
 
@@ -108,8 +97,8 @@ class TEI:
         return self.soup.teiHeader.fileDesc.titleStmt.author.get_text()
 
     def lines(self):
-        """Return an iterator over Lines extracted from the text of the TEI
-        document."""
+        """Return an iterator over (Locator, str) extracted from the text of the
+        TEI document."""
 
         # Internally this function works using recursion in the do_elem
         # function. The current line number (line_n), and the partial contents
@@ -128,7 +117,7 @@ class TEI:
             text = "".join(partial).strip()
             partial.clear()
             if text:
-                yield Line(env, line_n, text)
+                yield Locator(env.book_n, line_n), text
 
         def do_elem(root, env):
             nonlocal line_n, partial
