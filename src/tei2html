@@ -55,13 +55,6 @@ def parse_stats(f, work_identifier):
 def esc(v):
     return html.escape(v, True)
 
-def extract_words_and_intermediates(s):
-    prev_end = 0
-    for m in re.finditer("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", s):
-        yield s[prev_end:m.start()], s[m.start():m.end()]
-        prev_end = m.end()
-    yield s[prev_end:], None
-
 def z_css(z):
     if z is None:
         return "z-weighted-100"
@@ -286,7 +279,7 @@ header {
     print("<h1>{}</h1>".format(esc(doc.title)))
 
     book_n = None
-    for loc, text in doc.lines():
+    for loc, line in doc.lines():
         if loc.book_n != book_n:
             if book_n is not None:
                 print("</div>")
@@ -318,38 +311,56 @@ header {
             print("<div class=text>")
         book_n = loc.book_n
 
+        # Begin line.
         print("<span id=\"book-{book_n}-line-{line_n}\" class=\"line\" data-lineno=\"{line_n}\">".format(book_n=esc(loc.book_n), line_n=esc(loc.line_n)), end="")
 
-        sedes = None
-        for (word_n, (inter, word)) in enumerate(extract_words_and_intermediates(text)):
-            word_n = str(int(word_n) + 1)
-
-            if word is None:
-                print(esc(inter), end="")
+        buffered_nonwords = []
+        prev_sedes = None
+        word_n = 0
+        for token in line.tokens:
+            if token.type == tei.Token.Type.NONWORD:
+                if prev_sedes is None:
+                    print(esc(token.text), end="")
+                else:
+                    # These nonwords may or may not belong to the currently open
+                    # sedes span--it depends on whether the sedes of the next
+                    # word is the same or not.
+                    buffered_nonwords.append(token)
                 continue
 
-            key = (work_identifier, loc.book_n, loc.line_n, word_n)
-            try:
-                stats_entry = stats[key]
-                if word.lower() != stats_entry.word:
-                    stats_entry = None
-            except KeyError:
-                stats_entry = None
-
+            assert token.type == tei.Token.Type.WORD, token
+            word_n += 1
             word_attrs = collections.OrderedDict({
                 "id": "book-{}-line-{}-word-{}".format(loc.book_n, loc.line_n, word_n),
                 "class": "word",
             })
+
+            key = (work_identifier, loc.book_n, loc.line_n, str(word_n))
+            try:
+                stats_entry = stats[key]
+                if token.text.lower() != stats_entry.word:
+                    stats_entry = None
+            except KeyError:
+                stats_entry = None
+
             if stats_entry is not None:
-                if sedes == stats_entry.sedes:
-                    print(esc(inter), end="")
+                # We have a known sedes for this word. Is it the same as the
+                # sedes of the previous word (if any)?
+                assert stats_entry.sedes is not None, stats_entry
+                if stats_entry.sedes == prev_sedes:
+                    # Include these nonwords in the currently open sedes span.
+                    print(esc("".join(token.text for token in buffered_nonwords)), end="")
+                    buffered_nonwords.clear()
                 else:
-                    inters = re.sub(r"\s+", "\n", inter).split("\n")
-                    if sedes is not None:
-                        print("{}</span>".format(esc(inters[0])))
-                    print(esc("\n".join(inters[1:])), end="")
+                    if prev_sedes is not None:
+                        # Close the currently open sedes span.
+                        print("</span>", end="")
+                    # The nonwords in between belong to neither sedes span.
+                    print(esc(re.sub(r"\s+", "\n", "".join(token.text for token in buffered_nonwords))), end="")
+                    buffered_nonwords.clear()
+                    # Begin new sedes.
                     print("<span class=\"sedes s{}\">".format(esc(stats_entry.sedes.replace(".", "_"))), end="")
-                sedes = stats_entry.sedes
+                prev_sedes = stats_entry.sedes
 
                 word_attrs["data-x"] = str(stats_entry.x)
                 word_attrs["title"] = "x={}".format(stats_entry.x)
@@ -363,23 +374,33 @@ header {
                 word_attrs["title"] += " shape={}".format(stats_entry.metrical_shape)
                 word_attrs["title"] += " lemma={}".format(stats_entry.lemma)
             else:
-                if sedes is not None:
+                # The sedes for this word is unknown. Unconditionally close any
+                # currently open sedes span and output a word span without any
+                # sedes span around it.
+                if prev_sedes is not None:
                     print("</span>", end="")
-                sedes = None
-                print(esc(inter), end="")
+                prev_sedes = None
+
+                print(esc(re.sub(r"\s+", "\n", "".join(token.text for token in buffered_nonwords))), end="")
+                buffered_nonwords.clear()
 
                 print("warning: no stats for work {work} book {book_n} line {line_n} word {word_n}".format(
                     work=work_identifier, book_n=loc.book_n, line_n=loc.line_n, word_n=word_n,
                 ), file=sys.stderr)
                 word_attrs["class"] += " error"
 
+            # Span for a single word.
             print("<span", end="")
             for attr, value in word_attrs.items():
                 print(" {}=\"{}\"".format(esc(attr), esc(value)), end="")
-            print(">{}</span>".format(esc(word)), end="")
-        if sedes is not None:
+            print(">{}</span>".format(esc(token.text)), end="")
+        if prev_sedes is not None:
+            # Close the last remaining open sedes span.
             print("</span>", end="")
+        print(esc("".join(token.text for token in buffered_nonwords)), end="")
+        buffered_nonwords.clear()
 
+        # End line.
         print("</span>")
         print("<br>")
 

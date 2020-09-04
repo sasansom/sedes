@@ -4,6 +4,7 @@
 
 import bs4
 import copy
+import enum
 import re
 import sys
 
@@ -82,6 +83,49 @@ class Environment:
     def copy(self):
         return copy.copy(self)
 
+class Token:
+    """Token represents part of a text string, distinguishing words from
+    interword text and punctuation."""
+
+    class Type(enum.Enum):
+        WORD = enum.auto()
+        NONWORD = enum.auto()
+
+    def __init__(self, type, text):
+        self.type = type
+        self.text = text
+
+    def __repr__(self):
+        return f"Token({self.type}, {self.text!r})"
+
+def tokenize_text(text):
+    """Split text into a sequence of WORD and NONWORD tokens."""
+
+    prev_end = 0
+    for m in re.finditer("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", text):
+        nonword = text[prev_end:m.start()]
+        word = text[m.start():m.end()]
+        if nonword:
+            yield Token(Token.Type.NONWORD, nonword)
+        if word:
+            yield Token(Token.Type.WORD, word)
+        prev_end = m.end()
+    # Trailing nonword characters.
+    nonword = text[prev_end:]
+    if nonword:
+        yield Token(Token.Type.NONWORD, nonword)
+
+class Line:
+    """Line is a sequence of tokens."""
+    def __init__(self, tokens):
+        self.tokens = tokens
+
+    def text(self):
+        return "".join(token.text for token in self.tokens)
+
+    def words(self):
+        return (token.text for token in self.tokens if token.type == Token.Type.WORD)
+
 class TEI:
     """TEI represents a TEI document read from a file stream."""
 
@@ -110,14 +154,26 @@ class TEI:
         partial = []
 
         def flush(env):
-            """Yield the lines represented by the current partial list and clear
+            """Yield the Line represented by the current partial list and clear
             the list."""
             nonlocal line_n, partial
 
-            text = "".join(partial).strip()
-            partial.clear()
-            if text:
-                yield Locator(env.book_n, line_n), text
+            if partial:
+                tokens = partial[:]
+                partial.clear()
+                # Trim leading and trailing whitespace.
+                while tokens and tokens[0].type == Token.Type.NONWORD:
+                    tokens[0].text = tokens[0].text.strip()
+                    if tokens[0].text:
+                        break
+                    tokens.pop(0)
+                while tokens and tokens[-1].type == Token.Type.NONWORD:
+                    tokens[-1].text = tokens[-1].text.strip()
+                    if tokens[-1].text:
+                        break
+                    tokens.pop(-1)
+                if tokens:
+                    yield Locator(env.book_n, line_n), Line(tokens)
 
         def do_elem(root, env):
             nonlocal line_n, partial
@@ -177,7 +233,7 @@ class TEI:
                 else:
                     if "?" in elem:
                         raise ValueError("\"?\" not allowed in beta code; see https://github.com/sasansom/sedes/issues/11")
-                    partial.append(betacode.decode(elem))
+                    partial.extend(tokenize_text(betacode.decode(elem)))
 
         for x in do_elem(self.soup.find("text").body, Environment()):
             yield x

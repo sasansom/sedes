@@ -26,28 +26,25 @@ IDENTIFIER is a short text identifier for the work; e.g., "Il.".
 FILENAME.XML is a TEI XML document containing the text of the work.
 """.format(sys.argv[0]), end="", file=file)
 
-def extract_words(s):
-    return re.findall("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", s)
-
 def assign_sedes_for_line(line):
     """From a line, return a sequence of (word, sedes, num_scansions) tuples.
     sedes will be non-blank if and only if num_scansions is equal to 1."""
-    assignments = sedes.analyze(line)
+    assignments = sedes.analyze(line.text())
     if len(assignments) == 1:
         return tuple((word, sedes, shape, len(assignments)) for (word, sedes, shape) in assignments[0])
     else:
         # If no scansions or multiple scansions, output "".
-        return tuple((word, "", "", len(assignments)) for word in extract_words(line))
+        return tuple((word, "", "", len(assignments)) for word in line.words())
 
 def process(f):
     global csv_w, work_identifier
     doc = tei.TEI(f)
-    for loc, text in doc.lines():
-        if text in sedes.KNOWN_SCANSIONS:
+    for loc, line in doc.lines():
+        if line.text() in sedes.KNOWN_SCANSIONS:
             scanned = "manual"
         else:
             scanned = "auto"
-        for word_n, entry in enumerate(assign_sedes_for_line(text)):
+        for word_n, entry in enumerate(assign_sedes_for_line(line)):
             word, pos, shape, num_scansions = entry
             csv_w.writerow({
                 "work": work_identifier,
