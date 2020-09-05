@@ -318,7 +318,7 @@ header {
         prev_sedes = None
         word_n = 0
         for token in line.tokens:
-            if token.type == tei.Token.Type.NONWORD:
+            if token.type != tei.Token.Type.WORD:
                 if prev_sedes is None:
                     print(esc(token.text), end="")
                 else:
@@ -328,7 +328,6 @@ header {
                     buffered_nonwords.append(token)
                 continue
 
-            assert token.type == tei.Token.Type.WORD, token
             word_n += 1
             word_attrs = collections.OrderedDict({
                 "id": "book-{}-line-{}-word-{}".format(loc.book_n, loc.line_n, word_n),

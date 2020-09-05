@@ -79,6 +79,7 @@ class Environment:
 
     def __init__(self):
         self.book_n = None
+        self.in_line = False # Are we in a context that counts as being part of a line (i.e., not between l elements)?
 
     def copy(self):
         return copy.copy(self)
@@ -90,6 +91,8 @@ class Token:
     class Type(enum.Enum):
         WORD = enum.auto()
         NONWORD = enum.auto()
+        OPEN_QUOTE = enum.auto()
+        CLOSE_QUOTE = enum.auto()
 
     def __init__(self, type, text):
         self.type = type
@@ -115,6 +118,22 @@ def tokenize_text(text):
     if nonword:
         yield Token(Token.Type.NONWORD, nonword)
 
+def trim_tokens(tokens):
+    """Trim leading and trailing whitespace from a list of tokens."""
+
+    tokens = tokens[:]
+    while tokens and tokens[0].type == Token.Type.NONWORD:
+        tokens[0].text = tokens[0].text.strip()
+        if tokens[0].text:
+            break
+        tokens.pop(0)
+    while tokens and tokens[-1].type == Token.Type.NONWORD:
+        tokens[-1].text = tokens[-1].text.strip()
+        if tokens[-1].text:
+            break
+        tokens.pop(-1)
+    return tokens
+
 class Line:
     """Line is a sequence of tokens."""
     def __init__(self, tokens):
@@ -122,6 +141,10 @@ class Line:
 
     def text(self):
         return "".join(token.text for token in self.tokens)
+
+    def text_without_quotes(self):
+        tokens = trim_tokens([token for token in self.tokens if token.type not in (Token.Type.OPEN_QUOTE, Token.Type.CLOSE_QUOTE)])
+        return "".join(token.text for token in tokens)
 
     def words(self):
         return (token.text for token in self.tokens if token.type == Token.Type.WORD)
@@ -152,6 +175,9 @@ class TEI:
         # caller.
         line_n = None
         partial = []
+        # next_partial is a list of tokens to be prepended to the beginning of
+        # the next line, when it starts.
+        next_partial = []
 
         def flush(env):
             """Yield the Line represented by the current partial list and clear
@@ -159,24 +185,13 @@ class TEI:
             nonlocal line_n, partial
 
             if partial:
-                tokens = partial[:]
+                tokens = trim_tokens(partial)
                 partial.clear()
-                # Trim leading and trailing whitespace.
-                while tokens and tokens[0].type == Token.Type.NONWORD:
-                    tokens[0].text = tokens[0].text.strip()
-                    if tokens[0].text:
-                        break
-                    tokens.pop(0)
-                while tokens and tokens[-1].type == Token.Type.NONWORD:
-                    tokens[-1].text = tokens[-1].text.strip()
-                    if tokens[-1].text:
-                        break
-                    tokens.pop(-1)
                 if tokens:
                     yield Locator(env.book_n, line_n), Line(tokens)
 
         def do_elem(root, env):
-            nonlocal line_n, partial
+            nonlocal line_n, partial, next_partial
 
             for elem in root.children:
                 # Make a copy of the environment to pass to recursive calls to
@@ -189,14 +204,21 @@ class TEI:
                     pass
                 elif type(elem) == bs4.element.Tag:
                     # Lines may be marked up as
-                    #   <l>text text text</l>
-                    #   <lb/>text text text
+                    #   <l n="100">text text text</l>
+                    #   <lb n="100"/>text text text
                     # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
                     # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
                     if elem.name in ("l", "lb"):
-                        # Output previous line.
-                        for x in flush(env):
-                            yield x
+                        if elem.name == "lb":
+                            # Output the previous line. l elements are flushed
+                            # at the end of the loop iteration, where the
+                            # element is closed.
+                            for x in flush(env):
+                                yield x
+
+                        partial.extend(next_partial)
+                        next_partial.clear()
+
                         cur_loc = Locator(env.book_n, line_n)
                         n = elem.get("n")
                         if n is not None:
@@ -211,6 +233,11 @@ class TEI:
                             new_loc = cur_loc.successor()
                         assert env.book_n == new_loc.book_n
                         line_n = new_loc.line_n
+
+                        if elem.name == "l":
+                            sub_env.in_line = True
+                        elif elem.name == "lb":
+                            env.in_line = True
                     elif elem.name == "div1":
                         assert elem.get("type").lower() in ("book", "hymn", "poem"), elem.get("type")
                         sub_env.book_n = elem.get("n")
@@ -219,13 +246,52 @@ class TEI:
 
                     if elem.name in ("milestone", "head", "gap", "pb", "note", "speaker"):
                         pass
-                    elif elem.name in ("div1", "div2", "l", "lb", "p", "q", "sp", "add", "del", "name"):
+                    elif elem.name in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name"):
                         for x in do_elem(elem, sub_env):
                             yield x
+                    elif elem.name == "q":
+                        # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
+                        # Quotation is tricky because it can appear in two forms
+                        # with essentially opposite nesting:
+                        #   <lb/><q>abcd abcd abcd
+                        #   <lb/>efgh efgh efgh efgh</q>
+                        #
+                        #   <q><l>abcd abcd abcd</l>
+                        #   <l>efgh efgh efgh</l></q>
+                        # The first case is easy: we just add open and close
+                        # quotation marks where the open and close q tags
+                        # appear. In the second case, the q element doesn't
+                        # actually belong to either line; we have to migrate the
+                        # open quotation mark to the beginning of the first
+                        # line, and the close quotation mark to the end of the
+                        # last line.
+                        if env.in_line:
+                            partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
+                            for x in do_elem(elem, sub_env):
+                                yield x
+                            partial.append(Token(Token.Type.CLOSE_QUOTE, "’"))
+                        else:
+                            # Put the open quotation mark in a queue to be
+                            # prepended to the next line that begins.
+                            next_partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
+                            # Append the close quotation mark to the final
+                            # yielded line.
+                            buf = None
+                            for x in do_elem(elem, sub_env):
+                                if buf is not None:
+                                    yield buf
+                                buf = x
+                            assert buf is not None, buf
+                            loc, line = buf
+                            line.tokens.append(Token(Token.Type.CLOSE_QUOTE, "’"))
+                            yield loc, line
                     else:
                         raise ValueError("don't understand element {!r}".format(elem.name))
 
-                    if elem.name == "div1":
+                    if elem.name == "l":
+                        for x in flush(env):
+                            yield x
+                    elif elem.name == "div1":
                         for x in flush(sub_env):
                             yield x
                         # At the end of a book, reset the line counter to be safe.
