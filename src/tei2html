@@ -112,7 +112,7 @@ header {
 }
 
 .error {
-    color: firebrick;
+    background-color: firebrick;
 }
 
 /*
