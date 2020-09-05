@@ -338,7 +338,7 @@ header {
             key = (work_identifier, loc.book_n, loc.line_n, str(word_n))
             try:
                 stats_entry = stats[key]
-                if token.text.lower() != stats_entry.word:
+                if token.text.lower() != stats_entry.word.lower():
                     stats_entry = None
             except KeyError:
                 stats_entry = None
