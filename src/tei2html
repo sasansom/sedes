@@ -158,6 +158,12 @@ header {
 .grid {
     position: relative;
 }
+.grid .line {
+    visibility: hidden;
+}
+.grid .line::before, .grid .line .word {
+    visibility: visible;
+}
 .grid .s1,
 .grid .s2,
 .grid .s2_5,
