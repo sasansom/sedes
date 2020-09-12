@@ -114,7 +114,11 @@ def recover_known(known):
     sedes = 1.0
     result = []
     for (word, shape) in known:
-        result.append((word, "{:g}".format(sedes), shape))
+        # Ignore empty words; this is a hack to permit a line to start at a
+        # sedes other than 1, for example when one metrical line is split across
+        # multiple printed lines, as in Theoc 5.66–68.
+        if word:
+            result.append((word, "{:g}".format(sedes), shape))
         for value in shape:
             if value == "-":
                 sedes += 0.5
