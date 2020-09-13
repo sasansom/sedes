@@ -25,6 +25,12 @@ COLOR_DIVERGING_LOW  = (0xd7, 0x19, 0x1c)
 COLOR_DIVERGING_MID  = (0xf5, 0xf5, 0xf5)
 COLOR_DIVERGING_HIGH = (0x2c, 0x7b, 0xb6)
 
+# Increase this to increase the steepness of the tone mapping operation.
+SHADE_MAPPING_ADJUST = 1.0
+
+# Endpoints of the legends that illustrate shade mapping.
+SHADE_SCALE_RANGE = (-3.0, 3.0)
+
 def usage(file=sys.stdout):
     print("""\
 Usage: {} IDENTIFIER WORK.xml STATS.csv > WORK.html
@@ -67,7 +73,7 @@ def esc(v):
     return html.escape(v, True)
 
 def tone_map(z):
-    return 0.5 + math.atan(z) / math.pi
+    return 0.5 + math.atan(z * SHADE_MAPPING_ADJUST) / math.pi
 
 def z_css(z):
     if z is None:
@@ -296,6 +302,9 @@ header {
 }
 """)
 
+    def interval_range(start, stop, num_steps):
+        return [start + (stop - start) * (float(i) / num_steps) for i in range(num_steps + 1)]
+
     print("""\
 #shade-scale {{
     display: none;
@@ -307,7 +316,7 @@ header {
 #vis-helper.shade-bubbles #shade-scale {{
     display: flex;
 }}
-""".format(", ".join(css_color(*(interpolate_srgb(n / 100.0, COLOR_LOW, COLOR_HIGH))) for n in range(101))))
+""".format(", ".join(css_color(*(interpolate_srgb(tone_map(z), COLOR_LOW, COLOR_HIGH))) for z in interval_range(*SHADE_SCALE_RANGE, 50))))
 
     print("""\
 #shade-diverging-scale {{
@@ -320,7 +329,7 @@ header {
 #vis-helper.shade-bubbles-diverging #shade-diverging-scale {{
     display: flex;
 }}
-""".format(", ".join(css_color(*(diverging_scale(n / 100.0, COLOR_DIVERGING_LOW, COLOR_DIVERGING_MID, COLOR_DIVERGING_HIGH))) for n in range(101))))
+""".format(", ".join(css_color(*(diverging_scale(tone_map(z), COLOR_DIVERGING_LOW, COLOR_DIVERGING_MID, COLOR_DIVERGING_HIGH))) for z in interval_range(*SHADE_SCALE_RANGE, 50))))
 
     for n in range(101):
         r = n / 100.0
@@ -349,6 +358,10 @@ header {
 
     print("<body>")
 
+    # Format a floating-point number as appropriate for HTML, with a real minus
+    # sign.
+    def fmt_float(x):
+        return esc("{:+.3g}".format(x).replace("-", "−"))
     print("""\
 <header>
 <form id=controls>
@@ -365,16 +378,16 @@ header {
 <br>
 <div id=vis-helper>
 <div id=shade-scale>
-<span>−∞</span><span>+∞</span>
+<span>{min}</span><span>{max}</span>
 </div>
 <div id=shade-diverging-scale>
-<span>−∞</span><span>+∞</span>
+<span>{min}</span><span>{max}</span>
 </div>
 </div>
 <label><input name=z-calculation type=radio value=weighted checked> Weighted <var>z</var>-score</label><br>
 <label><input name=z-calculation type=radio value=unweighted> Unweighted <var>z</var>-score</label>
 </form>
-</header>""")
+</header>""".format(min = fmt_float(SHADE_SCALE_RANGE[0]), max = fmt_float(SHADE_SCALE_RANGE[1])))
 
     print("<article>")
     print("<h1>{}</h1>".format(esc(doc.title)))
