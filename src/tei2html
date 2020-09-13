@@ -66,17 +66,20 @@ def parse_stats(f, work_identifier):
 def esc(v):
     return html.escape(v, True)
 
+def tone_map(z):
+    return 0.5 + math.atan(z) / math.pi
+
 def z_css(z):
     if z is None:
         return "z-weighted-100"
     else:
-        return "z-weighted-{}".format(int(100 * (0.5 + math.atan(z) / math.pi)))
+        return "z-weighted-{}".format(int(100 * tone_map(z)))
 
 def z_css_unweighted(z):
     if z is None:
         return "z-unweighted-100"
     else:
-        return "z-unweighted-{}".format(int(100 * (0.5 + math.atan(z) / math.pi)))
+        return "z-unweighted-{}".format(int(100 * tone_map(z)))
 
 def css_color(sr, sg, sb):
     return "#{:02x}{:02x}{:02x}".format(sr, sg, sb)
