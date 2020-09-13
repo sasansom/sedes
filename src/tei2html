@@ -33,13 +33,17 @@ SHADE_SCALE_RANGE = (-3.0, 3.0)
 
 def usage(file=sys.stdout):
     print("""\
-Usage: {} IDENTIFIER WORK.xml STATS.csv > WORK.html
+Usage: {progname} [OPTION] IDENTIFIER WORK.xml STATS.csv > WORK.html
 
 IDENTIFIER is a short text identifier for the work; e.g., "Il.".
 WORK.XML is a TEI XML document containing the text of the work.
 STATS.csv is statistics on a corpus of text as produced by
 tei2csv and expectancy.R.
-""".format(sys.argv[0]), end="", file=file)
+
+  -s NUM, --shade-mapping-adjust=NUM  change steepness of shade mapping
+                                      (default {shade_mapping_adjust:.1f})
+  -h, --help  show this help
+""".format(progname = sys.argv[0], shade_mapping_adjust = SHADE_MAPPING_ADJUST), end="", file=file)
 
 class StatsEntry:
     def __init__(self, row):
@@ -576,11 +580,13 @@ CONTROLS["style"].dispatchEvent(new Event("change"));
 """)
     print("</html>")
 
-opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
+opts, args = getopt.gnu_getopt(sys.argv[1:], "hs:", ["help", "shade-mapping-adjust="])
 for o, a in opts:
     if o in ("-h", "--help"):
         usage()
         sys.exit(0)
+    elif o in ("-s", "--shade-mapping-adjust"):
+        SHADE_MAPPING_ADJUST = float(a)
 
 try:
     work_identifier, tei_filename, csv_filename = args
