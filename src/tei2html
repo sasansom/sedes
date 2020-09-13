@@ -91,7 +91,7 @@ def srgb_component_to_linear(s):
 
 def linear_component_to_srgb(u):
     # https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
-    if u <= 0.031308:
+    if u <= 0.0031308:
         s = 12.92 * u
     else:
         s = 1.055 * math.pow(u, 5.0/12.0) - 0.055
