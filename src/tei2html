@@ -14,6 +14,17 @@ import unicodedata
 
 import tei
 
+# Colors for low-to-high color scale.
+COLOR_LOW  = (0x00, 0x00, 0x00)
+COLOR_HIGH = (0xe6, 0xe6, 0xe6)
+
+# Colors for diverging color scale.
+# https://colorbrewer2.org/#type=diverging&scheme=RdYlBu&n=5
+# Then the midpoint adjusted to gray.
+COLOR_DIVERGING_LOW  = (0xd7, 0x19, 0x1c)
+COLOR_DIVERGING_MID  = (0xf5, 0xf5, 0xf5)
+COLOR_DIVERGING_HIGH = (0x2c, 0x7b, 0xb6)
+
 def usage(file=sys.stdout):
     print("""\
 Usage: {} IDENTIFIER WORK.xml STATS.csv > WORK.html
@@ -66,6 +77,40 @@ def z_css_unweighted(z):
         return "z-unweighted-100"
     else:
         return "z-unweighted-{}".format(int(100 * (0.5 + math.atan(z) / math.pi)))
+
+def css_color(sr, sg, sb):
+    return "#{:02x}{:02x}{:02x}".format(sr, sg, sb)
+
+def srgb_component_to_linear(s):
+    # https://en.wikipedia.org/wiki/SRGB#The_reverse_transformation
+    u = s / 255.0
+    if u <= 0.04045:
+        return u / 12.92
+    else:
+        return math.pow((u + 0.055)/1.055, 12.0/5.0)
+
+def linear_component_to_srgb(u):
+    # https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
+    if u <= 0.031308:
+        s = 12.92 * u
+    else:
+        s = 1.055 * math.pow(u, 5.0/12.0) - 0.055
+    return int(s * 255 + 0.5)
+
+def srgb_to_linear(sr, sg, sb):
+    return tuple(srgb_component_to_linear(c) for c in (sr, sg, sb))
+
+def linear_to_srgb(r, g, b):
+    return tuple(linear_component_to_srgb(u) for u in (r, g, b))
+
+def interpolate_srgb(x, s1, s2):
+    return linear_to_srgb(*((1.0 - x) * u1 + x * u2 for (u1, u2) in zip(srgb_to_linear(*s1), srgb_to_linear(*s2))))
+
+def diverging_scale(x, low, mid, high):
+    if x < 0.5:
+        return interpolate_srgb((0.5 - x) / 0.5, mid, low)
+    else:
+        return interpolate_srgb((x - 0.5) / 0.5, mid, high)
 
 def process(f, stats, work_identifier):
     doc = tei.TEI(f)
@@ -204,14 +249,17 @@ header {
 """)
 
     print("""\
-.shade-bubbles .word {
+.shade-bubbles .word,
+.shade-bubbles-diverging .word {
     --r: 2.5rem; /* radius of 100% circle */
     position: relative;
 }
-.shade-bubbles .word::before {
+.shade-bubbles .word::before,
+.shade-bubbles-diverging .word::before {
     background-color: magenta; /* highlight any missing background-colors */
 }
-.shade-bubbles .word::before {
+.shade-bubbles .word::before,
+.shade-bubbles-diverging .word::before {
     --s: 1.5rem;
     position: absolute;
     opacity: 0.5;
@@ -245,15 +293,49 @@ header {
 }
 """)
 
+    print("""\
+#shade-scale {{
+    display: none;
+    background: linear-gradient(to right, {});
+    color: gray;
+    justify-content: space-between;
+}}
+#vis-helper.shade-text #shade-scale,
+#vis-helper.shade-bubbles #shade-scale {{
+    display: flex;
+}}
+""".format(", ".join(css_color(*(interpolate_srgb(n / 100.0, COLOR_LOW, COLOR_HIGH))) for n in range(101))))
+
+    print("""\
+#shade-diverging-scale {{
+    display: none;
+    background: linear-gradient(to right, {});
+    color: black;
+    justify-content: space-between;
+}}
+#vis-helper.shade-text-diverging #shade-diverging-scale,
+#vis-helper.shade-bubbles-diverging #shade-diverging-scale {{
+    display: flex;
+}}
+""".format(", ".join(css_color(*(diverging_scale(n / 100.0, COLOR_DIVERGING_LOW, COLOR_DIVERGING_MID, COLOR_DIVERGING_HIGH))) for n in range(101))))
+
     for n in range(101):
         r = n / 100.0
 
-        gamma = 0.9 * math.pow(r, 1/2.2)
-        print(".shade-text.z-weighted .sedes .z-weighted-{} {{ color: hsl(0, 0%, {:.1f}%); }}".format(n, 100 * gamma))
-        print(".shade-text.z-unweighted .sedes .z-unweighted-{} {{ color: hsl(0, 0%, {:.1f}%); }}".format(n, 100 * gamma))
+        shade_color = interpolate_srgb(r, COLOR_LOW, COLOR_HIGH)
+        diverging_color = diverging_scale(r, COLOR_DIVERGING_LOW, COLOR_DIVERGING_MID, COLOR_DIVERGING_HIGH)
 
-        print(".shade-bubbles.z-weighted .sedes .z-weighted-{}::before {{ background-color: hsl(0, 0%, {:.1f}%); }}".format(n, 100 * gamma))
-        print(".shade-bubbles.z-unweighted .sedes .z-unweighted-{}::before {{ background-color: hsl(0, 0%, {:.1f}%); }}".format(n, 100 * gamma))
+        print(".shade-text.z-weighted .sedes .z-weighted-{} {{ color: {}; }}".format(n, css_color(*shade_color)))
+        print(".shade-text.z-unweighted .sedes .z-unweighted-{} {{ color: {}; }}".format(n, css_color(*shade_color)))
+
+        print(".shade-text-diverging.z-weighted .sedes .z-weighted-{} {{ color: {}; }}".format(n, css_color(*diverging_color)))
+        print(".shade-text-diverging.z-unweighted .sedes .z-unweighted-{} {{ color: {}; }}".format(n, css_color(*diverging_color)))
+
+        print(".shade-bubbles.z-weighted .sedes .z-weighted-{}::before {{ background-color: {}; }}".format(n, css_color(*shade_color)))
+        print(".shade-bubbles.z-unweighted .sedes .z-unweighted-{}::before {{ background-color: {}; }}".format(n, css_color(*shade_color)))
+
+        print(".shade-bubbles-diverging.z-weighted .sedes .z-weighted-{}::before {{ background-color: {}; }}".format(n, css_color(*diverging_color)))
+        print(".shade-bubbles-diverging.z-unweighted .sedes .z-unweighted-{}::before {{ background-color: {}; }}".format(n, css_color(*diverging_color)))
 
         area = math.sqrt(1.0 - r)
         print(".size-bubbles.z-weighted .sedes .z-weighted-{}::before {{ --s: calc(var(--r) * {:.3f}); }}".format(n, area))
@@ -272,10 +354,20 @@ header {
 <select name=style>
 <option value=>No highlighting</option>
 <option value=shade-text>Shade text</option>
+<option value=shade-text-diverging>Shade text, diverging</option>
 <option value=shade-bubbles>Shade bubbles</option>
+<option value=shade-bubbles-diverging>Shade bubbles, diverging</option>
 <option value=size-bubbles>Size bubbles</option>
 </select>
 <br>
+<div id=vis-helper>
+<div id=shade-scale>
+<span>−∞</span><span>+∞</span>
+</div>
+<div id=shade-diverging-scale>
+<span>−∞</span><span>+∞</span>
+</div>
+</div>
 <label><input name=z-calculation type=radio value=weighted checked> Weighted <var>z</var>-score</label><br>
 <label><input name=z-calculation type=radio value=unweighted> Unweighted <var>z</var>-score</label>
 </form>
@@ -419,7 +511,9 @@ header {
 <script>
 const ALL_STYLES = [
     "shade-text",
+    "shade-text-diverging",
     "shade-bubbles",
+    "shade-bubbles-diverging",
     "size-bubbles",
 ];
 const CONTROLS = document.getElementById("controls");
@@ -439,12 +533,16 @@ CONTROLS["grid"].addEventListener("change", event => {
     }
 });
 CONTROLS["grid"].dispatchEvent(new Event("change"));
+const VIS_HELPER = document.getElementById("vis-helper");
 CONTROLS["style"].addEventListener("change", event => {
     for (let elem of document.querySelectorAll(".text")) {
         elem.classList.remove(...ALL_STYLES);
         if (event.target.value)
             elem.classList.add(event.target.value);
     }
+    VIS_HELPER.classList.remove(...ALL_STYLES);
+    if (event.target.value)
+        VIS_HELPER.classList.add(event.target.value);
 });
 CONTROLS["style"].dispatchEvent(new Event("change"));
 {
