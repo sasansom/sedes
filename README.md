@@ -13,6 +13,20 @@ its line number and sedes. For example:
 ./src/tei2csv "Il." corpus/iliad.xml > corpus/iliad.csv
 ```
 
+The `expectancy.R` program annotates one or more CSV files
+as produced by `tei2csv` with statistics about expectancy for each word.
+```
+Rscript src/expectancy.R corpus/*.xml > expectancy.all.csv
+```
+
+The `tei2html` program produces an HTML representation of
+a TEI-encoded XML document, with visual highlighting of word expectancy.
+If you put the HTML file in the web-demo directory,
+it will have access to locally installed web fonts for Greek.
+```
+./src/tei2html "Il." corpus/iliad.xml expectancy.all.csv > web-demo/iliad.html
+```
+
 The "src/hexameter" subdirectory contains a Python module
 that we use for metrical analysis.
 It is by Hope Ranker and comes from https://github.com/epilanthanomai/hexameter.
@@ -22,7 +36,7 @@ It is by Hope Ranker and comes from https://github.com/epilanthanomai/hexameter.
 
 The "corpus" subdirectory contains selected TEI-encoded XML texts downloaded from
 [Perseus](https://www.perseus.tufts.edu/hopper/).
-These are suitable for input to `tei2csv`.
+These are suitable for input to `tei2csv` and `tei2html`.
 
 
 ## Getting started
