@@ -1,4 +1,9 @@
 # Lemmatization for Greek.
+#
+# Requires CLTK and the greek_models_cltk corpus. See:
+#   https://docs.cltk.org/en/latest/installation.html
+#   https://docs.cltk.org/en/latest/importing_corpora.html
+# python3 -c 'from cltk.corpus.utils.importer import CorpusImporter; CorpusImporter("greek").import_corpus("greek_models_cltk")'
 
 import unicodedata
 
