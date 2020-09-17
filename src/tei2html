@@ -484,8 +484,8 @@ header {
                 word_attrs["class"] += " {}".format(esc(z_css(stats_entry.z)))
                 word_attrs["class"] += " {}".format(esc(z_css_unweighted(stats_entry.z_alt)))
                 if stats_entry.z is not None:
-                    word_attrs["data-z"] = "{:.8}".format(stats_entry.z)
-                    word_attrs["title"] += " z={:.8}".format(stats_entry.z)
+                    word_attrs["data-z"] = "{:+.8}".format(stats_entry.z)
+                    word_attrs["title"] += " z={:+.8}".format(stats_entry.z).replace("-", "−")
                 if stats_entry.z_alt is not None:
                     word_attrs["data-z-unweighted"] = "{:.8}".format(stats_entry.z_alt)
                 word_attrs["title"] += " shape={}".format(stats_entry.metrical_shape)
