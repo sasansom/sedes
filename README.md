@@ -3,6 +3,31 @@
 Metrical position in Greek hexameter.
 
 
+## Setup
+
+Sedes depends on [The Classical Language Toolkit](http://cltk.org/)
+for lemmatization.
+You first need to [install CLTK](https://docs.cltk.org/en/latest/installation.html)
+in a virtual environment:
+```
+python3 -m venv venv
+source venv/bin/activate
+pip3 install cltk bs4 lxml
+```
+
+Next, [install the `greek_models_cltk` corpus](https://docs.cltk.org/en/latest/importing_corpora.html):
+```
+python3 -c 'from cltk.corpus.utils.importer import CorpusImporter; CorpusImporter("greek").import_corpus("greek_models_cltk")'
+```
+
+The corpus is stored in a `cltk_data` subdirectory of your home directory.
+The authors have used commit
+[a68b9837](https://github.com/cltk/grc_models_cltk/commit/a68b983734d34df16fd49661f11c4ea037ab173a)
+of the `greek_models_cltk` corpus.
+
+Each time you begin a new shell session, you will need to re-enter
+the virtual environment with `source venv/bin/activate`.
+
 ## Programs
 
 The "src" subdirectory contains a `tei2csv` program
