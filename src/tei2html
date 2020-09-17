@@ -77,7 +77,8 @@ def esc(v):
     return html.escape(v, True)
 
 def tone_map(z):
-    return 0.5 + math.atan(z * SHADE_MAPPING_ADJUST) / math.pi
+    # Logistic function.
+    return 1.0 / (1.0 + math.exp(-z * SHADE_MAPPING_ADJUST))
 
 def z_css(z):
     if z is None:
