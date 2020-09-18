@@ -17,6 +17,8 @@ __all__ = ["lookup"]
 
 OVERRIDES = (
     ("τ’", "τε"),
+    ("σ᾽", "σύ"),
+    ("ἀοιδοί", "ἀοιδός"),
 )
 
 cltk_lemmatizer = BackoffGreekLemmatizer()
