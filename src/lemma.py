@@ -49,6 +49,7 @@ OVERRIDES = (
     ("δαιτός", "δαίς"),
     ("Ζεῦ", "ζεύς"),
     ("ζεὺς", "ζεύς"),
+    ("κραδίην", "καρδία"),
 )
 
 cltk_lemmatizer = BackoffGreekLemmatizer()
