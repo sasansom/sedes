@@ -45,6 +45,13 @@ tei2csv and expectancy.R.
   -h, --help  show this help
 """.format(progname = sys.argv[0], shade_mapping_adjust = SHADE_MAPPING_ADJUST), end="", file=file)
 
+# Parse a float string, but return None for the string "NA".
+def float_or_none(s):
+    if s == "NA":
+        return None
+    else:
+        return float(s)
+
 class StatsEntry:
     def __init__(self, row):
         self.word = unicodedata.normalize("NFD", row["word"])
@@ -52,14 +59,8 @@ class StatsEntry:
         self.metrical_shape = row["metrical_shape"]
         self.lemma = row["lemma"]
         self.x = row["x"]
-        if row["z"] == "NA":
-            self.z = None
-        else:
-            self.z = float(row["z"])
-        if row["z.alt"] == "NA":
-            self.z_alt = None
-        else:
-            self.z_alt = float(row["z.alt"])
+        self.z = float_or_none(row["z"])
+        self.z_alt = float_or_none(row["z.alt"])
 
 def parse_stats(f, work_identifier):
     stats = {}
