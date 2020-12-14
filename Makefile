@@ -28,12 +28,9 @@ WORK_IDENTIFIER_worksanddays     = W.D.
 WORKS_CSV = $(addprefix corpus/,$(addsuffix .csv,$(WORKS)))
 
 .PHONY: all
-all: all.csv expectancy.all.csv expectancy.hellenic+archaic.csv
+all: expectancy.all.csv expectancy.hellenic+archaic.csv
 
-all.csv: $(WORKS_CSV)
-	(sed -n -e '1p' "$<"; for x in $^; do sed -e '1d' $$x; done) > "$@"
-
-expectancy.all.csv: all.csv
+expectancy.all.csv: $(WORKS_CSV)
 	Rscript src/expectancy.R $^ > "$@"
 
 expectancy.hellenic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/homerichymns.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv
@@ -41,7 +38,6 @@ expectancy.hellenic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/home
 
 corpus/%.csv: corpus/%.xml
 	src/tei2csv "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
-.INTERMEDIATE: $(WORKS_CSV)
 
 PYTHON = python3
 

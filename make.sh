@@ -20,9 +20,8 @@ src/tei2csv "Theog." corpus/theogony.xml > corpus/theogony.csv
 src/tei2csv "W.D." corpus/worksanddays.xml > corpus/worksanddays.csv
 
 WORKS_CSV="$(for work in $WORKS; do echo "corpus/$work.csv"; done)"
-(sed -n -e '1p' corpus/homerichymns.csv; for x in $WORKS_CSV; do sed -e '1d' $x; done) > all.csv
 
-Rscript src/expectancy.R all.csv > expectancy.all.csv
+Rscript src/expectancy.R $WORKS_CSV > expectancy.all.csv
 Rscript src/expectancy.R corpus/iliad.csv corpus/odyssey.csv corpus/homerichymns.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv > expectancy.hellenic+archaic.csv
 
 rm -f $(for work in $WORKS; do echo "corpus/$work.csv"; done)

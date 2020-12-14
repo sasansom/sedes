@@ -49,7 +49,7 @@ a TEI-encoded XML document, with visual highlighting of word expectancy.
 If you put the HTML file in the web-demo directory,
 it will have access to locally installed web fonts for Greek.
 ```
-./src/tei2html "Il." corpus/iliad.xml expectancy.all.csv > web-demo/iliad.html
+./src/tei2html corpus/iliad.xml expectancy.all.csv > web-demo/iliad.html
 ```
 
 The "src/hexameter" subdirectory contains a Python module

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Usage:
-# tei2html Sh. corpus/shield.xml expectancy.hellenic+archaic.csv > shield.html
+# tei2html corpus/shield.xml expectancy.hellenic+archaic.csv > shield.html
 
 import collections
 import csv
@@ -12,6 +12,8 @@ import sys
 import re
 import unicodedata
 
+import lemma as lemma_mod
+import sedes as sedes_mod
 import tei
 
 # Colors for low-to-high color scale.
@@ -33,9 +35,8 @@ SHADE_SCALE_RANGE = (-3.0, 3.0)
 
 def usage(file=sys.stdout):
     print("""\
-Usage: {progname} [OPTION] IDENTIFIER WORK.xml STATS.csv > WORK.html
+Usage: {progname} [OPTION] WORK.xml STATS.csv > WORK.html
 
-IDENTIFIER is a short text identifier for the work; e.g., "Il.".
 WORK.XML is a TEI XML document containing the text of the work.
 STATS.csv is statistics on a corpus of text as produced by
 tei2csv and expectancy.R.
@@ -45,6 +46,8 @@ tei2csv and expectancy.R.
   -h, --help  show this help
 """.format(progname = sys.argv[0], shade_mapping_adjust = SHADE_MAPPING_ADJUST), end="", file=file)
 
+ExpectancyEntry = collections.namedtuple("ExpectancyEntry", ("x", "z", "z_alt"))
+
 # Parse a float string, but return None for the string "NA".
 def float_or_none(s):
     if s == "NA":
@@ -52,26 +55,17 @@ def float_or_none(s):
     else:
         return float(s)
 
-class StatsEntry:
-    def __init__(self, row):
-        self.word = unicodedata.normalize("NFD", row["word"])
-        self.sedes = row["sedes"]
-        self.metrical_shape = row["metrical_shape"]
-        self.lemma = row["lemma"]
-        self.x = row["x"]
-        self.z = float_or_none(row["z"])
-        self.z_alt = float_or_none(row["z.alt"])
-
-def parse_stats(f, work_identifier):
+def parse_expectancy(f):
     stats = {}
     for row in csv.DictReader(f):
-        if row["work"] != work_identifier:
-            continue
-        key = (row["work"], row["book_n"], row["line_n"], row["word_n"])
+        key = (row["lemma"], row["sedes"])
         if key in stats:
-            print("warning: ignoring duplicate work {work} book {book_n} line {line_n} word {word_n}".format(**row), file=sys.stderr)
-            continue
-        stats[key] = StatsEntry(row)
+            raise ValueError(f"duplicate lemma/sedes pair {key}")
+        stats[key] = ExpectancyEntry(
+            x = int(row["x"]),
+            z = float_or_none(row["z"]),
+            z_alt = float_or_none(row["z.alt"]),
+        )
     return stats
 
 def esc(v):
@@ -127,7 +121,16 @@ def diverging_scale(x, low, mid, high):
     else:
         return interpolate_srgb((x - 0.5) / 0.5, mid, high)
 
-def process(f, stats, work_identifier):
+def assign_sedes_for_line(line):
+    """From a line, return a sequence of (word, sedes, shape) tuples. sedes will
+    be non-blank if and only if num_scansions is equal to 1."""
+    assignments = sedes_mod.analyze(line.text_without_quotes())
+    if len(assignments) == 1:
+        return tuple(assignments[0])
+    else:
+        return tuple((word, None, None) for word in line.words())
+
+def process(f, expectancy):
     doc = tei.TEI(f)
 
     print("<!DOCTYPE html>")
@@ -437,6 +440,9 @@ header {
         buffered_nonwords = []
         prev_sedes = None
         word_n = 0
+        # We will walk word_entries and line.tokens in parallel, popping an
+        # entry from word_entries every time a token has type WORD.
+        word_entries = list(assign_sedes_for_line(line))
         for token in line.tokens:
             if token.type != tei.Token.Type.WORD:
                 if prev_sedes is None:
@@ -454,65 +460,72 @@ header {
                 "class": "word",
             })
 
-            key = (work_identifier, loc.book_n, loc.line_n, str(word_n))
-            try:
-                stats_entry = stats[key]
-                if token.text.lower() != stats_entry.word.lower():
-                    stats_entry = None
-            except KeyError:
-                stats_entry = None
+            while True:
+                try:
+                    word, sedes, shape = word_entries.pop(0)
+                except IndexError:
+                    sedes = None
+                    shape = None
+                    break
+                if word:
+                    if word.lower() != token.text.lower():
+                        print(f"warning: book {loc.book_n} line {loc.line_n} word {word_n} {token.text!r} does not match scansion word {word!r}", file=sys.stderr)
+                    break
+                # Ignore empty metrical placeholder words (as found in known.py).
 
-            if stats_entry is not None:
-                # We have a known sedes for this word. Is it the same as the
-                # sedes of the previous word (if any)?
-                assert stats_entry.sedes is not None, stats_entry
-                if stats_entry.sedes == prev_sedes:
-                    # Include these nonwords in the currently open sedes span.
-                    print(esc("".join(token.text for token in buffered_nonwords)), end="")
-                    buffered_nonwords.clear()
-                else:
-                    if prev_sedes is not None:
-                        # Close the currently open sedes span.
-                        print("</span>", end="")
-                    # The nonwords in between belong to neither sedes span.
-                    print(esc(re.sub(r"\s+", "\n", "".join(token.text for token in buffered_nonwords))), end="")
-                    buffered_nonwords.clear()
-                    # Begin new sedes.
-                    print("<span class=\"sedes s{}\">".format(esc(stats_entry.sedes.replace(".", "_"))), end="")
-                prev_sedes = stats_entry.sedes
-
-                word_attrs["data-x"] = str(stats_entry.x)
-                word_attrs["title"] = "x={}".format(stats_entry.x)
-                word_attrs["class"] += " {}".format(esc(z_css(stats_entry.z)))
-                word_attrs["class"] += " {}".format(esc(z_css_unweighted(stats_entry.z_alt)))
-                if stats_entry.z is not None:
-                    word_attrs["data-z"] = "{:+.8}".format(stats_entry.z)
-                    word_attrs["title"] += " z={:+.8}".format(stats_entry.z).replace("-", "−")
-                if stats_entry.z_alt is not None:
-                    word_attrs["data-z-unweighted"] = "{:.8}".format(stats_entry.z_alt)
-                word_attrs["title"] += " shape={}".format(stats_entry.metrical_shape)
-                word_attrs["title"] += " lemma={}".format(stats_entry.lemma)
+            # Is the sedes for this word the the same as the sedes of the
+            # previous word (if any)?
+            if sedes is not None and sedes == prev_sedes:
+                # Include these nonwords in the currently open sedes span.
+                print(esc("".join(token.text for token in buffered_nonwords)), end="")
+                buffered_nonwords.clear()
             else:
-                # The sedes for this word is unknown. Unconditionally close any
-                # currently open sedes span and output a word span without any
-                # sedes span around it.
                 if prev_sedes is not None:
+                    # Close the currently open sedes span.
                     print("</span>", end="")
-                prev_sedes = None
-
+                # The nonwords in between belong to neither sedes span.
                 print(esc(re.sub(r"\s+", "\n", "".join(token.text for token in buffered_nonwords))), end="")
                 buffered_nonwords.clear()
+                if sedes is not None:
+                    # Begin new sedes.
+                    print("<span class=\"sedes s{}\">".format(esc(sedes.replace(".", "_"))), end="")
+            prev_sedes = sedes
 
-                print("warning: no stats for work {work} book {book_n} line {line_n} word {word_n}".format(
-                    work=work_identifier, book_n=loc.book_n, line_n=loc.line_n, word_n=word_n,
+            lemma = lemma_mod.lookup(word, word)
+            assert lemma, (word, lemma)
+            expectancy_entry = expectancy.get((lemma, sedes))
+            title_attr = []
+            if expectancy_entry is not None:
+                word_attrs["data-x"] = str(expectancy_entry.x)
+                title_attr.append("x={}".format(expectancy_entry.x))
+                word_attrs["class"] += " {}".format(esc(z_css(expectancy_entry.z)))
+                word_attrs["class"] += " {}".format(esc(z_css_unweighted(expectancy_entry.z_alt)))
+                if expectancy_entry.z is not None:
+                    word_attrs["data-z"] = "{:+.8}".format(expectancy_entry.z)
+                    title_attr.append("z={:+.8}".format(expectancy_entry.z).replace("-", "−"))
+                if expectancy_entry.z_alt is not None:
+                    word_attrs["data-z-unweighted"] = "{:.8}".format(expectancy_entry.z_alt)
+                if lemma is not None:
+                    title_attr.append("lemma={}".format(lemma))
+                if shape is not None:
+                    title_attr.append("shape={}".format(shape))
+            else:
+                print("warning: no expectancy score for book {book_n} line {line_n} word {word_n}: {word} {lemma!r}/{sedes}".format(
+                    book_n=loc.book_n, line_n=loc.line_n, word_n=word_n, word=word, lemma=lemma, sedes=sedes,
                 ), file=sys.stderr)
                 word_attrs["class"] += " error"
+            if title_attr:
+                word_attrs["title"] = " ".join(title_attr)
 
             # Span for a single word.
             print("<span", end="")
             for attr, value in word_attrs.items():
                 print(" {}=\"{}\"".format(esc(attr), esc(value)), end="")
             print(">{}</span>".format(esc(token.text)), end="")
+
+        if word_entries:
+            print(f"warning: book {loc.book_n} line {loc.line_n} word {word_n} leftover scansion words {word_entries}", file=sys.stderr)
+
         if prev_sedes is not None:
             # Close the last remaining open sedes span.
             print("</span>", end="")
@@ -591,15 +604,15 @@ for o, a in opts:
         SHADE_MAPPING_ADJUST = float(a)
 
 try:
-    work_identifier, tei_filename, csv_filename = args
+    tei_filename, expectancy_filename = args
 except ValueError:
     print("error: usage error", file=sys.stderr)
     print(file=sys.stderr)
     usage(sys.stderr)
     sys.exit(1)
 
-with open(csv_filename) as csv_file:
-    stats = parse_stats(csv_file, work_identifier)
+with open(expectancy_filename) as expectancy_file:
+    expectancy = parse_expectancy(expectancy_file)
 
 with open(tei_filename) as tei_file:
-    process(tei_file, stats, work_identifier)
+    process(tei_file, expectancy)
