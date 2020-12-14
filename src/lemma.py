@@ -106,4 +106,4 @@ def lookup(word, default=None):
     # The CLTK lemmatizer expects its input to be normalized according to
     # cltk_normalize, but our convention elsewhere is to always use NFD
     # normalization.
-    return unicodedata.normalize("NFD", lemmatizer.lemmatize([cltk_normalize(word)])[0][1])
+    return unicodedata.normalize("NFD", lemmatizer.lemmatize([cltk_normalize(word)])[0][1]) or default
