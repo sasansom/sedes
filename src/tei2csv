@@ -27,8 +27,8 @@ FILENAME.XML is a TEI XML document containing the text of the work.
 """.format(sys.argv[0]), end="", file=file)
 
 def assign_sedes_for_line(line):
-    """From a line, return a sequence of (word, sedes, num_scansions) tuples.
-    sedes will be non-blank if and only if num_scansions is equal to 1."""
+    """From a line, return a sequence of (word, sedes, shape, num_scansions)
+    tuples. sedes will be non-blank if and only if num_scansions is equal to 1."""
     assignments = sedes.analyze(line.text_without_quotes())
     if len(assignments) == 1:
         return tuple((word, sedes, shape, len(assignments)) for (word, sedes, shape) in assignments[0])
