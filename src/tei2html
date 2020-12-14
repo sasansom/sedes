@@ -34,17 +34,17 @@ SHADE_MAPPING_ADJUST = 1.0
 SHADE_SCALE_RANGE = (-3.0, 3.0)
 
 def usage(file=sys.stdout):
-    print("""\
-Usage: {progname} [OPTION] WORK.xml STATS.csv > WORK.html
+    print(f"""\
+Usage: {sys.argv[0]} [OPTION] WORK.xml STATS.csv > WORK.html
 
 WORK.XML is a TEI XML document containing the text of the work.
 STATS.csv is statistics on a corpus of text as produced by
 tei2csv and expectancy.R.
 
   -s NUM, --shade-mapping-adjust=NUM  change steepness of shade mapping
-                                      (default {shade_mapping_adjust:.1f})
+                                      (default {SHADE_MAPPING_ADJUST:.1f})
   -h, --help  show this help
-""".format(progname = sys.argv[0], shade_mapping_adjust = SHADE_MAPPING_ADJUST), end="", file=file)
+""", end="", file=file)
 
 ExpectancyEntry = collections.namedtuple("ExpectancyEntry", ("x", "z", "z_alt"))
 
@@ -79,16 +79,16 @@ def z_css(z):
     if z is None:
         return "z-weighted-100"
     else:
-        return "z-weighted-{}".format(int(100 * tone_map(z)))
+        return f"z-weighted-{int(100 * tone_map(z))}"
 
 def z_css_unweighted(z):
     if z is None:
         return "z-unweighted-100"
     else:
-        return "z-unweighted-{}".format(int(100 * tone_map(z)))
+        return f"z-unweighted-{int(100 * tone_map(z))}"
 
 def css_color(sr, sg, sb):
-    return "#{:02x}{:02x}{:02x}".format(sr, sg, sb)
+    return f"#{sr:02x}{sg:02x}{sb:02x}"
 
 def srgb_component_to_linear(s):
     # https://en.wikipedia.org/wiki/SRGB#The_reverse_transformation
@@ -137,7 +137,7 @@ def process(f, expectancy):
     print("<html>")
     print("<head>")
     print("<meta charset=utf-8>")
-    print("<title>{}</title>".format(esc(doc.title)))
+    print(f"<title>{esc(doc.title)}</title>")
     print("<style>")
     print("""\
 @font-face {
@@ -346,21 +346,21 @@ header {
         shade_color = interpolate_srgb(r, COLOR_LOW, COLOR_HIGH)
         diverging_color = diverging_scale(r, COLOR_DIVERGING_LOW, COLOR_DIVERGING_MID, COLOR_DIVERGING_HIGH)
 
-        print(".shade-text.z-weighted .sedes .z-weighted-{} {{ color: {}; }}".format(n, css_color(*shade_color)))
-        print(".shade-text.z-unweighted .sedes .z-unweighted-{} {{ color: {}; }}".format(n, css_color(*shade_color)))
+        print(f".shade-text.z-weighted .sedes .z-weighted-{n} {{ color: {css_color(*shade_color)}; }}")
+        print(f".shade-text.z-unweighted .sedes .z-unweighted-{n} {{ color: {css_color(*shade_color)}; }}")
 
-        print(".shade-text-diverging.z-weighted .sedes .z-weighted-{} {{ color: {}; }}".format(n, css_color(*diverging_color)))
-        print(".shade-text-diverging.z-unweighted .sedes .z-unweighted-{} {{ color: {}; }}".format(n, css_color(*diverging_color)))
+        print(f".shade-text-diverging.z-weighted .sedes .z-weighted-{n} {{ color: {css_color(*diverging_color)}; }}")
+        print(f".shade-text-diverging.z-unweighted .sedes .z-unweighted-{n} {{ color: {css_color(*diverging_color)}; }}")
 
-        print(".shade-bubbles.z-weighted .sedes .z-weighted-{}::before {{ background-color: {}; }}".format(n, css_color(*shade_color)))
-        print(".shade-bubbles.z-unweighted .sedes .z-unweighted-{}::before {{ background-color: {}; }}".format(n, css_color(*shade_color)))
+        print(f".shade-bubbles.z-weighted .sedes .z-weighted-{n}::before {{ background-color: {css_color(*shade_color)}; }}")
+        print(f".shade-bubbles.z-unweighted .sedes .z-unweighted-{n}::before {{ background-color: {css_color(*shade_color)}; }}")
 
-        print(".shade-bubbles-diverging.z-weighted .sedes .z-weighted-{}::before {{ background-color: {}; }}".format(n, css_color(*diverging_color)))
-        print(".shade-bubbles-diverging.z-unweighted .sedes .z-unweighted-{}::before {{ background-color: {}; }}".format(n, css_color(*diverging_color)))
+        print(f".shade-bubbles-diverging.z-weighted .sedes .z-weighted-{n}::before {{ background-color: {css_color(*diverging_color)}; }}")
+        print(f".shade-bubbles-diverging.z-unweighted .sedes .z-unweighted-{n}::before {{ background-color: {css_color(*diverging_color)}; }}")
 
         area = math.sqrt(1.0 - r)
-        print(".size-bubbles.z-weighted .sedes .z-weighted-{}::before {{ --s: calc(var(--r) * {:.3f}); }}".format(n, area))
-        print(".size-bubbles.z-unweighted .sedes .z-unweighted-{}::before {{ --s: calc(var(--r) * {:.3f}); }}".format(n, area))
+        print(f".size-bubbles.z-weighted .sedes .z-weighted-{n}::before {{ --s: calc(var(--r) * {area:.3f}); }}")
+        print(f".size-bubbles.z-unweighted .sedes .z-unweighted-{n}::before {{ --s: calc(var(--r) * {area:.3f}); }}")
 
     print("</style>")
     print("</head>")
@@ -370,7 +370,7 @@ header {
     # Format a floating-point number as appropriate for HTML, with a real minus
     # sign.
     def fmt_float(x):
-        return esc("{:+.3g}".format(x).replace("-", "−"))
+        return esc(f"{x:+.3g}".replace("-", "−"))
     print("""\
 <header>
 <form id=controls>
@@ -399,7 +399,7 @@ header {
 </header>""".format(min = fmt_float(SHADE_SCALE_RANGE[0]), max = fmt_float(SHADE_SCALE_RANGE[1])))
 
     print("<article>")
-    print("<h1>{}</h1>".format(esc(doc.title)))
+    print(f"<h1>{esc(doc.title)}</h1>")
 
     book_n = None
     for loc, line in doc.lines():
@@ -408,8 +408,8 @@ header {
                 print("</div>")
                 print("</section>")
             print()
-            print("<section id=\"book-{}\">".format(esc(loc.book_n)))
-            print("<h2>{}</h2>".format(esc(loc.book_n)))
+            print(f"<section id=\"book-{esc(loc.book_n)}\">")
+            print(f"<h2>{esc(loc.book_n)}</h2>")
 
             print("""\
 <div class="grid-markers grid">
@@ -456,7 +456,7 @@ header {
 
             word_n += 1
             word_attrs = collections.OrderedDict({
-                "id": "book-{}-line-{}-word-{}".format(loc.book_n, loc.line_n, word_n),
+                "id": f"book-{loc.book_n}-line-{loc.line_n}-word-{word_n}",
                 "class": "word",
             })
 
@@ -497,22 +497,20 @@ header {
             title_attr = []
             if expectancy_entry is not None:
                 word_attrs["data-x"] = str(expectancy_entry.x)
-                title_attr.append("x={}".format(expectancy_entry.x))
-                word_attrs["class"] += " {}".format(esc(z_css(expectancy_entry.z)))
-                word_attrs["class"] += " {}".format(esc(z_css_unweighted(expectancy_entry.z_alt)))
+                title_attr.append(f"x={expectancy_entry.x}")
+                word_attrs["class"] += " " + esc(z_css(expectancy_entry.z))
+                word_attrs["class"] += " " + esc(z_css_unweighted(expectancy_entry.z_alt))
                 if expectancy_entry.z is not None:
-                    word_attrs["data-z"] = "{:+.8}".format(expectancy_entry.z)
-                    title_attr.append("z={:+.8}".format(expectancy_entry.z).replace("-", "−"))
+                    word_attrs["data-z"] = f"{expectancy_entry.z:+.8}"
+                    title_attr.append(f"z={expectancy_entry.z:+.8}".replace("-", "−"))
                 if expectancy_entry.z_alt is not None:
-                    word_attrs["data-z-unweighted"] = "{:.8}".format(expectancy_entry.z_alt)
+                    word_attrs["data-z-unweighted"] = f"{expectancy_entry.z_alt:.8}"
                 if lemma is not None:
-                    title_attr.append("lemma={}".format(lemma))
+                    title_attr.append(f"lemma={lemma}")
                 if shape is not None:
-                    title_attr.append("shape={}".format(shape))
+                    title_attr.append(f"shape={shape}")
             else:
-                print("warning: no expectancy score for book {book_n} line {line_n} word {word_n}: {word} {lemma!r}/{sedes}".format(
-                    book_n=loc.book_n, line_n=loc.line_n, word_n=word_n, word=word, lemma=lemma, sedes=sedes,
-                ), file=sys.stderr)
+                print(f"warning: no expectancy score for book {loc.book_n} line {loc.line_n} word {word_n}: {word} {lemma!r}/{sedes}", file=sys.stderr)
                 word_attrs["class"] += " error"
             if title_attr:
                 word_attrs["title"] = " ".join(title_attr)
@@ -520,8 +518,8 @@ header {
             # Span for a single word.
             print("<span", end="")
             for attr, value in word_attrs.items():
-                print(" {}=\"{}\"".format(esc(attr), esc(value)), end="")
-            print(">{}</span>".format(esc(token.text)), end="")
+                print(f" {esc(attr)}=\"{esc(value)}\"", end="")
+            print(f">{esc(token.text)}</span>", end="")
 
         if word_entries:
             print(f"warning: book {loc.book_n} line {loc.line_n} word {word_n} leftover scansion words {word_entries}", file=sys.stderr)

@@ -19,12 +19,12 @@ import sedes
 import tei
 
 def usage(file=sys.stdout):
-    print("""\
-Usage: {} IDENTIFIER FILENAME.xml > FILENAME.csv
+    print(f"""\
+Usage: {sys.argv[0]} IDENTIFIER FILENAME.xml > FILENAME.csv
 
 IDENTIFIER is a short text identifier for the work; e.g., "Il.".
 FILENAME.XML is a TEI XML document containing the text of the work.
-""".format(sys.argv[0]), end="", file=file)
+""", end="", file=file)
 
 def assign_sedes_for_line(line):
     """From a line, return a sequence of (word, sedes, shape, num_scansions)
