@@ -496,6 +496,8 @@ header {
             assert lemma, (word, lemma)
             if lemma is not None:
                 title_attr.append(f"lemma={lemma}")
+            if sedes is not None:
+                title_attr.append(f"sedes={sedes}")
             expectancy_entry = expectancy.get((lemma, sedes))
             if expectancy_entry is not None:
                 word_attrs["data-x"] = str(expectancy_entry.x)
