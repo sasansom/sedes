@@ -491,10 +491,12 @@ header {
                     print("<span class=\"sedes s{}\">".format(esc(sedes.replace(".", "_"))), end="")
             prev_sedes = sedes
 
+            title_attr = []
             lemma = lemma_mod.lookup(word, word)
             assert lemma, (word, lemma)
+            if lemma is not None:
+                title_attr.append(f"lemma={lemma}")
             expectancy_entry = expectancy.get((lemma, sedes))
-            title_attr = []
             if expectancy_entry is not None:
                 word_attrs["data-x"] = str(expectancy_entry.x)
                 title_attr.append(f"x={expectancy_entry.x}")
@@ -505,13 +507,11 @@ header {
                     title_attr.append(f"z={expectancy_entry.z:+.8}".replace("-", "−"))
                 if expectancy_entry.z_alt is not None:
                     word_attrs["data-z-unweighted"] = f"{expectancy_entry.z_alt:.8}"
-                if lemma is not None:
-                    title_attr.append(f"lemma={lemma}")
-                if shape is not None:
-                    title_attr.append(f"shape={shape}")
             else:
                 print(f"warning: no expectancy score for book {loc.book_n} line {loc.line_n} word {word_n}: {word} {lemma!r}/{sedes}", file=sys.stderr)
                 word_attrs["class"] += " error"
+            if shape is not None:
+                title_attr.append(f"shape={shape}")
             if title_attr:
                 word_attrs["title"] = " ".join(title_attr)
 
