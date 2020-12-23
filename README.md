@@ -109,4 +109,4 @@ After UTF-8 encoding, this sequence is
 
 ## Web-demo
 
-You can access a web-based demonstration at http://sasansom.github.io/sedes/.
+You can access a web-based demonstration of the visualizations at http://sasansom.github.io/sedes/.
