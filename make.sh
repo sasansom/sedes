@@ -23,5 +23,3 @@ WORKS_CSV="$(for work in $WORKS; do echo "corpus/$work.csv"; done)"
 
 Rscript src/expectancy.R $WORKS_CSV > expectancy.all.csv
 Rscript src/expectancy.R corpus/iliad.csv corpus/odyssey.csv corpus/homerichymns.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv > expectancy.hellenic+archaic.csv
-
-rm -f $(for work in $WORKS; do echo "corpus/$work.csv"; done)
