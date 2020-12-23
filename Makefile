@@ -26,9 +26,10 @@ WORK_IDENTIFIER_theogony         = Theog.
 WORK_IDENTIFIER_worksanddays     = W.D.
 
 WORKS_CSV = $(addprefix corpus/,$(addsuffix .csv,$(WORKS)))
+WORKS_HTML = $(addprefix web-demo/,$(addsuffix .html,$(WORKS)))
 
 .PHONY: all
-all: expectancy.all.csv expectancy.hellenic+archaic.csv
+all: expectancy.all.csv expectancy.hellenic+archaic.csv $(WORKS_HTML)
 
 expectancy.all.csv: $(WORKS_CSV)
 	Rscript src/expectancy.R $^ > "$@"
@@ -38,6 +39,9 @@ expectancy.hellenic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/home
 
 corpus/%.csv: corpus/%.xml
 	src/tei2csv "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
+
+web-demo/%.html: corpus/%.xml expectancy.all.csv
+	src/tei2html $^ > "$@"
 
 PYTHON = python3
 
