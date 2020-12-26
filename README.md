@@ -2,6 +2,10 @@
 
 Metrical position in Greek hexameter.
 
+See https://sasansom.github.io/sedes/ for a
+web-based demonstration of the visualizations
+produced by this system.
+
 
 ## Setup
 
@@ -106,7 +110,3 @@ U+0301 COMBINING ACUTE ACCENT
 ```
 After UTF-8 encoding, this sequence is
 `\xce\xb1\xcc\x93\xce\xbf\xce\xb9\xce\xb4\xce\xb7\xcc\x81`.
-
-## Web-demo
-
-You can access a web-based demonstration of the visualizations at https://sasansom.github.io/sedes/.
