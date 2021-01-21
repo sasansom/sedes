@@ -56,6 +56,13 @@ it will have access to locally installed web fonts for Greek.
 ./src/tei2html corpus/iliad.xml expectancy.all.csv > web-demo/iliad.html
 ```
 
+The `join-expectancy` program takes a work-specific CSV file (as
+produced by `tei2csv`) and augments it with lemma/sedes expectancy
+numbers.
+```
+./src/join-expectancy corpus/iliad.csv expectancy.all.csv > iliad-expectancy.csv
+```
+
 The "src/hexameter" subdirectory contains a Python module
 that we use for metrical analysis.
 It is by Hope Ranker and comes from https://github.com/epilanthanomai/hexameter.
