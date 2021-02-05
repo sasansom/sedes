@@ -70,7 +70,7 @@ def assign(scansion):
     sedes = 1.0
 
     for sub_scansion in partition_scansion_into_words(scansion):
-        # List of character cluster making up the current word.
+        # List of character clusters making up the current word.
         word = []
         # List of "-" and "+" symbols indicating the metrical shape of the current
         # word.
