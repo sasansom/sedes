@@ -14,8 +14,8 @@ def usage(file = sys.stdout):
 Usage: {sys.argv[0]} WORK.CSV EXPECTANCY.CSV > JOINED.CSV
 
 Outputs the contents of WORK.CSV, augmented with the rows from EXPECTANCY.CSV
-that match on the "lemma" and "sedes" columns.\
-""", file = file)
+that match on the "lemma" and "sedes" columns.
+""", end="", file=file)
 
 COMMON_FIELDS = ("lemma", "sedes")
 
