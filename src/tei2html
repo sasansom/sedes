@@ -39,7 +39,7 @@ Usage: {sys.argv[0]} [OPTION] WORK.xml STATS.csv > WORK.html
 
 WORK.XML is a TEI XML document containing the text of the work.
 STATS.csv is statistics on a corpus of text as produced by
-tei2csv and expectancy.R.
+the tei2csv and expectancy programs.
 
   -s NUM, --shade-mapping-adjust=NUM  change steepness of shade mapping
                                       (default {SHADE_MAPPING_ADJUST:.1f})

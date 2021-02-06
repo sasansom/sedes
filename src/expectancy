@@ -1,0 +1,161 @@
+#!/usr/bin/env python3
+
+# Computes an expectancy score for each unique lemma/sedes pair in the input
+# files, as produced by tei2csv.
+#
+# Usage:
+#   expectancy corpus/*.csv > expectancy.csv
+#
+# Writes CSV to standard output. Besides lemma and sedes, there are three
+# columns:
+#   x: The number of times this lemma/sedes pair appears
+#   z: The expectancy score, weighted as if each x value were repeated x times.
+#   z.alt: The unweighted expectancy score, where each x value is counted only
+#          once. The unweighted score is no longer used for anything.
+
+import csv
+import getopt
+import math
+import sys
+
+# We're deliberately not using modules outside the standard library, like numpy
+# or pandas, in order to make the program easier to run (see
+# https://github.com/sasansom/sedes/issues/24). This program is a translation to
+# Python of the following R program:
+#
+#   library(data.table)
+#
+#   sd_pop <- function(x) {
+#       sd(x) * sqrt((length(x) - 1) / length(x))
+#   }
+#
+#   data <- data.table()
+#   for (csv_filename in commandArgs(trailingOnly=TRUE)) {
+#       data <- rbind(data, fread(csv_filename, na.strings=c("")))
+#   }
+#
+#   data[is.na(lemma), lemma := word]
+#
+#   data <- data[, .(x = .N), by = .(lemma, sedes)]
+#   data[, z := (x - mean(rep(x, x))) / sd_pop(rep(x, x)), by = .(lemma)]
+#   data[, z.alt := (x - mean(x)) / sd_pop(x), by = .(lemma)]
+#
+#   setkey(data, "lemma", "sedes")
+#   write.csv(data, "", row.names=FALSE)
+
+def usage(file=sys.stdout):
+    print(f"""\
+Usage: {sys.argv[0]} [INPUT.csv...] > OUTPUT.csv
+
+Computes expectancy z-scores for every unique lemma/sedes pair found in
+the corpus of INPUT.csv files. The INPUT.csv files are the output of tei2csv.
+""", end="", file=file)
+
+# Return the mean of x.
+def mean(x):
+    return sum(x) / len(x)
+
+# Return the mean of the sequence that arises from repeating each element e of
+# x, e times.
+def weighted_mean(x):
+    return sum(e*e for e in x) / sum(x)
+
+# Population standard deviation.
+def sd_pop(x):
+    μ = mean(x)
+    return math.sqrt(sum((e - μ)**2 for e in x) / len(x))
+
+# Weighted population standard deviation, as in weighted_mean.
+def weighted_sd_pop(x):
+    μ = weighted_mean(x)
+    return math.sqrt(sum(e*(e - μ)**2 for e in x) / sum(x))
+
+def read_input(f):
+    rows = []
+    r = csv.DictReader(f)
+    for row in r:
+        # Infer known lemmata to be the same as the word.
+        if not row["lemma"]:
+            assert row["word"], row
+            row["lemma"] = row["word"]
+        if not row["sedes"]:
+            row["sedes"] = None
+        rows.append(row)
+    return rows
+
+# Yields contiguous slices of x that are equal in fieldnames, along with a tuple
+# containing the values that fieldnames maps to for the group.
+def group_by(x, *fieldnames):
+    i = 0
+    j = 0
+    prev_key = None
+    for row in x:
+        key = tuple(row[fieldname] for fieldname in fieldnames)
+        if prev_key is not None and key != prev_key:
+            yield prev_key, x[i:j]
+            i = j
+        prev_key = key
+        j += 1
+    yield key, x[i:]
+
+# Has the side effect of sorting input by lemma and sedes.
+def process(input, output):
+    expectancy = []
+
+    # The sedes may be None, so add a None-checking element to the key, to avoid
+    # an error caused by trying to compare None and a float.
+    input.sort(key = lambda row: (row["lemma"], row["sedes"] is not None, row["sedes"] is not None and float(row["sedes"])))
+
+    # Count the unique lemma/sedes pairs.
+    for (lemma, sedes), group in group_by(input, "lemma", "sedes"):
+        expectancy.append({
+            "lemma": lemma,
+            "sedes": sedes,
+            "x": len(group),
+        })
+
+    for (lemma,), group in group_by(expectancy, "lemma"):
+        xvec = [inst["x"] for inst in group]
+        μ = weighted_mean(xvec)
+        σ = weighted_sd_pop(xvec)
+        μ_unweighted = mean(xvec)
+        σ_unweighted = sd_pop(xvec)
+        for inst in group:
+            x = inst["x"]
+            if σ != 0:
+                inst["z"] = (x - μ) / σ
+            else:
+                inst["z"] = "NA"
+            if σ_unweighted != 0:
+                inst["z.alt"] = (x - μ_unweighted) / σ_unweighted
+            else:
+                inst["z.alt"] = "NA"
+
+    for row in expectancy:
+        if row["z"] != "NA":
+            row["z"] = "{:.15g}".format(row["z"])
+        if row["z.alt"] != "NA":
+            row["z.alt"] = "{:.15g}".format(row["z.alt"])
+
+    output = csv.DictWriter(output, [
+        "lemma",
+        "sedes",
+        "x",
+        "z",
+        "z.alt",
+    ], lineterminator="\n")
+    output.writeheader()
+    output.writerows(expectancy)
+
+opts, filenames = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
+for o, _ in opts:
+    if o in ("-h", "--help"):
+        usage()
+        sys.exit(0)
+
+input = []
+for filename in filenames:
+    with open(filename) as f:
+        input.extend(read_input(f))
+
+process(input, sys.stdout)
