@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-# Usage: ./join-expectancy corpus/work.csv expectancy.all.csv > joined.csv
+# Usage:
+#   join-expectancy corpus/work.csv expectancy.all.csv > joined.csv
 #
 # Outputs work.csv, augmented with rows from expectancy.all.csv that match in
 # the "lemma" and "sedes" columns (left outer join).
