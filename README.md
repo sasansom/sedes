@@ -29,8 +29,12 @@ The authors have used commit
 [a68b9837](https://github.com/cltk/grc_models_cltk/commit/a68b983734d34df16fd49661f11c4ea037ab173a)
 of the `greek_models_cltk` corpus.
 
-Each time you begin a new shell session, you will need to re-enter
-the virtual environment with `source venv/bin/activate`.
+You only need to do the steps above once.
+Thereafter, every time you start a new shell,
+you need to run only the single command
+```
+source venv/bin/activate
+```
 
 ## Programs
 
