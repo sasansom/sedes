@@ -29,7 +29,7 @@ def unique(s):
 def join(left, right, fieldnames, output):
     left = csv.DictReader(left)
     right = csv.DictReader(right)
-    output = csv.DictWriter(output, fieldnames = unique(left.fieldnames + right.fieldnames))
+    output = csv.DictWriter(output, fieldnames = unique(left.fieldnames + right.fieldnames), lineterminator = "\n")
     output.writeheader()
 
     lookup = {}
