@@ -48,9 +48,9 @@ the tei2csv and expectancy programs.
 
 ExpectancyEntry = collections.namedtuple("ExpectancyEntry", ("x", "z", "z_alt"))
 
-# Parse a float string, but return None for the string "NA".
+# Parse a float string, but return None for the strings "" and "NA".
 def float_or_none(s):
-    if s == "NA":
+    if s in ("", "NA"):
         return None
     else:
         return float(s)

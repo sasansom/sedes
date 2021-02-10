@@ -127,12 +127,8 @@ def process(input, output):
             x = inst["x"]
             if σ != 0:
                 inst["z"] = format_float((x - μ) / σ)
-            else:
-                inst["z"] = "NA"
             if σ_unweighted != 0:
                 inst["z.alt"] = format_float((x - μ_unweighted) / σ_unweighted)
-            else:
-                inst["z.alt"] = "NA"
 
     output = csv.DictWriter(output, [
         "lemma",
