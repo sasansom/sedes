@@ -510,8 +510,9 @@ h1 a, h2 a {
                 word_attrs["class"] += " " + esc(z_css(expectancy_entry.z))
                 word_attrs["class"] += " " + esc(z_css_unweighted(expectancy_entry.z_alt))
                 if expectancy_entry.z is not None:
-                    word_attrs["data-z"] = f"{expectancy_entry.z:+.8}"
-                    title_attr.append(f"z={expectancy_entry.z:+.8}".replace("-", "−"))
+                    z_fmt = f"{expectancy_entry.z:+.8}"
+                    word_attrs["data-z"] = z_fmt
+                    title_attr.append(f"z={z_fmt.replace('-', '−')}")
                 if expectancy_entry.z_alt is not None:
                     word_attrs["data-z-unweighted"] = f"{expectancy_entry.z_alt:.8}"
             else:
