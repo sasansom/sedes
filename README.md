@@ -46,10 +46,10 @@ its line number and sedes. For example:
 ./src/tei2csv "Il." corpus/iliad.xml > corpus/iliad.csv
 ```
 
-The `expectancy.R` program annotates one or more CSV files
+The `expectancy` program annotates one or more CSV files
 as produced by `tei2csv` with statistics about expectancy for each word.
 ```
-Rscript src/expectancy.R corpus/*.csv > expectancy.all.csv
+./src/expectancy corpus/*.csv > expectancy.all.csv
 ```
 
 The `tei2html` program produces an HTML representation of

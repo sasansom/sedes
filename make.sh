@@ -21,5 +21,5 @@ src/tei2csv "W.D." corpus/worksanddays.xml > corpus/worksanddays.csv
 
 WORKS_CSV="$(for work in $WORKS; do echo "corpus/$work.csv"; done)"
 
-Rscript src/expectancy.R $WORKS_CSV > expectancy.all.csv
-Rscript src/expectancy.R corpus/iliad.csv corpus/odyssey.csv corpus/homerichymns.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv > expectancy.hellenic+archaic.csv
+src/expectancy $WORKS_CSV > expectancy.all.csv
+src/expectancy corpus/iliad.csv corpus/odyssey.csv corpus/homerichymns.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv > expectancy.hellenic+archaic.csv
