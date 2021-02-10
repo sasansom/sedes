@@ -98,6 +98,9 @@ def group_by(x, *fieldnames):
         j += 1
     yield key, x[i:]
 
+def format_float(f):
+    return "{:.15g}".format(f)
+
 # Has the side effect of sorting input by lemma and sedes.
 def process(input, output):
     expectancy = []
@@ -123,19 +126,13 @@ def process(input, output):
         for inst in group:
             x = inst["x"]
             if σ != 0:
-                inst["z"] = (x - μ) / σ
+                inst["z"] = format_float((x - μ) / σ)
             else:
                 inst["z"] = "NA"
             if σ_unweighted != 0:
-                inst["z.alt"] = (x - μ_unweighted) / σ_unweighted
+                inst["z.alt"] = format_float((x - μ_unweighted) / σ_unweighted)
             else:
                 inst["z.alt"] = "NA"
-
-    for row in expectancy:
-        if row["z"] != "NA":
-            row["z"] = "{:.15g}".format(row["z"])
-        if row["z.alt"] != "NA":
-            row["z.alt"] = "{:.15g}".format(row["z.alt"])
 
     output = csv.DictWriter(output, [
         "lemma",
