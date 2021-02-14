@@ -592,8 +592,8 @@ CONTROLS["style"].dispatchEvent(new Event("change"));
     const group = CONTROLS["z-calculation"];
     group.forEach(elem => elem.addEventListener("change", event => {
         for (let elem of document.querySelectorAll(".text")) {
-            elem.classList.toggle("z-weighted", group.value == "weighted");
-            elem.classList.toggle("z-unweighted", group.value == "unweighted");
+            elem.classList.toggle("z-weighted", group.value === "weighted");
+            elem.classList.toggle("z-unweighted", group.value === "unweighted");
         }
     }));
     // Dispatch a "change" event to an arbitrary element of the radio group.
