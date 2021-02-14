@@ -567,19 +567,12 @@ const ALL_STYLES = [
     "size-bubbles",
 ];
 const CONTROLS = document.getElementById("controls");
-function setClass(elem, className, cond) {
-    if (cond) {
-        return elem.classList.add(className);
-    } else {
-        return elem.classList.remove(className);
-    }
-}
 CONTROLS["grid"].addEventListener("change", event => {
     for (let elem of document.querySelectorAll(".grid-markers")) {
-        setClass(elem, "visible", event.target.checked);
+        elem.classList.toggle("visible", event.target.checked);
     }
     for (let elem of document.querySelectorAll(".text")) {
-        setClass(elem, "grid", event.target.checked);
+        elem.classList.toggle("grid", event.target.checked);
     }
 });
 CONTROLS["grid"].dispatchEvent(new Event("change"));
@@ -599,8 +592,8 @@ CONTROLS["style"].dispatchEvent(new Event("change"));
     const group = CONTROLS["z-calculation"];
     group.forEach(elem => elem.addEventListener("change", event => {
         for (let elem of document.querySelectorAll(".text")) {
-            setClass(elem, "z-weighted", group.value == "weighted");
-            setClass(elem, "z-unweighted", group.value == "unweighted");
+            elem.classList.toggle("z-weighted", group.value == "weighted");
+            elem.classList.toggle("z-unweighted", group.value == "unweighted");
         }
     }));
     // Dispatch a "change" event to an arbitrary element of the radio group.
