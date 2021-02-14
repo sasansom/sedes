@@ -77,15 +77,13 @@ def tone_map(z):
 
 def z_css(z):
     if z is None:
-        return "z-weighted-100"
-    else:
-        return f"z-weighted-{int(100 * tone_map(z))}"
+        z = 0.0
+    return f"z-weighted-{int(100 * tone_map(z))}"
 
 def z_css_unweighted(z):
     if z is None:
-        return "z-unweighted-100"
-    else:
-        return f"z-unweighted-{int(100 * tone_map(z))}"
+        z = 0.0
+    return f"z-unweighted-{int(100 * tone_map(z))}"
 
 def css_color(sr, sg, sb):
     return f"#{sr:02x}{sg:02x}{sb:02x}"
