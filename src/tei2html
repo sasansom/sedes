@@ -210,6 +210,11 @@ h1 a, h2 a {
     margin-left: 4rem;
     position: relative;
 }
+/* Keep background colors and full saturation when printing. */
+.text, #vis-helper {
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+}
 
 .grid-markers {
     color: gray;
