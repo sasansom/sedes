@@ -12,10 +12,10 @@ import sys
 
 def usage(file = sys.stdout):
     print(f"""\
-Usage: {sys.argv[0]} WORK.CSV EXPECTANCY.CSV > JOINED.CSV
+Usage: {sys.argv[0]} WORK.CSV [WORK.CSV...] EXPECTANCY.CSV > JOINED.CSV
 
-Outputs the contents of WORK.CSV, augmented with the rows from EXPECTANCY.CSV
-that match on the "lemma" and "sedes" columns.
+Outputs the contents of the WORK.CSV inputs, augmented with the rows from
+EXPECTANCY.CSV that match on the "lemma" and "sedes" columns.
 """, end="", file=file)
 
 COMMON_FIELDS = ("lemma", "sedes")
@@ -27,9 +27,30 @@ def unique(s):
             result.append(x)
     return result
 
-def join(left, right, fieldnames, output):
-    left = csv.DictReader(left)
-    right = csv.DictReader(right)
+# Acts like a csv.DictReader over multiple files consecutively. Asserts that the
+# fieldnames of all files are identical.
+class MultiDictReader:
+    def __init__(self, filenames):
+        self.filenames = filenames
+        self.first_file = open(self.filenames[0])
+        self.first_reader = csv.DictReader(self.first_file)
+        self.fieldnames = self.first_reader.fieldnames
+
+    def __iter__(self):
+        try:
+            for row in self.first_reader:
+                yield row
+        finally:
+            self.first_file.close()
+        for filename in self.filenames[1:]:
+            with open(filename) as f:
+                reader = csv.DictReader(f)
+                assert reader.fieldnames == self.fieldnames, (reader.fieldnames, self.fieldnames)
+                for row in reader:
+                    yield row
+
+def join(left, right_file, fieldnames, output):
+    right = csv.DictReader(right_file)
     output = csv.DictWriter(output, fieldnames = unique(left.fieldnames + right.fieldnames), lineterminator = "\n")
     output.writeheader()
 
@@ -56,7 +77,10 @@ for o, _ in opts:
         usage()
         sys.exit(0)
 
-work_filename, expectancy_filename = args
-with open(work_filename) as work:
-    with open(expectancy_filename) as expectancy:
-        join(work, expectancy, COMMON_FIELDS, sys.stdout)
+(*work_filenames, expectancy_filename) = args
+if not work_filenames:
+    usage(sys.stderr)
+    sys.exit(1)
+works = MultiDictReader(work_filenames)
+with open(expectancy_filename) as expectancy:
+    join(works, expectancy, COMMON_FIELDS, sys.stdout)
