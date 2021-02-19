@@ -413,6 +413,12 @@ h1 a, h2 a {
     print("<article>")
     print(f"<h1>{esc(doc.title)}</h1>")
 
+    # Sum of x per lemma.
+    sum_x = {}
+    for (lemma, _), expectancy_entry in expectancy.items():
+        sum_x.setdefault(lemma, 0)
+        sum_x[lemma] += expectancy_entry.x
+
     book_n = None
     for loc, line in doc.lines():
         if loc.book_n != book_n:
@@ -514,6 +520,8 @@ h1 a, h2 a {
             if expectancy_entry is not None:
                 word_attrs["data-x"] = str(expectancy_entry.x)
                 title_attr.append(f"x={expectancy_entry.x}")
+                word_attrs["data-sum-x"] = str(sum_x[lemma])
+                title_attr.append(f"Σx={sum_x[lemma]}")
                 word_attrs["class"] += " " + esc(z_css(expectancy_entry.z))
                 word_attrs["class"] += " " + esc(z_css_unweighted(expectancy_entry.z_alt))
                 if expectancy_entry.z is not None:
