@@ -10,8 +10,6 @@
 # columns:
 #   x: The number of times this lemma/sedes pair appears
 #   z: The expectancy score, weighted as if each x value were repeated x times.
-#   z.alt: The unweighted expectancy score, where each x value is counted only
-#          once. The unweighted score is no longer used for anything.
 
 import csv
 import getopt
@@ -38,7 +36,6 @@ import sys
 #
 #   data <- data[, .(x = .N), by = .(lemma, sedes)]
 #   data[, z := (x - mean(rep(x, x))) / sd_pop(rep(x, x)), by = .(lemma)]
-#   data[, z.alt := (x - mean(x)) / sd_pop(x), by = .(lemma)]
 #
 #   setkey(data, "lemma", "sedes")
 #   write.csv(data, "", row.names=FALSE)
@@ -51,19 +48,10 @@ Computes expectancy z-scores for every unique lemma/sedes pair found in
 the corpus of INPUT.csv files. The INPUT.csv files are the output of tei2csv.
 """, end="", file=file)
 
-# Return the mean of x.
-def mean(x):
-    return sum(x) / len(x)
-
 # Return the mean of the sequence that arises from repeating each element e of
 # x, e times.
 def weighted_mean(x):
     return sum(e*e for e in x) / sum(x)
-
-# Population standard deviation.
-def sd_pop(x):
-    μ = mean(x)
-    return math.sqrt(sum((e - μ)**2 for e in x) / len(x))
 
 # Weighted population standard deviation, as in weighted_mean.
 def weighted_sd_pop(x):
@@ -121,21 +109,16 @@ def process(input, output):
         xvec = [inst["x"] for inst in group]
         μ = weighted_mean(xvec)
         σ = weighted_sd_pop(xvec)
-        μ_unweighted = mean(xvec)
-        σ_unweighted = sd_pop(xvec)
         for inst in group:
             x = inst["x"]
             if σ != 0:
                 inst["z"] = format_float((x - μ) / σ)
-            if σ_unweighted != 0:
-                inst["z.alt"] = format_float((x - μ_unweighted) / σ_unweighted)
 
     output = csv.DictWriter(output, [
         "lemma",
         "sedes",
         "x",
         "z",
-        "z.alt",
     ], lineterminator="\n")
     output.writeheader()
     output.writerows(expectancy)

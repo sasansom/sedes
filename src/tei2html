@@ -46,7 +46,7 @@ the tei2csv and expectancy programs.
   -h, --help  show this help
 """, end="", file=file)
 
-ExpectancyEntry = collections.namedtuple("ExpectancyEntry", ("x", "z", "z_alt"))
+ExpectancyEntry = collections.namedtuple("ExpectancyEntry", ("x", "z"))
 
 # Parse a float string, but return None for the strings "" and "NA".
 def float_or_none(s):
@@ -64,7 +64,6 @@ def parse_expectancy(f):
         stats[key] = ExpectancyEntry(
             x = int(row["x"]),
             z = float_or_none(row["z"]),
-            z_alt = float_or_none(row["z.alt"]),
         )
     return stats
 
@@ -78,12 +77,7 @@ def tone_map(z):
 def z_css(z):
     if z is None:
         z = 0.0
-    return f"z-weighted-{int(100 * tone_map(z))}"
-
-def z_css_unweighted(z):
-    if z is None:
-        z = 0.0
-    return f"z-unweighted-{int(100 * tone_map(z))}"
+    return f"z-{int(100 * tone_map(z))}"
 
 def css_color(sr, sg, sb):
     return f"#{sr:02x}{sg:02x}{sb:02x}"
@@ -357,21 +351,12 @@ h1 a, h2 a {
         shade_color = interpolate_srgb(r, COLOR_LOW, COLOR_HIGH)
         diverging_color = diverging_scale(r, COLOR_DIVERGING_LOW, COLOR_DIVERGING_MID, COLOR_DIVERGING_HIGH)
 
-        print(f".shade-text.z-weighted .sedes .z-weighted-{n} {{ color: {css_color(*shade_color)}; }}")
-        print(f".shade-text.z-unweighted .sedes .z-unweighted-{n} {{ color: {css_color(*shade_color)}; }}")
-
-        print(f".shade-text-diverging.z-weighted .sedes .z-weighted-{n} {{ color: {css_color(*diverging_color)}; }}")
-        print(f".shade-text-diverging.z-unweighted .sedes .z-unweighted-{n} {{ color: {css_color(*diverging_color)}; }}")
-
-        print(f".shade-bubbles.z-weighted .sedes .z-weighted-{n}::before {{ background-color: {css_color(*shade_color)}; }}")
-        print(f".shade-bubbles.z-unweighted .sedes .z-unweighted-{n}::before {{ background-color: {css_color(*shade_color)}; }}")
-
-        print(f".shade-bubbles-diverging.z-weighted .sedes .z-weighted-{n}::before {{ background-color: {css_color(*diverging_color)}; }}")
-        print(f".shade-bubbles-diverging.z-unweighted .sedes .z-unweighted-{n}::before {{ background-color: {css_color(*diverging_color)}; }}")
-
+        print(f".shade-text .sedes .z-{n} {{ color: {css_color(*shade_color)}; }}")
+        print(f".shade-text-diverging .sedes .z-{n} {{ color: {css_color(*diverging_color)}; }}")
+        print(f".shade-bubbles .sedes .z-{n}::before {{ background-color: {css_color(*shade_color)}; }}")
+        print(f".shade-bubbles-diverging .sedes .z-{n}::before {{ background-color: {css_color(*diverging_color)}; }}")
         area = math.sqrt(1.0 - r)
-        print(f".size-bubbles.z-weighted .sedes .z-weighted-{n}::before {{ --s: calc(var(--r) * {area:.3f}); }}")
-        print(f".size-bubbles.z-unweighted .sedes .z-unweighted-{n}::before {{ --s: calc(var(--r) * {area:.3f}); }}")
+        print(f".size-bubbles .sedes .z-{n}::before {{ --s: calc(var(--r) * {area:.3f}); }}")
 
     print("</style>")
     print("</head>")
@@ -404,8 +389,6 @@ h1 a, h2 a {
 <span>{min}</span><span>{max}</span>
 </div>
 </div>
-<label><input name=z-calculation type=radio value=weighted checked> Weighted <var>z</var>-score</label><br>
-<label><input name=z-calculation type=radio value=unweighted> Unweighted <var>z</var>-score</label><br>
 <label><input name=show-undefined-expectancy type=checkbox> Highlight undefined <var>z</var>-scores</label>
 </form>
 </header>""".format(min = fmt_float(SHADE_SCALE_RANGE[0]), max = fmt_float(SHADE_SCALE_RANGE[1])))
@@ -523,15 +506,12 @@ h1 a, h2 a {
                 word_attrs["data-sum-x"] = str(sum_x[lemma])
                 title_attr.append(f"Σx={sum_x[lemma]}")
                 word_attrs["class"] += " " + esc(z_css(expectancy_entry.z))
-                word_attrs["class"] += " " + esc(z_css_unweighted(expectancy_entry.z_alt))
                 if expectancy_entry.z is not None:
                     z_fmt = f"{expectancy_entry.z:+.8}"
                     word_attrs["data-z"] = z_fmt
                     title_attr.append(f"z={z_fmt.replace('-', '−')}")
                 else:
                     word_attrs["class"] += " " + "undefined-expectancy"
-                if expectancy_entry.z_alt is not None:
-                    word_attrs["data-z-unweighted"] = f"{expectancy_entry.z_alt:.8}"
             else:
                 print(f"warning: no expectancy score for book {loc.book_n} line {loc.line_n} word {word_n}: {word} {lemma!r}/{sedes}", file=sys.stderr)
                 word_attrs["class"] += " error"
@@ -596,17 +576,6 @@ CONTROLS["style"].addEventListener("change", event => {
         VIS_HELPER.classList.add(event.target.value);
 });
 CONTROLS["style"].dispatchEvent(new Event("change"));
-{
-    const group = CONTROLS["z-calculation"];
-    group.forEach(elem => elem.addEventListener("change", event => {
-        for (let elem of document.querySelectorAll(".text")) {
-            elem.classList.toggle("z-weighted", group.value === "weighted");
-            elem.classList.toggle("z-unweighted", group.value === "unweighted");
-        }
-    }));
-    // Dispatch a "change" event to an arbitrary element of the radio group.
-    group[0].dispatchEvent(new Event("change"));
-}
 CONTROLS["show-undefined-expectancy"].addEventListener("change", event => {
     for (let elem of document.querySelectorAll(".text")) {
         elem.classList.toggle("show-undefined-expectancy", event.target.checked);
