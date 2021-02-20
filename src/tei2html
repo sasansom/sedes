@@ -28,10 +28,10 @@ COLOR_DIVERGING_MID  = (0xf1, 0xf1, 0xf1) # lch(95%  0   0)
 COLOR_DIVERGING_HIGH = (0x20, 0x7d, 0xc2) # lch(50% 45 260)
 
 # Increase this to increase the steepness of the tone mapping operation.
-SHADE_MAPPING_ADJUST = 1.0
+SHADE_MAPPING_ADJUST = 1.5
 
 # Endpoints of the legends that illustrate shade mapping.
-SHADE_SCALE_RANGE = (-3.0, 3.0)
+SHADE_SCALE_RANGE = (-2.0, 2.0)
 
 def usage(file=sys.stdout):
     print(f"""\
