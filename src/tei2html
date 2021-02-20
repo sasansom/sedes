@@ -20,12 +20,12 @@ import tei
 COLOR_LOW  = (0x00, 0x00, 0x00)
 COLOR_HIGH = (0xe6, 0xe6, 0xe6)
 
-# Colors for diverging color scale.
-# https://colorbrewer2.org/#type=diverging&scheme=RdYlBu&n=5
-# Then the midpoint adjusted to gray.
-COLOR_DIVERGING_LOW  = (0xd7, 0x19, 0x1c)
-COLOR_DIVERGING_MID  = (0xf5, 0xf5, 0xf5)
-COLOR_DIVERGING_HIGH = (0x2c, 0x7b, 0xb6)
+# Colors for diverging color scale. The extremes are chosen to be different
+# colors of equal lightness, with a lighter gray in the middle.
+# Used this tool: https://css.land/lch/.
+COLOR_DIVERGING_LOW  = (0xb4, 0x5d, 0x48) # lch(50% 45  40)
+COLOR_DIVERGING_MID  = (0xf1, 0xf1, 0xf1) # lch(95%  0   0)
+COLOR_DIVERGING_HIGH = (0x20, 0x7d, 0xc2) # lch(50% 45 260)
 
 # Increase this to increase the steepness of the tone mapping operation.
 SHADE_MAPPING_ADJUST = 1.0
