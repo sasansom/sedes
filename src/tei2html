@@ -113,6 +113,13 @@ def diverging_scale(x, low, mid, high):
     else:
         return interpolate_srgb((x - 0.5) / 0.5, mid, high)
 
+# Normalize Unicode text for output. While we do all internal processing in NFD,
+# NFC is better for HTML output.
+# https://www.w3.org/TR/charmod-norm/#normalizationChoice: "Content authors
+# SHOULD use Unicode Normalization Form C (NFC) wherever possible for content."
+def normalize(s):
+    return unicodedata.normalize("NFC", s)
+
 def assign_sedes_for_line(line):
     """From a line, return a sequence of (word, sedes, shape) tuples. sedes will
     be non-blank if and only if num_scansions is equal to 1."""
@@ -447,7 +454,7 @@ h1 a, h2 a {
         for token in line.tokens:
             if token.type != tei.Token.Type.WORD:
                 if prev_sedes is None:
-                    print(esc(token.text), end="")
+                    print(esc(normalize(token.text)), end="")
                 else:
                     # These nonwords may or may not belong to the currently open
                     # sedes span--it depends on whether the sedes of the next
@@ -485,7 +492,7 @@ h1 a, h2 a {
                     # Close the currently open sedes span.
                     print("</span>", end="")
                 # The nonwords in between belong to neither sedes span.
-                print(esc(re.sub(r"\s+", "\n", "".join(token.text for token in buffered_nonwords))), end="")
+                print(esc(normalize(re.sub(r"\s+", "\n", "".join(token.text for token in buffered_nonwords)))), end="")
                 buffered_nonwords.clear()
                 if sedes is not None:
                     # Begin new sedes.
@@ -496,7 +503,7 @@ h1 a, h2 a {
             lemma = lemma_mod.lookup(word, word)
             assert lemma, (word, lemma)
             if lemma is not None:
-                title_attr.append(f"lemma={lemma}")
+                title_attr.append(f"lemma={normalize(lemma)}")
             if sedes is not None:
                 title_attr.append(f"sedes={sedes}")
             expectancy_entry = expectancy.get((lemma, sedes))
@@ -524,7 +531,7 @@ h1 a, h2 a {
             print("<span", end="")
             for attr, value in word_attrs.items():
                 print(f" {esc(attr)}=\"{esc(value)}\"", end="")
-            print(f">{esc(token.text)}</span>", end="")
+            print(f">{esc(normalize(token.text))}</span>", end="")
 
         if word_entries:
             print(f"warning: book {loc.book_n} line {loc.line_n} word {word_n} leftover scansion words {word_entries}", file=sys.stderr)
@@ -532,7 +539,7 @@ h1 a, h2 a {
         if prev_sedes is not None:
             # Close the last remaining open sedes span.
             print("</span>", end="")
-        print(esc("".join(token.text for token in buffered_nonwords)), end="")
+        print(esc(normalize("".join(token.text for token in buffered_nonwords))), end="")
         buffered_nonwords.clear()
 
         # End line.
