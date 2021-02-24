@@ -7,11 +7,15 @@
 
 import unicodedata
 
-# https://docs.cltk.org/en/latest/greek.html#lemmatization-backoff-method
-from cltk.lemmatize.greek.backoff import BackoffGreekLemmatizer
-from cltk.lemmatize.backoff import DictLemmatizer
-# https://docs.cltk.org/en/latest/greek.html#normalization
-from cltk.corpus.utils.formatter import cltk_normalize
+try:
+    # https://docs.cltk.org/en/latest/greek.html#lemmatization-backoff-method
+    from cltk.lemmatize.greek.backoff import BackoffGreekLemmatizer
+    from cltk.lemmatize.backoff import DictLemmatizer
+    # https://docs.cltk.org/en/latest/greek.html#normalization
+    from cltk.corpus.utils.formatter import cltk_normalize
+except ModuleNotFoundError as e:
+    e.msg += ". Run:\nsource venv/bin/activate"
+    raise
 
 __all__ = ["lookup"]
 
