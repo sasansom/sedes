@@ -25,11 +25,12 @@ WORK_IDENTIFIER_theocritus       = Theoc.
 WORK_IDENTIFIER_theogony         = Theog.
 WORK_IDENTIFIER_worksanddays     = W.D.
 
+EXPECTANCY_FILES = expectancy.all.csv expectancy.hellenic+archaic.csv
 WORKS_CSV = $(addprefix corpus/,$(addsuffix .csv,$(WORKS)))
 WORKS_HTML = $(addprefix web-demo/,$(addsuffix .html,$(WORKS)))
 
 .PHONY: all
-all: expectancy.all.csv expectancy.hellenic+archaic.csv $(WORKS_HTML)
+all: $(EXPECTANCY_FILES) $(WORKS_HTML)
 
 expectancy.all.csv: $(WORKS_CSV)
 	src/expectancy $^ > "$@"
@@ -66,5 +67,9 @@ web-demo/fonts/SIL\ Open\ Font\ License.txt: fonts/cardo.zip
 web-demo/fonts/%.woff: %.ttf
 	mkdir -p web-demo/fonts
 	fontforge -lang ff -script fonts/subset-greek.ff "$<" "$@"
+
+.PHONY: clean
+clean:
+	rm -f $(WORKS_CSV) $(WORKS_HTML)
 
 .DELETE_ON_ERROR:
