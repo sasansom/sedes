@@ -523,7 +523,8 @@ h1 a, h2 a {
                 print(f"warning: no expectancy score for book {loc.book_n} line {loc.line_n} word {word_n}: {word} {lemma!r}/{sedes}", file=sys.stderr)
                 word_attrs["class"] += " error"
             if shape is not None:
-                title_attr.append(f"shape={shape.replace('-', '−')}")
+                unicode_shape = "".join({"-": "⏑", "+": "–"}[c] for c in shape)
+                title_attr.append(f"shape={unicode_shape}")
             if title_attr:
                 word_attrs["title"] = " ".join(title_attr)
 
