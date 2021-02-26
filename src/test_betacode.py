@@ -155,9 +155,9 @@ class TestDecode(unittest.TestCase):
 
     def test_invalid(self):
         TESTS = [
-            "\\e)gw/", # initial diacritical
-            "e)gw//",  # duplicate diacritical
-            "*)e)gw/", # duplicate diacritical
+            "\\e)gw/", # initial diacritic
+            "e)gw//",  # duplicate diacritic
+            "*)e)gw/", # duplicate diacritic
             "a*",      # "*" with nothing following
             "*`a",     # "*" with nothing following
             "*s1",     # no capital form of "s1"
