@@ -1,3 +1,4 @@
+import unicodedata
 import unittest
 
 import betacode
@@ -169,3 +170,39 @@ class TestDecode(unittest.TestCase):
             except ValueError:
                 continue
             self.fail("{!r} did not raise ValueError; returned {!r}".format(beta, uni))
+
+    def test_diacritic_ordering(self):
+        """Test that the order of certain diacritics is canonicalized."""
+        for beta, expected in (
+            ("i(/", "\u1f35"),  # GREEK SMALL LETTER IOTA WITH DASIA AND OXIA
+            ("i/(", "\u1f35"),  # GREEK SMALL LETTER IOTA WITH DASIA AND OXIA
+            ("i(\\", "\u1f33"), # GREEK SMALL LETTER IOTA WITH DASIA AND VARIA
+            ("i\\(", "\u1f33"), # GREEK SMALL LETTER IOTA WITH DASIA AND VARIA
+            ("i(=", "\u1f37"),  # GREEK SMALL LETTER IOTA WITH DASIA AND PERISPOMENI
+            ("i=(", "\u1f37"),  # GREEK SMALL LETTER IOTA WITH DASIA AND PERISPOMENI
+
+            ("i)/", "\u1f34"),  # GREEK SMALL LETTER IOTA WITH PSILI AND OXIA
+            ("i/)", "\u1f34"),  # GREEK SMALL LETTER IOTA WITH PSILI AND OXIA
+            ("i)\\", "\u1f32"), # GREEK SMALL LETTER IOTA WITH PSILI AND VARIA
+            ("i\\)", "\u1f32"), # GREEK SMALL LETTER IOTA WITH PSILI AND VARIA
+            ("i)=", "\u1f36"),  # GREEK SMALL LETTER IOTA WITH PSILI AND PERISPOMENI
+            ("i=)", "\u1f36"),  # GREEK SMALL LETTER IOTA WITH PSILI AND PERISPOMENI
+
+            ("i+/", "\u0390"),  # GREEK SMALL LETTER IOTA WITH DIALYTIKA AND TONOS
+            ("i/+", "\u0390"),  # GREEK SMALL LETTER IOTA WITH DIALYTIKA AND TONOS
+            ("i+\\", "\u1fd2"), # GREEK SMALL LETTER IOTA WITH DIALYTIKA AND VARIA
+            ("i\\+", "\u1fd2"), # GREEK SMALL LETTER IOTA WITH DIALYTIKA AND VARIA
+            ("i+=", "\u1fd7"),  # GREEK SMALL LETTER IOTA WITH DIALYTIKA AND PERISPOMENI
+            ("i=+", "\u1fd7"),  # GREEK SMALL LETTER IOTA WITH DIALYTIKA AND PERISPOMENI
+
+            # Test interaction with capital letters and prediacriticals.
+            ("*+i/", "\u03aa\u0301"), # GREEK CAPITAL LETTER IOTA WITH DIALYTIKA, COMBINING ACUTE ACCENT
+            ("*/i+", "\u03aa\u0301"), # GREEK CAPITAL LETTER IOTA WITH DIALYTIKA, COMBINING ACUTE ACCENT
+            ("*i+/", "\u03aa\u0301"), # GREEK CAPITAL LETTER IOTA WITH DIALYTIKA, COMBINING ACUTE ACCENT
+            ("*i/+", "\u03aa\u0301"), # GREEK CAPITAL LETTER IOTA WITH DIALYTIKA, COMBINING ACUTE ACCENT
+            ("*+/i", "\u03aa\u0301"), # GREEK CAPITAL LETTER IOTA WITH DIALYTIKA, COMBINING ACUTE ACCENT
+            ("*/+i", "\u03aa\u0301"), # GREEK CAPITAL LETTER IOTA WITH DIALYTIKA, COMBINING ACUTE ACCENT
+        ):
+            decoded = betacode.decode(beta)
+            composed = unicodedata.normalize("NFC", decoded)
+            self.assertEqual(f"{composed!a}", f"{expected!a}", ", ".join(unicodedata.name(c) for c in composed))

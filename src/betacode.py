@@ -4,6 +4,7 @@
 # http://www.tlg.uci.edu/encoding/quickbeta.pdf
 # https://web.archive.org/web/20151104201807/http://www.tlg.uci.edu/~opoudjis/unicode/unicode.html
 
+import functools
 import unicodedata
 
 __all__ = ["decode"]
@@ -90,15 +91,75 @@ BETA_MAP = BETA_LETTER_MAP.copy()
 BETA_MAP.update(BETA_NONLETTER_MAP)
 
 BETA_DIACRITIC_MAP = {
-    ")": "\u0313",
-    "(": "\u0314",
-    "/": "\u0301",
-    "=": "\u0342",
-   "\\": "\u0300",
-    "+": "\u0308",
-    "|": "\u0345",
-    "?": "\u0323",
+    ")": "\u0313", # COMBINING COMMA ABOVE
+    "(": "\u0314", # COMBINING REVERSED COMMA ABOVE
+    "/": "\u0301", # COMBINING ACUTE ACCENT
+    "=": "\u0342", # COMBINING GREEK PERISPOMENI
+   "\\": "\u0300", # COMBINING GRAVE ACCENT
+    "+": "\u0308", # COMBINING DIAERESIS
+    "|": "\u0345", # COMBINING GREEK YPOGEGRAMMENI
+    "?": "\u0323", # COMBINING DOT BELOW
 }
+
+# When we are attaching Unicode combining characters to a base character, we
+# need to take care with certain diacritics so that they normalize into NFC
+# nicely. The basic rule is that we want to sort these three diacritics:
+#   ( ) +
+# before these three:
+#   / \ =
+# Getting the order wrong prevents full NFC composition. For example, `i(/`,
+# after decoding and normalizing, becomes the single character
+#   U+1f35 GREEK SMALL LETTER IOTA WITH DASIA AND OXIA
+# But `i/(`, if the diacritics were kept in that order, normalizes only
+# partially:
+#   U+03af GREEK SMALL LETTER IOTA WITH TONOS
+#   U+0314 COMBINING REVERSED COMMA ABOVE
+#
+# These are the combination I tried, to come up with the rule above.
+#   (/  WITH DASIA AND OXIA
+#   (\  WITH DASIA AND VARIA
+#   (=  WITH DASIA AND PERISPOMENI
+#   )/  WITH PSILI AND OXIA
+#   )\  WITH PSILI AND VARIA
+#   )=  WITH PSILI AND PERISPOMENI
+#   +/  WITH DIALYTIKA AND TONOS
+#   +\  WITH DIALYTIKA AND VARIA
+#   +=  WITH DIALYTIKA AND PERISPOMENI
+#
+#   /(  WITH TONOS + COMBINING REVERSED COMMA ABOVE
+#   \(  WITH VARIA + COMBINING REVERSED COMMA ABOVE
+#   =(  WITH PERISPOMENI + COMBINING REVERSED COMMA ABOVE
+#   /)  WITH TONOS + COMBINING COMMA ABOVE
+#   \)  WITH VARIA + COMBINING COMMA ABOVE
+#   =)  WITH PERISPOMENI + COMBINING COMMA ABOVE
+#   /+  WITH TONOS + COMBINING DIAERESIS
+#   \+  WITH VARIA + COMBINING DIAERESIS
+#   =+  WITH PERISPOMENI + COMBINING DIAERESIS
+#
+# The order of ? and | seems not to matter. Just for consistency, we sort those
+# using their Unicode canonical combining class.
+#
+# https://github.com/sasansom/sedes/issues/45
+
+# Diacritics in the same tier are considered incomparable. They should not
+# appear attached to the same base character.
+BETA_DIACRITIC_TIER = dict((c, n) for (n, tier) in enumerate((
+    # Unicode combining class 220
+    ("?",),
+    # Unicode combining class 230
+    ("(", ")", "+"),
+    ("/", "\\", "="),
+    # Unicode combining class 240
+    ("|",),
+)) for c in tier)
+def cmp_diacritics(a, b):
+    c = BETA_DIACRITIC_TIER[a] - BETA_DIACRITIC_TIER[b]
+    if c == 0:
+        raise ValueError("Cannot order diacritics {!a} and {!a}".format(a, b))
+    return c
+key_diacritics = functools.cmp_to_key(cmp_diacritics)
+def sorted_diacritics(diacritics):
+    return sorted(diacritics, key = key_diacritics)
 
 def decode(beta):
     """Decode Beta Code to Unicode. The input Beta Code is itself a Unicode
@@ -203,7 +264,7 @@ def decode(beta):
                 output.append(BETA_MAP[key])
             except KeyError:
                 raise ValueError("unknown Beta Code character {!r} {!r}".format(key, (beta[:i[0]], beta[i[0]:])))
-            for diacritic in diacritics:
+            for diacritic in sorted_diacritics(diacritics):
                 output.append(BETA_DIACRITIC_MAP[diacritic])
             state = STATE_INIT
 
