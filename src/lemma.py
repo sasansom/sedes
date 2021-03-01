@@ -228,3 +228,13 @@ def lookup(word, default=None):
     # cltk_normalize, but our convention elsewhere is to always use NFD
     # normalization.
     return unicodedata.normalize("NFD", lemmatizer.lemmatize([cltk_normalize(word)])[0][1]) or default
+
+# Run this module as a command to decode beta code from the command line.
+# python3 lemma.py βιὸν
+if __name__ == "__main__":
+    import sys
+    error = False
+    for arg in sys.argv[1:]:
+        word = unicodedata.normalize("NFD", arg)
+        lemma = lookup(word)
+        print(f"{word}\t{lemma}")
