@@ -5,6 +5,7 @@
 #   https://docs.cltk.org/en/latest/importing_corpora.html
 # python3 -c 'from cltk.corpus.utils.importer import CorpusImporter; CorpusImporter("greek").import_corpus("greek_models_cltk")'
 
+import re
 import unicodedata
 
 try:
@@ -217,6 +218,43 @@ OVERRIDES = (
     ("κεραυνοί", "κεραυνός"),
 )
 
+# Looks for the rightmost sequence of one or more vowels and diacritics,
+# followed by zero or more non-vowels.
+FINAL_VOWEL_CLUSTER_RE = re.compile("([αεηιουω\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323]+)[^αεηιουω]*$", re.I)
+
+# We help the lemmatizer out by trying a few transformed variations on the
+# original word, in case there is no lemma found for the original word. The
+# transformations involve diacritics in the final syllable:
+#   change a grave accent to an acute accent
+#   remove an acute accent
+# We try the original word, followed by each transformation in order, stopping
+# that the first one for which lemmatization succeeds.
+# https://github.com/sasansom/sedes/issues/29
+#
+# Instead of looking for the final "syllable," we look for the final subsequence
+# of vowels and diacritics, which is almost the same. This could result in false
+# transformations for words in which the final vowel cluster represents more
+# than one syllable, and which have a transformable diacritic on a non-final
+# syllable, like "ἁθρόοι" or "Ἠελίοιο". This should not be a problem for the
+# purpose of augmented lemmatization, however.
+def pre_transformations(word):
+    yield word
+
+    vowels = FINAL_VOWEL_CLUSTER_RE.search(word)
+    if vowels is None:
+        return
+
+    seen = set([word])
+    for old, new in (
+        ("\u0300", "\u0301"), # grave → acute
+        ("\u0301", ""),       # acute → no accent
+    ):
+        start, end = vowels.span()
+        transformed = word[:start] + vowels.group().replace(old, new) + word[end:]
+        if transformed not in seen:
+            yield transformed
+            seen.add(transformed)
+
 cltk_lemmatizer = BackoffGreekLemmatizer()
 # Insert our own lookup of hardcoded lemmata before the CTLK process.
 lemmatizer = DictLemmatizer(dict(
@@ -224,10 +262,14 @@ lemmatizer = DictLemmatizer(dict(
 ), source = "Sedes overrides", backoff = cltk_lemmatizer.lemmatizer, verbose = cltk_lemmatizer.VERBOSE)
 
 def lookup(word, default=None):
-    # The CLTK lemmatizer expects its input to be normalized according to
-    # cltk_normalize, but our convention elsewhere is to always use NFD
-    # normalization.
-    return unicodedata.normalize("NFD", lemmatizer.lemmatize([cltk_normalize(word)])[0][1]) or default
+    for transformed in pre_transformations(word):
+        # The CLTK lemmatizer expects its input to be normalized according to
+        # cltk_normalize, but our convention elsewhere is to always use NFD
+        # normalization.
+        lemma = lemmatizer.lemmatize([cltk_normalize(transformed)])[0][1]
+        if lemma:
+            return unicodedata.normalize("NFD", lemma)
+    return default
 
 # Run this module as a command to decode beta code from the command line.
 # python3 lemma.py βιὸν
