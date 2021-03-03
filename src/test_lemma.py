@@ -66,3 +66,11 @@ class TestLemma(unittest.TestCase):
             word = word.upper()
             expected = tuple(x.upper() for x in expected)
             self.assertEqual(tuple(lemma_mod.pre_transformations(word)), expected)
+
+        for word, expected in (
+            ("ἀγαθὴν", "ἀγαθός"),
+            ("τ’", "τε"),
+        ):
+            word = unicodedata.normalize("NFD", word)
+            expected = unicodedata.normalize("NFD", expected)
+            self.assertEqual(lemma_mod.lookup(word), expected)

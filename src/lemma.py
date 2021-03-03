@@ -255,7 +255,11 @@ def pre_transformations(word):
             yield transformed
             seen.add(transformed)
 
-cltk_lemmatizer = BackoffGreekLemmatizer()
+# Set verbose = True in order to find out what lemmatizer in the backoff chain
+# is responsible for the returned result. We want to ignore lemmata that come
+# from IdentityLemmatizer in the lookup loop below, because a returned identity
+# lemma would otherwise prevent us from trying the next pre-transformation.
+cltk_lemmatizer = BackoffGreekLemmatizer(verbose = True)
 # Insert our own lookup of hardcoded lemmata before the CTLK process.
 lemmatizer = DictLemmatizer(dict(
     (map(cltk_normalize, x) for x in OVERRIDES)
@@ -266,8 +270,11 @@ def lookup(word, default=None):
         # The CLTK lemmatizer expects its input to be normalized according to
         # cltk_normalize, but our convention elsewhere is to always use NFD
         # normalization.
-        lemma = lemmatizer.lemmatize([cltk_normalize(transformed)])[0][1]
-        if lemma:
+        _, lemma, source = lemmatizer.lemmatize([cltk_normalize(transformed)])[0]
+        # IdentityLemmatizer is the last link in the backoff chain. If that's
+        # the source of the lemma, ignore it, in order to try again with the
+        # next pre-transformation.
+        if lemma and source != "<IdentityLemmatizer>":
             return unicodedata.normalize("NFD", lemma)
     return default
 
