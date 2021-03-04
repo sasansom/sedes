@@ -14,3 +14,63 @@ class TestLemma(unittest.TestCase):
                 lemma = lemma_mod.lookup(unicodedata.normalize(norm, word))
                 # Output should be NFD.
                 self.assertEqual(lemma, unicodedata.normalize("NFD", expected_lemma))
+
+    def test_pre_transformations(self):
+        for word, expected in (
+            # Non-letters.
+            ("", ("",)),
+            (".", (".",)),
+            ("abc", ("abc",)),
+            # Single vowel, no trailing non-vowels.
+            ("ἄϊδι", ("ἄϊδι",)),
+            ("μηρὼ", ("μηρὼ", "μηρώ")),
+            ("δαιτί", ("δαιτί", "δαιτι")),
+            # Multiple vowels, no trailing non-vowels.
+            ("Ζεῦ", ("Ζεῦ",)),
+            ("ἀοιδοὶ", ("ἀοιδοὶ", "ἀοιδοί")),
+            ("πολεμήϊα", ("πολεμήϊα", "πολεμηϊα")),
+            # Single vowel with trailing non-vowels.
+            ("ἀτροπος", ("ἀτροπος",)),
+            ("σαρκὸς", ("σαρκὸς", "σαρκός")),
+            ("φρῖσσόν", ("φρῖσσόν", "φρῖσσον")),
+            # Multiple vowels with trailing non-vowels.
+            ("σφεας", ("σφεας",)),
+            ("ἀοιδοῖς", ("ἀοιδοῖς",)),
+            ("περσεὺς", ("περσεὺς", "περσεύς")),
+            ("ὑμεναίους", ("ὑμεναίους", "ὑμεναιους")),
+            # Multiple diacritics, not all transformable.
+            ("εἴδεΐ", ("εἴδεΐ", "εἴδεϊ"),),
+            # Transformable diacritics not in final syllable.
+            ("κτείνειν", ("κτείνειν",)),
+            ("κοΐλην", ("κοΐλην",)),
+            ("Προΐωξίς", ("Προΐωξίς", "Προΐωξις")),
+
+            # More than one transformation possible. (Not sure if this can
+            # happen with real words.)
+            ("αβίὸν", ("αβίὸν", "αβίόν", "αβιὸν")),
+            ("αβό̀ν", ("αβό̀ν", "αβό́ν", "αβὸν")),
+
+            # These words have a final vowel cluster that covers more than one
+            # syllable, with a transformable diacritic not on the final
+            # syllable. These should really not be transformed, but the
+            # transformation is probably harmless for the purpose of
+            # lemmatization.
+            ("ἁθρόοι", ('ἁθρόοι', 'ἁθροοι')),
+            ("Ἠελίοιο", ('Ἠελίοιο', 'Ἠελιοιο')),
+        ):
+            word = unicodedata.normalize("NFD", word)
+            expected = tuple(unicodedata.normalize("NFD", x) for x in expected)
+            self.assertEqual(tuple(lemma_mod.pre_transformations(word)), expected)
+
+            # Test upper-case variants too.
+            word = word.upper()
+            expected = tuple(x.upper() for x in expected)
+            self.assertEqual(tuple(lemma_mod.pre_transformations(word)), expected)
+
+        for word, expected in (
+            ("ἀγαθὴν", "ἀγαθός"),
+            ("τ’", "τε"),
+        ):
+            word = unicodedata.normalize("NFD", word)
+            expected = unicodedata.normalize("NFD", expected)
+            self.assertEqual(lemma_mod.lookup(word), expected)
