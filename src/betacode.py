@@ -168,12 +168,12 @@ def decode(beta):
     in NFD form."""
     STATE_INIT, STATE_LETTER_PREDIACRITICS, STATE_LETTER_DIGITS, STATE_NONLETTER_DIGITS, STATE_LETTER_POSTDIACRITICS, STATE_EMIT, STATE_DONE = range(7)
 
-    # Allow the next closure to modify this value.
-    i = [0]
+    i = 0
     def next():
-        if i[0] < len(beta):
-            c = beta[i[0]]
-            i[0] += 1
+        nonlocal i
+        if i < len(beta):
+            c = beta[i]
+            i += 1
             return c
         return None
 
@@ -210,7 +210,7 @@ def decode(beta):
                 state = STATE_NONLETTER_DIGITS
                 c = next()
             elif c in BETA_DIACRITIC_MAP:
-                raise ValueError("unexpected diacritic {!r} {!r}".format(c, (beta[:i[0]], beta[i[0]:])))
+                raise ValueError("unexpected diacritic {!r} {!r}".format(c, (beta[:i], beta[i:])))
             else:
                 # Not an Beta Code sequence, some other symbol or literal code
                 # point.
@@ -222,7 +222,7 @@ def decode(beta):
         if state == STATE_LETTER_PREDIACRITICS:
             if c is not None and c in BETA_DIACRITIC_MAP:
                 if c in diacritics:
-                    raise ValueError("duplicate {!r} diacritic {!r}".format(c, (beta[:i[0]], beta[i[0]:])))
+                    raise ValueError("duplicate {!r} diacritic {!r}".format(c, (beta[:i], beta[i:])))
                 diacritics.append(c)
                 c = next()
             elif c is not None and c.isalpha():
@@ -230,7 +230,7 @@ def decode(beta):
                 state = STATE_LETTER_DIGITS
                 c = next()
             else:
-                raise ValueError("expected diacritic or alphabetic {!r}".format((beta[:i[0]], beta[i[0]:])))
+                raise ValueError("expected diacritic or alphabetic {!r}".format((beta[:i], beta[i:])))
         if state == STATE_LETTER_DIGITS:
             if c is not None and c in "0123456789":
                 key += c
@@ -246,7 +246,7 @@ def decode(beta):
         if state == STATE_LETTER_POSTDIACRITICS:
             if c is not None and c in BETA_DIACRITIC_MAP:
                 if c in diacritics:
-                    raise ValueError("duplicate {!r} diacritic {!r}".format(c, (beta[:i[0]], beta[i[0]:])))
+                    raise ValueError("duplicate {!r} diacritic {!r}".format(c, (beta[:i], beta[i:])))
                 diacritics.append(c)
                 c = next()
             else:
@@ -264,7 +264,7 @@ def decode(beta):
             try:
                 output.append(BETA_MAP[key])
             except KeyError:
-                raise ValueError("unknown Beta Code character {!r} {!r}".format(key, (beta[:i[0]], beta[i[0]:])))
+                raise ValueError("unknown Beta Code character {!r} {!r}".format(key, (beta[:i], beta[i:])))
             for diacritic in sorted_diacritics(diacritics):
                 output.append(BETA_DIACRITIC_MAP[diacritic])
             state = STATE_INIT
