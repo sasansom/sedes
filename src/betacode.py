@@ -101,6 +101,8 @@ BETA_DIACRITIC_MAP = {
     "?": "\u0323", # COMBINING DOT BELOW
 }
 
+# https://github.com/sasansom/sedes/issues/45
+#
 # When we are attaching Unicode combining characters to a base character, we
 # need to take care with certain diacritics so that they normalize into NFC
 # nicely. The basic rule is that we want to sort these three diacritics:
@@ -109,37 +111,36 @@ BETA_DIACRITIC_MAP = {
 #   / \ =
 # Getting the order wrong prevents full NFC composition. For example, `i(/`,
 # after decoding and normalizing, becomes the single character
-#   U+1f35 GREEK SMALL LETTER IOTA WITH DASIA AND OXIA
+#   1F35 GREEK SMALL LETTER IOTA WITH DASIA AND OXIA
 # But `i/(`, if the diacritics were kept in that order, normalizes only
 # partially:
-#   U+03af GREEK SMALL LETTER IOTA WITH TONOS
-#   U+0314 COMBINING REVERSED COMMA ABOVE
+#   03AF GREEK SMALL LETTER IOTA WITH TONOS
+#   0314 COMBINING REVERSED COMMA ABOVE
 #
-# These are the combinations I tried, to come up with the rule above.
-#   (/  WITH DASIA AND OXIA
-#   (\  WITH DASIA AND VARIA
-#   (=  WITH DASIA AND PERISPOMENI
-#   )/  WITH PSILI AND OXIA
-#   )\  WITH PSILI AND VARIA
-#   )=  WITH PSILI AND PERISPOMENI
-#   +/  WITH DIALYTIKA AND TONOS
-#   +\  WITH DIALYTIKA AND VARIA
-#   +=  WITH DIALYTIKA AND PERISPOMENI
+# The ordering rule is a consequence of how canonical equivalence is defined for
+# Greek characters (https://www.unicode.org/charts/PDF/U0370.pdf#page=2). Take
+# for example 0390 GREEK SMALL LETTER IOTA WITH DIALYTIKA AND TONOS. 0390 is
+# canonically equivalent to 03CA GREEK SMALL LETTER IOTA WITH DIALYTIKA +
+# 0301 COMBINING ACUTE ACCENT. 03CA is itself canonically equivalent to
+# 03B9 GREEK SMALL LETTER IOTA + 0308 COMBINING DIAERESIS.
+#   0390 ≡ 03CA + 0301
+#   03CA ≡ 03B9 + 0308
+# Applying these equivalencies in reverse, 03B9 + 0308 + 0301 composes properly
+# into 0390. But no such chain of equivalencies leads to 0390 if we start with
+# the opposite order of diacritics, 03B9 + 0301 + 0308. By applying the
+# canonical equivalence rule
+#   03AF ≡ 03B9 + 0301
+# we can get as far as 03AF GREEK SMALL LETTER IOTA WITH TONOS + 0308 COMBINING
+# DIAERESIS, but from there, no further composition is possible.
 #
-#   /(  WITH TONOS + COMBINING REVERSED COMMA ABOVE
-#   \(  WITH VARIA + COMBINING REVERSED COMMA ABOVE
-#   =(  WITH PERISPOMENI + COMBINING REVERSED COMMA ABOVE
-#   /)  WITH TONOS + COMBINING COMMA ABOVE
-#   \)  WITH VARIA + COMBINING COMMA ABOVE
-#   =)  WITH PERISPOMENI + COMBINING COMMA ABOVE
-#   /+  WITH TONOS + COMBINING DIAERESIS
-#   \+  WITH VARIA + COMBINING DIAERESIS
-#   =+  WITH PERISPOMENI + COMBINING DIAERESIS
-#
-# The order of ? and | seems not to matter. Just for consistency, we sort those
-# using their Unicode canonical combining class.
-#
-# https://github.com/sasansom/sedes/issues/45
+# The order of diacritics only matters for those with the same canonical
+# combining class. ( ) + / \ = all map to Unicode characters with a combining
+# class of 230. The relative order of ? and | does not matter, as they map to
+# characters with combining classes of 220 and 240 respectively. For
+# consistency, we sort these in order of combining class, which is the same
+# order that Unicode normalization would put them in.
+# Unicode 3.6 P5 https://www.unicode.org/versions/Unicode13.0.0/ch03.pdf#page=42
+# Unicode 3.11 D108 https://www.unicode.org/versions/Unicode13.0.0/ch03.pdf#page=66
 
 # Diacritics in the same tier are considered incomparable. They should not
 # appear attached to the same base character.
