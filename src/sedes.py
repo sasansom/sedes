@@ -52,6 +52,14 @@ def partition_scansion_into_words(scansion):
     if current:
         yield current
 
+def format_shape(shape):
+    """
+    Converts the hexameter module's internal long/short notation ('+'/'-') to
+    Unicode '–'/'⏑'.
+    https://github.com/sasansom/sedes/issues/44
+    """
+    return "".join({"+": "–", "-": "⏑"}[c] for c in shape)
+
 def assign(scansion):
     """From a metrical scansion (sequence of (character cluster, preliminary
     metrical analysis, final metrical analysis) tuples as output by
@@ -98,7 +106,7 @@ def assign(scansion):
             # Once we know the sedes, output all the words seen since the
             # last time we saw a sedes.
             for (w, s) in zip(words, shapes):
-                result.append((w, "{:g}".format(word_sedes), s))
+                result.append((w, "{:g}".format(word_sedes), format_shape(s)))
             words = []
             shapes = []
             word_sedes = None
@@ -118,7 +126,7 @@ def recover_known(known):
         # sedes other than 1, for example when one metrical line is split across
         # multiple printed lines, as in Theoc 5.66–68.
         if word:
-            result.append((word, "{:g}".format(sedes), shape))
+            result.append((word, "{:g}".format(sedes), format_shape(shape)))
         for value in shape:
             if value == "-":
                 sedes += 0.5

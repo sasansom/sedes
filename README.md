@@ -121,3 +121,7 @@ U+0301 COMBINING ACUTE ACCENT
 ```
 After UTF-8 encoding, this sequence is
 `\xce\xb1\xcc\x93\xce\xbf\xce\xb9\xce\xb4\xce\xb7\xcc\x81`.
+
+The characters that mark long and short metrical values
+are respectively `–` U+2013 EN DASH
+and `⏑` U+23D1 METRICAL BREVE.
