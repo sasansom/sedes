@@ -115,7 +115,7 @@ BETA_DIACRITIC_MAP = {
 #   U+03af GREEK SMALL LETTER IOTA WITH TONOS
 #   U+0314 COMBINING REVERSED COMMA ABOVE
 #
-# These are the combination I tried, to come up with the rule above.
+# These are the combinations I tried, to come up with the rule above.
 #   (/  WITH DASIA AND OXIA
 #   (\  WITH DASIA AND VARIA
 #   (=  WITH DASIA AND PERISPOMENI
