@@ -1,3 +1,7 @@
+# Our convention elsewhere is to use the characters – ('\u2013') and ⏑
+# ('\u23d1') for long and short, respectively. However, in this file, for ease
+# of data entry, we use + ('\u002b') and - ('\u002d') for ease of data entry.
+
 KNOWN_SCANSIONS = {
     'μῆνιν ἄειδε θεὰ Πηληϊάδεω Ἀχιλῆος': # Il. 1.1
         (('μῆνιν', '+-'), ('ἄειδε', '-+-'), ('θεὰ', '-+'), ('πηληϊάδεω', '++--+'), ('ἀχιλῆος', '--++')),
