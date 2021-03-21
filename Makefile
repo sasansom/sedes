@@ -57,14 +57,18 @@ fonts: \
 	web-demo/fonts/Cardo-Italic.woff \
 	web-demo/fonts/Cardo-Bold.woff
 
-web-demo/fonts/SIL\ Open\ Font\ License.txt: fonts/cardo.zip
-	unzip -D -o "$<" "$(notdir $@)"
-	mv -f "$(notdir $@)" "$@"
+web-demo/fonts/SIL\ Open\ Font\ License.txt: fonts/SIL\ Open\ Font\ License.txt
+	cp -f "$^" "$@"
 
-%.ttf: fonts/cardo.zip
-	unzip -D -o "$<" "$(notdir $@)"
+.INTERMEDIATE: Cardo104s.ttf Cardoi99.ttf Cardob101.ttf
+Cardo104s.ttf Cardoi99.ttf Cardob101.ttf: fonts/cardo104.zip
+	unzip -D -o "$<" "$@"
 
-web-demo/fonts/%.woff: %.ttf
+web-demo/fonts/Cardo-Regular.woff: Cardo104s.ttf
+web-demo/fonts/Cardo-Italic.woff: Cardoi99.ttf
+web-demo/fonts/Cardo-Bold.woff: Cardob101.ttf
+
+web-demo/fonts/Cardo-Regular.woff web-demo/fonts/Cardo-Italic.woff web-demo/fonts/Cardo-Bold.woff:
 	mkdir -p web-demo/fonts
 	fontforge -lang ff -script fonts/subset-greek.ff "$<" "$@"
 
