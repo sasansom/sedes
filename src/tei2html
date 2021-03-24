@@ -377,7 +377,7 @@ h1 a, h2 a {
     print("""\
 <header>
 <form id=controls>
-<label><input name=grid type=checkbox> Align to sedes grid</label>
+<label><input name=grid type=checkbox> Align to <i>sedes</i> grid</label>
 <br>
 <select name=style>
 <option value=>No highlighting</option>
