@@ -283,7 +283,7 @@ def lookup(word, default=None):
             return unicodedata.normalize("NFD", lemma)
     return default
 
-# Run this module as a command to decode beta code from the command line.
+# Run this module as a command to find lemmata from the command line.
 # python3 lemma.py βιὸν
 if __name__ == "__main__":
     import sys
