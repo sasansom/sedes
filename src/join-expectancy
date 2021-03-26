@@ -56,11 +56,15 @@ def join(left, right_file, fieldnames, output):
 
     lookup = {}
     for row in right:
+        if not row["lemma"]:
+            row["lemma"] = row["word"]
         key = tuple(row[x] for x in fieldnames)
         lookup.setdefault(key, [])
         lookup[key].append(row)
 
     for row in left:
+        if not row["lemma"]:
+            row["lemma"] = row["word"]
         key = tuple(row[x] for x in fieldnames)
         matches = lookup.get(key)
         if not matches:

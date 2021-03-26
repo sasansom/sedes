@@ -270,7 +270,8 @@ lemmatizer = DictLemmatizer(dict(
     (map(cltk_normalize, x) for x in OVERRIDES)
 ), source = "Sedes overrides", backoff = cltk_lemmatizer.lemmatizer, verbose = cltk_lemmatizer.VERBOSE)
 
-def lookup(word, default=None):
+# Returns None if no lemma was found.
+def lookup(word):
     for transformed in pre_transformations(word):
         # The CLTK lemmatizer expects its input to be normalized according to
         # cltk_normalize, but our convention elsewhere is to always use NFD
@@ -281,7 +282,6 @@ def lookup(word, default=None):
         # next pre-transformation.
         if lemma and source != "<IdentityLemmatizer>":
             return unicodedata.normalize("NFD", lemma)
-    return default
 
 # Run this module as a command to find lemmata from the command line.
 # python3 lemma.py βιὸν

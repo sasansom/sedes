@@ -500,7 +500,7 @@ h1 a, h2 a {
             prev_sedes = sedes
 
             title_attr = []
-            lemma = lemma_mod.lookup(word, word)
+            lemma = lemma_mod.lookup(word) or word
             assert lemma, (word, lemma)
             if lemma is not None:
                 title_attr.append(f"lemma={normalize(lemma)}")

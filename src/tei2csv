@@ -58,7 +58,7 @@ def process(f):
                 "num_scansions": num_scansions,
                 "sedes": pos,
                 "metrical_shape": shape,
-                "lemma": lemma.lookup(word, word),
+                "lemma": lemma.lookup(word),
             })
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
