@@ -145,7 +145,6 @@ def process(f, expectancy):
     font-weight: 400;
     font-display: swap;
     src: local("Cardo Regular"), local("Cardo-Regular"), url(fonts/Cardo-Regular.woff) format("woff2");
-    unicode-range: U+0370-03FF, U+1F00-1FFF;
 }
 @font-face {
     font-family: "Cardo";
@@ -153,7 +152,6 @@ def process(f, expectancy):
     font-weight: 400;
     font-display: swap;
     src: local("Cardo Italic"), local("Cardo-Italic"), url(fonts/Cardo-Italic.woff) format("woff2");
-    unicode-range: U+0370-03FF, U+1F00-1FFF;
 }
 @font-face {
     font-family: "Cardo";
@@ -161,7 +159,6 @@ def process(f, expectancy):
     font-weight: 700;
     font-display: swap;
     src: local("Cardo Bold"), local("Cardo-Bold"), url(fonts/Cardo-Bold.woff) format("woff2");
-    unicode-range: U+0370-03FF, U+1F00-1FFF;
 }
 
 header {

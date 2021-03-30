@@ -2,8 +2,11 @@
 # fontforge -lang ff -script subset-greek.ff input.ttf output.woff
 Open($1)
 SelectNone();
+SelectMore(0u0000, 0u007f); # Basic Latin, for space character, numerals, and punctuation
+SelectMore(0u0080, 0u00ff); # Latin-1 Supplement, for middle dot punctuation
 SelectMore(0u0370, 0u03ff); # Greek and Coptic
 SelectMore(0u1f00, 0u1fff); # Greek Extended
+SelectMore(0u2018, 0u2019); # Open and close quotation marks
 SelectInvert();
 DetachAndRemoveGlyphs();
 Generate($2);
