@@ -70,6 +70,12 @@ def parse_expectancy(f):
 def esc(v):
     return html.escape(v, True)
 
+# Return an escaped JavaScript string literal.
+def js_string(s):
+    return '"' + "".join(("\\" + c if c in ("\\", "\"") else c) for c in s) + '"'
+
+# This function needs to be kept in sync with the function of the same name in
+# the <script></script> block at the bottom.
 def tone_map(z):
     # Logistic function.
     return 1.0 / (1.0 + math.exp(-z * SHADE_MAPPING_ADJUST))
@@ -112,6 +118,11 @@ def diverging_scale(x, low, mid, high):
         return interpolate_srgb((0.5 - x) / 0.5, mid, low)
     else:
         return interpolate_srgb((x - 0.5) / 0.5, mid, high)
+
+def srgb_luminance(sr, sg, sb):
+    # https://en.wikipedia.org/wiki/Relative_luminance#Relative_luminance_in_colorimetric_spaces
+    r, g, b = srgb_to_linear(sr, sg, sb)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 
 # Normalize Unicode text for output. While we do all internal processing in NFD,
 # NFC is better for HTML output.
@@ -162,13 +173,56 @@ def process(f, expectancy):
     src: local("Cardo Bold"), local("Cardo-Bold"), url(fonts/Cardo-Bold.woff) format("woff2");
 }
 
-header {
-    background-color: ivory;
+#sidebar {
+    background-color: peachpuff;
     position: fixed;
-    display: inline-block;
-    top: 1em;
-    right: 1em;
+    bottom: 1rem;
+    right: 1rem;
     z-index: 1;
+    max-width: 100vw;
+    max-height: 60vh;
+    overflow: auto;
+    padding: 0.5rem;
+}
+#controls {
+    display: grid;
+    gap: 0.5em;
+}
+#word-output, #lemma-output {
+    font-family: "Cardo";
+}
+#infobox {
+    line-height: 1rem;
+}
+#infobox th {
+    padding-right: 0.5em;
+}
+#infobox th, #infobox td {
+    text-align: left;
+}
+#sedes-dist {
+    background-color: white;
+    border-spacing: 1px;
+}
+#sedes-dist th {
+    font-weight: inherit;
+}
+#sedes-dist th[scope=col] {
+    text-align: center;
+    min-width: 6.5ex;
+    background-color: powderblue;
+}
+#sedes-dist th[scope=col].selected {
+    background-color: coral;
+}
+#sedes-dist th[scope=col], #sedes-dist td {
+    font-size: x-small;
+}
+#sedes-dist th[scope=row] {
+    text-align: left;
+}
+#sedes-dist td {
+    text-align: right;
 }
 
 h1 a, h2 a {
@@ -183,11 +237,9 @@ h1 a, h2 a {
     background-color: gold;
 }
 
-/*
-.word, .word::before {
-    transition: all 0.3s;
+summary, .word {
+    cursor: pointer;
 }
-*/
 
 .line, .grid-markers {
     font-family: "Cardo";
@@ -359,9 +411,13 @@ h1 a, h2 a {
         diverging_color = diverging_scale(r, COLOR_DIVERGING_LOW, COLOR_DIVERGING_MID, COLOR_DIVERGING_HIGH)
 
         print(f".shade-text .sedes .z-{n} {{ color: {css_color(*shade_color)}; }}")
+        print(f"#sedes-dist.shade-text .z-{n} {{ color: {'white' if srgb_luminance(*shade_color) < 0.25 else 'black'}; background-color: {css_color(*shade_color)}; }}")
         print(f".shade-text-diverging .sedes .z-{n} {{ color: {css_color(*diverging_color)}; }}")
+        print(f"#sedes-dist.shade-text-diverging .z-{n} {{ color: {'white' if srgb_luminance(*diverging_color) < 0.25 else 'black'}; background-color: {css_color(*diverging_color)}; }}")
         print(f".shade-bubbles .sedes .z-{n}::before {{ background-color: {css_color(*shade_color)}; }}")
+        print(f"#sedes-dist.shade-bubbles .z-{n} {{ color: {'white' if srgb_luminance(*shade_color) < 0.25 else 'black'}; background-color: {css_color(*shade_color)}; }}")
         print(f".shade-bubbles-diverging .sedes .z-{n}::before {{ background-color: {css_color(*diverging_color)}; }}")
+        print(f"#sedes-dist.shade-bubbles-diverging .z-{n} {{ color: {'white' if srgb_luminance(*diverging_color) < 0.25 else 'black'}; background-color: {css_color(*diverging_color)}; }}")
         area = math.sqrt(1.0 - r)
         print(f".size-bubbles .sedes .z-{n}::before {{ --s: calc(var(--r) * {area:.3f}); }}")
 
@@ -375,10 +431,13 @@ h1 a, h2 a {
     def fmt_float(x):
         return esc(f"{x:+.3g}".replace("-", "−"))
     print("""\
-<header>
+<details id=sidebar open>
+<summary>Controls</summary>
+
+<div>
 <form id=controls>
 <label><input name=grid type=checkbox> Align to <i>sedes</i> grid</label>
-<br>
+<div>
 <select name=style>
 <option value=>No highlighting</option>
 <option value=shade-text>Shade text</option>
@@ -387,7 +446,6 @@ h1 a, h2 a {
 <option value=shade-bubbles-diverging>Shade bubbles, diverging</option>
 <option value=size-bubbles>Size bubbles</option>
 </select>
-<br>
 <div id=vis-helper>
 <div id=shade-scale>
 <span>{min}</span><span>{max}</span>
@@ -396,12 +454,115 @@ h1 a, h2 a {
 <span>{min}</span><span>{max}</span>
 </div>
 </div>
+</div>
 <label><input name=show-undefined-expectancy type=checkbox> Highlight undefined <var>z</var>-scores</label>
 </form>
-</header>""".format(min = fmt_float(SHADE_SCALE_RANGE[0]), max = fmt_float(SHADE_SCALE_RANGE[1])))
+
+<hr>
+
+<span><output id=loc-output></output></span>
+
+<table id=infobox>
+<tr><th scope=row>word</th><td><output id=word-output></output></td></tr>
+<tr><th scope=row>shape</th><td><output id=shape-output></output></td></tr>
+<tr><th scope=row>lemma</th><td><output id=lemma-output></output></td></tr>
+<tr><th scope=row>sedes</th><td><output id=sedes-output></output></td></tr>
+</table>
+
+<table id=sedes-dist>
+<tr>
+  <td></td>
+  <th scope=col id=sedes-dist-header-1>1</th>
+  <th scope=col id=sedes-dist-header-2>2</th>
+  <th scope=col id=sedes-dist-header-2.5>2.5</th>
+  <th scope=col id=sedes-dist-header-3>3</th>
+  <th scope=col id=sedes-dist-header-4>4</th>
+  <th scope=col id=sedes-dist-header-4.5>4.5</th>
+  <th scope=col id=sedes-dist-header-5>5</th>
+  <th scope=col id=sedes-dist-header-6>6</th>
+  <th scope=col id=sedes-dist-header-6.5>6.5</th>
+  <th scope=col id=sedes-dist-header-7>7</th>
+  <th scope=col id=sedes-dist-header-8>8</th>
+  <th scope=col id=sedes-dist-header-8.5>8.5</th>
+  <th scope=col id=sedes-dist-header-9>9</th>
+  <th scope=col id=sedes-dist-header-10>10</th>
+  <th scope=col id=sedes-dist-header-10.5>10.5</th>
+  <th scope=col id=sedes-dist-header-11>11</th>
+  <th scope=col id=sedes-dist-header-12>12</th>
+</tr>
+<tr>
+  <th scope=row><var>x</var></th>
+  <td><output id=output-x-1></output></td>
+  <td><output id=output-x-2></output></td>
+  <td><output id=output-x-2.5></output></td>
+  <td><output id=output-x-3></output></td>
+  <td><output id=output-x-4></output></td>
+  <td><output id=output-x-4.5></output></td>
+  <td><output id=output-x-5></output></td>
+  <td><output id=output-x-6></output></td>
+  <td><output id=output-x-6.5></output></td>
+  <td><output id=output-x-7></output></td>
+  <td><output id=output-x-8></output></td>
+  <td><output id=output-x-8.5></output></td>
+  <td><output id=output-x-9></output></td>
+  <td><output id=output-x-10></output></td>
+  <td><output id=output-x-10.5></output></td>
+  <td><output id=output-x-11></output></td>
+  <td><output id=output-x-12></output></td>
+</tr>
+<tr>
+  <th scope=row><var>x</var>/Σ<var>x</var></th>
+  <td><output id=output-fracx-1></output></td>
+  <td><output id=output-fracx-2></output></td>
+  <td><output id=output-fracx-2.5></output></td>
+  <td><output id=output-fracx-3></output></td>
+  <td><output id=output-fracx-4></output></td>
+  <td><output id=output-fracx-4.5></output></td>
+  <td><output id=output-fracx-5></output></td>
+  <td><output id=output-fracx-6></output></td>
+  <td><output id=output-fracx-6.5></output></td>
+  <td><output id=output-fracx-7></output></td>
+  <td><output id=output-fracx-8></output></td>
+  <td><output id=output-fracx-8.5></output></td>
+  <td><output id=output-fracx-9></output></td>
+  <td><output id=output-fracx-10></output></td>
+  <td><output id=output-fracx-10.5></output></td>
+  <td><output id=output-fracx-11></output></td>
+  <td><output id=output-fracx-12></output></td>
+</tr>
+<tr>
+  <th scope=row><var>z</var></th>
+  <td><output id=output-z-1></output></td>
+  <td><output id=output-z-2></output></td>
+  <td><output id=output-z-2.5></output></td>
+  <td><output id=output-z-3></output></td>
+  <td><output id=output-z-4></output></td>
+  <td><output id=output-z-4.5></output></td>
+  <td><output id=output-z-5></output></td>
+  <td><output id=output-z-6></output></td>
+  <td><output id=output-z-6.5></output></td>
+  <td><output id=output-z-7></output></td>
+  <td><output id=output-z-8></output></td>
+  <td><output id=output-z-8.5></output></td>
+  <td><output id=output-z-9></output></td>
+  <td><output id=output-z-10></output></td>
+  <td><output id=output-z-10.5></output></td>
+  <td><output id=output-z-11></output></td>
+  <td><output id=output-z-12></output></td>
+</tr>
+</table>
+
+</div>
+</details>""".format(min = fmt_float(SHADE_SCALE_RANGE[0]), max = fmt_float(SHADE_SCALE_RANGE[1])))
 
     print("<article>")
+    print("<header>")
     print(f"<h1>{esc(doc.title)}</h1>")
+    print("</header>")
+
+    # Lemmata whose expectancy entries actually needed for the words in this
+    # text, built up as we go.
+    expectancy_needed = set()
 
     # Sum of x per lemma.
     sum_x = {}
@@ -416,7 +577,7 @@ h1 a, h2 a {
                 print("</div>")
                 print("</section>")
             print()
-            print(f"<section id=\"book-{esc(loc.book_n)}\">")
+            print(f"<section id=\"book-{esc(loc.book_n)}\" data-bookno=\"{esc(loc.book_n)}\">")
             print(f"<h2><a href=\"#book-{esc(loc.book_n)}\">{esc(loc.book_n)}</a></h2>")
 
             print("""\
@@ -502,20 +663,21 @@ h1 a, h2 a {
             title_attr = []
             lemma = lemma_mod.lookup(word) or word
             assert lemma, (word, lemma)
+            word_attrs["data-wordno"] = str(word_n)
             if lemma is not None:
+                word_attrs["data-lemma"] = normalize(lemma);
                 title_attr.append(f"lemma={normalize(lemma)}")
             if sedes is not None:
+                word_attrs["data-sedes"] = sedes;
                 title_attr.append(f"sedes={sedes}")
+            expectancy_needed.add(lemma)
             expectancy_entry = expectancy.get((lemma, sedes))
             if expectancy_entry is not None:
-                word_attrs["data-x"] = str(expectancy_entry.x)
                 title_attr.append(f"x={expectancy_entry.x}")
-                word_attrs["data-sum-x"] = str(sum_x[lemma])
                 title_attr.append(f"Σx={sum_x[lemma]}")
                 word_attrs["class"] += " " + esc(z_css(expectancy_entry.z))
                 if expectancy_entry.z is not None:
                     z_fmt = f"{expectancy_entry.z:+.8}"
-                    word_attrs["data-z"] = z_fmt
                     title_attr.append(f"z={z_fmt.replace('-', '−')}")
                 else:
                     word_attrs["class"] += " " + "undefined-expectancy"
@@ -523,7 +685,8 @@ h1 a, h2 a {
                 print(f"warning: no expectancy score for book {loc.book_n} line {loc.line_n} word {word_n}: {word} {lemma!r}/{sedes}", file=sys.stderr)
                 word_attrs["class"] += " error"
             if shape is not None:
-                title_attr.append(f"shape={shape}")
+                word_attrs["data-shape"] = normalize(shape)
+                title_attr.append(f"shape={normalize(shape)}")
             if title_attr:
                 word_attrs["title"] = " ".join(title_attr)
 
@@ -551,9 +714,98 @@ h1 a, h2 a {
         print("</section>")
 
     print("</article>")
-    print("</body>")
+
+    print("<script defer>")
+    print("\"use strict\";")
+
+    print("const EXPECTANCY = new Map([");
+    for lemma, sedes in ((lemma, sedes) for lemma, sedes in expectancy.keys() if lemma in expectancy_needed):
+        expectancy_entry = expectancy.get((lemma, sedes))
+        fields = [("x", str(expectancy_entry.x)),]
+        if expectancy_entry.z is not None:
+            fields.append(("z", f"{expectancy_entry.z:+.8}"))
+        key = f"{normalize(lemma)}/{sedes}"
+        value = ", ".join(f"{name}: {value}" for name, value in fields)
+        print(f"[{js_string(key)}, {{{value}}}],")
+    print("]);");
+
+    print(f"const SHADE_MAPPING_ADJUST = {SHADE_MAPPING_ADJUST};")
+
     print("""
-<script>
+const POSSIBLE_SEDES = [1, 2, 2.5, 3, 4, 4.5, 5, 6, 6.5, 7, 8, 8.5, 9, 10, 10.5, 11, 12].map(sedes => sedes.toString());
+
+const LOC_OUTPUT = document.getElementById("loc-output");
+const WORD_OUTPUT = document.getElementById("word-output");
+const SHAPE_OUTPUT = document.getElementById("shape-output");
+const LEMMA_OUTPUT = document.getElementById("lemma-output");
+const SEDES_OUTPUT = document.getElementById("sedes-output");
+const SEDES_DIST = document.getElementById("sedes-dist");
+
+function format_signed_float(x, digits) {
+    return (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(digits);
+}
+
+// This function needs to be kept in sync with the Python function of the same
+// name.
+function tone_map(z) {
+    return 1.0 / (1.0 + Math.exp(-z * SHADE_MAPPING_ADJUST))
+}
+
+function info(event) {
+    // Search upward for the containing book and line.
+    let bookno, lineno, wordno;
+    for (let elem = event.target;
+         (bookno == null || lineno == null || wordno == null) && elem != null;
+         elem = elem.parentElement)
+    {
+        bookno = bookno ?? elem.getAttribute("data-bookno");
+        lineno = lineno ?? elem.getAttribute("data-lineno");
+        wordno = wordno ?? elem.getAttribute("data-wordno");
+    }
+    LOC_OUTPUT.textContent = [
+        (bookno != null) && `book ${bookno}`,
+        (lineno != null) && `line ${lineno}`,
+        (wordno != null) && `word ${wordno}`,
+    ].filter(x => x).join(", ");
+
+    let lemma = event.target.getAttribute("data-lemma");
+    let sedes = event.target.getAttribute("data-sedes");
+    WORD_OUTPUT.textContent = event.target.textContent;
+    SHAPE_OUTPUT.textContent = event.target.getAttribute("data-shape") ?? "";
+    LEMMA_OUTPUT.textContent = lemma ?? "";
+    SEDES_OUTPUT.textContent = sedes ?? "";
+
+    for (let elem of SEDES_DIST.getElementsByTagName("th"))
+        elem.classList.toggle("selected", false);
+    if (sedes != null)
+        document.getElementById(`sedes-dist-header-${sedes}`).classList.toggle("selected", true);
+
+    let sum_x = POSSIBLE_SEDES.map(sedes => EXPECTANCY.get(`${lemma}/${sedes}`)?.x ?? 0).reduce((a, b) => a + b);
+    for (let sedes of POSSIBLE_SEDES) {
+        let {x, z} = EXPECTANCY.get(`${lemma}/${sedes}`) ?? {};
+        let output_x = document.getElementById(`output-x-${sedes}`);
+        let output_fracx = document.getElementById(`output-fracx-${sedes}`);
+        let output_z = document.getElementById(`output-z-${sedes}`);
+        if (x !== undefined) {
+            output_x.textContent = x;
+            output_fracx.textContent = (x / sum_x * 100).toFixed(1) + "%";
+        } else {
+            output_x.textContent = "";
+            output_fracx.textContent = "";
+        }
+        output_z.parentNode.className = output_z.parentNode.className.split(" ").filter(name => !/^z-\d+$/.test(name)).join(" ");
+        if (z !== undefined) {
+            output_z.textContent = format_signed_float(z, 2);
+            output_z.parentNode.classList.add(`z-${(tone_map(z) * 100).toFixed()}`);
+        } else {
+            output_z.textContent = "";
+        }
+        output_z.parentNode.classList.toggle("undefined-expectancy", x !== undefined && z === undefined);
+    }
+}
+for (let word of document.querySelectorAll("article .word"))
+    word.addEventListener("click", info);
+
 const ALL_STYLES = [
     "shade-text",
     "shade-text-diverging",
@@ -573,7 +825,7 @@ CONTROLS["grid"].addEventListener("change", event => {
 CONTROLS["grid"].dispatchEvent(new Event("change"));
 const VIS_HELPER = document.getElementById("vis-helper");
 CONTROLS["style"].addEventListener("change", event => {
-    for (let elem of document.querySelectorAll(".text")) {
+    for (let elem of document.querySelectorAll(".text, #sedes-dist")) {
         elem.classList.remove(...ALL_STYLES);
         if (event.target.value)
             elem.classList.add(event.target.value);
@@ -584,13 +836,14 @@ CONTROLS["style"].addEventListener("change", event => {
 });
 CONTROLS["style"].dispatchEvent(new Event("change"));
 CONTROLS["show-undefined-expectancy"].addEventListener("change", event => {
-    for (let elem of document.querySelectorAll(".text")) {
+    for (let elem of document.querySelectorAll(".text, #sedes-dist")) {
         elem.classList.toggle("show-undefined-expectancy", event.target.checked);
     }
 });
 CONTROLS["show-undefined-expectancy"].dispatchEvent(new Event("change"));
 </script>
 """)
+    print("</body>")
     print("</html>")
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "hs:", ["help", "shade-mapping-adjust="])
