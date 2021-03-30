@@ -136,6 +136,7 @@ def process(f, expectancy):
     print("<html>")
     print("<head>")
     print("<meta charset=utf-8>")
+    print("<meta name=viewport content=\"width=device-width, initial-scale=1\">")
     print(f"<title>{esc(doc.title)}</title>")
     print("<style>")
     print("""\
@@ -192,21 +193,22 @@ h1 a, h2 a {
     font-family: "Cardo";
     font-size: 120%;
     line-height: 140%;
+    white-space: nowrap;
 }
 
 .line::before {
     content: attr(data-lineno);
     display: inline-block;
     position: absolute;
-    left: -4rem;
-    width: 3rem;
+    left: -3rem;
+    width: 2rem;
     text-align: right;
     color: gray;
     font-size: 80%;
 }
 
 .text, .grid-markers {
-    margin-left: 4rem;
+    margin-left: 3rem;
     position: relative;
 }
 /* Keep background colors and full saturation when printing. */
@@ -218,6 +220,7 @@ h1 a, h2 a {
 .grid-markers {
     color: gray;
     opacity: 0;
+    overflow: hidden;
     visibility: hidden;
     transition-property: opacity, visibility;
     transition-duration: 0.5s;
