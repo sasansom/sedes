@@ -1360,19 +1360,19 @@
 <div1 type="poem" n="14" org="uniform" sample="complete">
 <head>*kuni/skas *)/erws h)\ *Quw/nixos.</head>
 <sp><speaker>*Ai)sxi/nhs</speaker><p>
-<lb />xai/rein polla\ to\n a)/ndra *quw/nixon.</p></sp>
+<lb n="1" />xai/rein polla\ to\n a)/ndra *quw/nixon.</p></sp>
 <sp><speaker>*Quw/nixos</speaker><p>
-<lb rend="displayNumAndIndent" />a)lla\ tu\ tau)ta/,
-<lb />*ai)sxi/na.
+<lb rend="displayNumAndIndent" n="1" />a)lla\ tu\ tau)ta/,
+<lb n="2" />*ai)sxi/na.
 <pb n="112" /></p></sp>
 <sp><speaker>*Ai)sxi/nhs</speaker><p>
-<lb rend="displayNumAndIndent" />w(s xro/nios.</p></sp>
+<lb rend="displayNumAndIndent" n="2" />w(s xro/nios.</p></sp>
 <sp><speaker>*Quw/nixos</speaker><p>
-<lb rend="displayNumAndIndent" />xro/nios; ti/ de/ toi to\ me/lhma;</p></sp>
+<lb rend="displayNumAndIndent" n="2" />xro/nios; ti/ de/ toi to\ me/lhma;</p></sp>
 <sp><speaker>*Ai)sxi/nhs</speaker><p>
-<lb />pra/ssomes ou)x w(s lw=|sta *quw/nixe.</p></sp>
+<lb n="3" />pra/ssomes ou)x w(s lw=|sta *quw/nixe.</p></sp>
 <sp><speaker>*Quw/nixos</speaker><p>
-<lb rend="displayNumAndIndent" />tau=t' a)/ra lepto/s,
+<lb rend="displayNumAndIndent" n="3" />tau=t' a)/ra lepto/s,
 <lb />xw( mu/stac polu\s ou(=tos, a)ustale/oi de\ ki/kinnoi.
 <lb />toiou=tos prw/an tis a)fi/keto *puqagorikta/s,
 <lb />w)xro\s ka)nupo/dhtos: *)aqhnai=os d' e)/fat' h)=men.
@@ -1453,15 +1453,15 @@
 <div1 type="poem" n="15" org="uniform" sample="complete">
 <head>*surakou/siai h)\ *adwnia/zousai</head>
 <sp><speaker>*Gorgw/</speaker><p>
-<lb />*)/endoi *pracino/a;</p></sp>
+<lb n="1" />*)/endoi *pracino/a;</p></sp>
 <sp><speaker>*Praxino/a</speaker><p>
-<lb rend="displayNumAndIndent" />*gorgoi= fi/la, w(s xro/nw|. e)/ndoi.
+<lb rend="displayNumAndIndent" n="1" />*gorgoi= fi/la, w(s xro/nw|. e)/ndoi.
 <lb />qau=m' o(/ti kai\ nu=n h)=nqes. o(/rh di/fron *eu)no/a au)th=|.
-<lb />e)/mbale kai\ poti/kranon.</p></sp>
+<lb n="3" />e)/mbale kai\ poti/kranon.</p></sp>
 <sp><speaker>*Gorgw/</speaker><p>
-<lb rend="displayNumAndIndent" />e)/xei ka/llista.</p></sp>
+<lb rend="displayNumAndIndent" n="3" />e)/xei ka/llista.</p></sp>
 <sp><speaker>*Praxino/a</speaker><p>
-<lb rend="displayNumAndIndent" />kaqi/zeu.</p></sp>
+<lb rend="displayNumAndIndent" n="3" />kaqi/zeu.</p></sp>
 <sp><speaker>*Gorgw/</speaker><p>
 <lb />w)\ ta=s a)lema/tw yuxa=s: mo/lis u)/mmin e)sw/qhn
 <lb rend="displayNum" n="5" />*pracino/a pollw= me\n o)/xlw, pollw=n de\ teqri/ppwn.
@@ -1477,9 +1477,9 @@
 <lb />qa/rsei *zwpuri/wn, glukero\n te/kos: ou) le/gei a)pfu=n.
 <pb n="116" /></p></sp>
 <sp><speaker>*Praxino/a</speaker><p>
-<lb />ai)sqa/netai to\ bre/fos, nai\ ta\n po/tnian.</p></sp>
+<lb n="3" />ai)sqa/netai to\ bre/fos, nai\ ta\n po/tnian.</p></sp>
 <sp><speaker>*Gorgw/</speaker><p>
-<lb rend="displayNumAndIndent" />kalo\s a)pfu=s.</p></sp>
+<lb rend="displayNumAndIndent" n="3" />kalo\s a)pfu=s.</p></sp>
 <sp><speaker>*Praxino/a</speaker><p>
 <lb rend="displayNum" n="15" />a)pfu=s ma\n th=nos ta\ pro/an （le/gomes de\ pro/an qhn
 <lb />pa/nta） ni/tron kai\ fu=kos a)po\ skana=s a)gora/sdwn
@@ -1491,14 +1491,14 @@
 <lb />a)ll' i)/qi tw)mpe/xonon kai\ ta\n peronatri/da la/zeu.
 <lb />ba=mes tw= basilh=os e)s a)fneiw= *ptolemai/w
 <lb />qaso/menai to\n *)/adwnin: a)kou/w xrh=ma kalo/n ti
-<lb />kosmei=n ta\n basi/lissan.</p></sp>
+<lb n="24" />kosmei=n ta\n basi/lissan.</p></sp>
 <sp><speaker>*Praxino/a</speaker><p>
-<lb rend="displayNumAndIndent" />e)n o)lbi/w o)/lbia pa/nta.</p></sp>
+<lb rend="displayNumAndIndent" n="24" />e)n o)lbi/w o)/lbia pa/nta.</p></sp>
 <sp><speaker>*Gorgw/</speaker><p>
 <lb rend="displayNum" n="25" />w(=n i)/des, w(=n ei)=pes kai\ i)doi=sa tu\ tw=| mh\ i)do/nti.
-<lb />e(/rpein w(/ra k' ei)/h.</p></sp>
+<lb n="26" />e(/rpein w(/ra k' ei)/h.</p></sp>
 <sp><speaker>*Praxino/a</speaker><p>
-<lb rend="displayNumAndIndent" />a)ergoi=s ai)e\n e(orta/.
+<lb rend="displayNumAndIndent" n="26" />a)ergoi=s ai)e\n e(orta/.
 <lb />*eu)no/a, ai)=re to\ nh=ma kai\ e)s me/son ai)no/qrupte
 <lb />qe\s pa/lin. ai( gale/ai malakw=s xrh/|zonti kaqeu/dein:
 <lb />kineu= dh/, fe/re qa=sson u(/dwr. u(/datos pro/teron dei=.
@@ -1545,12 +1545,12 @@
 <sp><speaker>*Gorgw/</speaker><p>
 <lb rend="displayNum" n="60" />e)c au)la=s w)= ma=ter;</p></sp>
 <sp><speaker>*Grau=s</speaker><p>
-<lb rend="displayNumAndIndent" />e)gw\n w)= te/kna.</p></sp>
+<lb rend="displayNumAndIndent" n="60" />e)gw\n w)= te/kna.</p></sp>
 <sp><speaker>*Gorgw/</speaker><p>
-<lb rend="displayNumAndIndent" />parenqei=n
-<lb />eu)mare/s;</p></sp>
+<lb rend="displayNumAndIndent" n="60" />parenqei=n
+<lb n="61" />eu)mare/s;</p></sp>
 <sp><speaker>*Grau=s</speaker><p>
-<lb rend="displayNumAndIndent" />e)s *troi/an peirw/menoi h)=nqon *)axaioi/,
+<lb rend="displayNumAndIndent" n="61" />e)s *troi/an peirw/menoi h)=nqon *)axaioi/,
 <lb />kalli/sta pai/dwn: pei/ra| qhn pa/nta telei=tai.</p></sp>
 <sp><speaker>*Gorgw/</speaker><p>
 <lb />xrhsmw\s a( presbu=tis a)pw/|xeto qespi/casa.</p></sp>
@@ -1567,12 +1567,12 @@
 <lb rend="displayNum" n="70" />e)/sxistai *gorgoi=. po\t tw= *dio/s, ei)/ti ge/noio
 <lb />eu)dai/mwn w)/nqrwpe, fula/sseo tw)mpe/xono/n meu.</p></sp>
 <sp><speaker>*ce/nos</speaker><p>
-<lb />ou)k e)p' e)mi\n me/n, o(/mws de\ fulaceu=mai:</p></sp>
+<lb n="72" />ou)k e)p' e)mi\n me/n, o(/mws de\ fulaceu=mai:</p></sp>
 <sp><speaker>*Praxino/a</speaker><p>
-<lb rend="displayNumAndIndent" />o)/xlos a)laqe/ws.
-<lb />w)qeu=nq' w(/sper u(/es.</p></sp>
+<lb rend="displayNumAndIndent" n="72" />o)/xlos a)laqe/ws.
+<lb n="73" />w)qeu=nq' w(/sper u(/es.</p></sp>
 <sp><speaker>*ce/nos</speaker><p>
-<lb rend="displayNumAndIndent" />qa/rsei gu/nai: e)n kalw=| ei)me/s.</p></sp>
+<lb rend="displayNumAndIndent" n="73" />qa/rsei gu/nai: e)n kalw=| ei)me/s.</p></sp>
 <sp><speaker>*Praxino/a</speaker><p>
 <lb />kei)s w(/ras kh)/peita fi/l' a)ndrw=n e)n kalw=| ei)/hs
 <lb rend="displayNum" n="75" />a)/mme periste/llwn. xrhstw= kw)|kti/rmonos a)ndro/s.
