@@ -379,11 +379,15 @@ summary, .word {
         return [start + (stop - start) * (float(i) / num_steps) for i in range(num_steps + 1)]
 
     print("""\
-#shade-scale {{
+#shade-scale, #shade-diverging-scale {
     display: none;
+    justify-content: space-between;
+}
+""")
+    print("""\
+#shade-scale {{
     background: linear-gradient(to right, {});
     color: gray;
-    justify-content: space-between;
 }}
 #vis-helper.shade-text #shade-scale,
 #vis-helper.shade-bubbles #shade-scale {{
@@ -393,10 +397,8 @@ summary, .word {
 
     print("""\
 #shade-diverging-scale {{
-    display: none;
     background: linear-gradient(to right, {});
     color: black;
-    justify-content: space-between;
 }}
 #vis-helper.shade-text-diverging #shade-diverging-scale,
 #vis-helper.shade-bubbles-diverging #shade-diverging-scale {{
