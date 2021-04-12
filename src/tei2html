@@ -382,6 +382,7 @@ summary, .word {
 #shade-scale, #shade-diverging-scale {
     display: none;
     justify-content: space-between;
+    padding: 0.25em;
 }
 """)
     print("""\
