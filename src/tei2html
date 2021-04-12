@@ -165,13 +165,6 @@ def process(f, expectancy):
     font-display: swap;
     src: local("Cardo Italic"), local("Cardo-Italic"), url(fonts/Cardo-Italic.woff) format("woff2");
 }
-@font-face {
-    font-family: "Cardo";
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: local("Cardo Bold"), local("Cardo-Bold"), url(fonts/Cardo-Bold.woff) format("woff2");
-}
 
 #sidebar {
     background-color: peachpuff;
