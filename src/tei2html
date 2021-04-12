@@ -335,7 +335,7 @@ summary, .word {
 }
 .shade-bubbles .word::before,
 .shade-bubbles-diverging .word::before {
-    --s: 1.5rem;
+    --s: 1.5em;
     position: absolute;
     opacity: 0.5;
     border-radius: 50%;
@@ -343,12 +343,12 @@ summary, .word {
     content: "";
     width: var(--s);
     height: var(--s);
-    bottom: calc(var(--s) / -2 + 1ex);
-    left: calc(var(--s) / -2 + 0.5rem);
+    bottom: calc(var(--s) / -2 + 0.667em);
+    left: calc(var(--s) / -2 + 1ch);
 }
 
 .size-bubbles .word {
-    --r: 2.5rem; /* radius of 100% circle */
+    --r: 2em; /* radius of 100% circle */
     position: relative;
 }
 .size-bubbles .word::before {
@@ -363,8 +363,8 @@ summary, .word {
     content: "";
     width: var(--s);
     height: var(--s);
-    bottom: calc(var(--s) / -2 + 1ex);
-    left: calc(var(--s) / -2 + 0.5rem);
+    bottom: calc(var(--s) / -2 + 0.667em);
+    left: calc(var(--s) / -2 + 1ch);
 }
 """)
 
