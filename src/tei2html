@@ -264,7 +264,7 @@ summary, .word {
     position: relative;
 }
 /* Keep background colors and full saturation when printing. */
-.text, #vis-helper {
+.text, #vis-helper, #sedes-dist {
     color-adjust: exact;
     -webkit-print-color-adjust: exact;
 }
