@@ -33,6 +33,10 @@ SHADE_MAPPING_ADJUST = 1.5
 # Endpoints of the legends that illustrate shade mapping.
 SHADE_SCALE_RANGE = (-2.0, 2.0)
 
+# Text on a background of luminance less than this will be displayed as
+# light-on-dark rather than dark-on-light.
+LUMINANCE_INVERSION_THRESHOLD = 0.25
+
 def usage(file=sys.stdout):
     print(f"""\
 Usage: {sys.argv[0]} [OPTION] WORK.xml STATS.csv > WORK.html
@@ -407,13 +411,13 @@ summary, .word {
         diverging_color = diverging_scale(r, COLOR_DIVERGING_LOW, COLOR_DIVERGING_MID, COLOR_DIVERGING_HIGH)
 
         print(f".shade-text .sedes .z-{n} {{ color: {css_color(*shade_color)}; }}")
-        print(f"#sedes-dist.shade-text .z-{n} {{ color: {'white' if srgb_luminance(*shade_color) < 0.25 else 'black'}; background-color: {css_color(*shade_color)}; }}")
+        print(f"#sedes-dist.shade-text .z-{n} {{ color: {'white' if srgb_luminance(*shade_color) < LUMINANCE_INVERSION_THRESHOLD else 'black'}; background-color: {css_color(*shade_color)}; }}")
         print(f".shade-text-diverging .sedes .z-{n} {{ color: {css_color(*diverging_color)}; }}")
-        print(f"#sedes-dist.shade-text-diverging .z-{n} {{ color: {'white' if srgb_luminance(*diverging_color) < 0.25 else 'black'}; background-color: {css_color(*diverging_color)}; }}")
+        print(f"#sedes-dist.shade-text-diverging .z-{n} {{ color: {'white' if srgb_luminance(*diverging_color) < LUMINANCE_INVERSION_THRESHOLD else 'black'}; background-color: {css_color(*diverging_color)}; }}")
         print(f".shade-bubbles .sedes .z-{n}::before {{ background-color: {css_color(*shade_color)}; }}")
-        print(f"#sedes-dist.shade-bubbles .z-{n} {{ color: {'white' if srgb_luminance(*shade_color) < 0.25 else 'black'}; background-color: {css_color(*shade_color)}; }}")
+        print(f"#sedes-dist.shade-bubbles .z-{n} {{ color: {'white' if srgb_luminance(*shade_color) < LUMINANCE_INVERSION_THRESHOLD else 'black'}; background-color: {css_color(*shade_color)}; }}")
         print(f".shade-bubbles-diverging .sedes .z-{n}::before {{ background-color: {css_color(*diverging_color)}; }}")
-        print(f"#sedes-dist.shade-bubbles-diverging .z-{n} {{ color: {'white' if srgb_luminance(*diverging_color) < 0.25 else 'black'}; background-color: {css_color(*diverging_color)}; }}")
+        print(f"#sedes-dist.shade-bubbles-diverging .z-{n} {{ color: {'white' if srgb_luminance(*diverging_color) < LUMINANCE_INVERSION_THRESHOLD else 'black'}; background-color: {css_color(*diverging_color)}; }}")
         area = math.sqrt(1.0 - r)
         print(f".size-bubbles .sedes .z-{n}::before {{ --s: calc(var(--r) * {area:.3f}); }}")
 
