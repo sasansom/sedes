@@ -35,7 +35,7 @@ SHADE_SCALE_RANGE = (-2.0, 2.0)
 
 # Text on a background of luminance less than this will be displayed as
 # light-on-dark rather than dark-on-light.
-LUMINANCE_INVERSION_THRESHOLD = 0.25
+LUMINANCE_INVERSION_THRESHOLD = 0.3
 
 def usage(file=sys.stdout):
     print(f"""\
