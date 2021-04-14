@@ -188,6 +188,10 @@ def process(f, expectancy):
 #word-output, #lemma-output {
     font-family: "Cardo";
 }
+.shape {
+    /* Prevent longa from running together: https://github.com/sasansom/sedes/issues/58 */
+    letter-spacing: 0.5ex;
+}
 #infobox {
     line-height: 1rem;
 }
@@ -464,7 +468,7 @@ summary, .word {
 
 <table id=infobox>
 <tr><th scope=row>word</th><td><output id=word-output></output></td></tr>
-<tr><th scope=row>shape</th><td><output id=shape-output></output></td></tr>
+<tr><th scope=row>shape</th><td class=shape><output id=shape-output></output></td></tr>
 <tr><th scope=row><i>sedes</i></th><td><output id=sedes-output></output></td></tr>
 <tr><th scope=row>lemma</th><td><output id=lemma-output></output></td></tr>
 <tr><th scope=row>Σ<var>x</var></th><td><output id=sumx-output></output></td></tr>
