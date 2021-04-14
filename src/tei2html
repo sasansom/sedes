@@ -462,7 +462,7 @@ summary, .word {
 <tr><th scope=row>word</th><td><output id=word-output></output></td></tr>
 <tr><th scope=row>shape</th><td><output id=shape-output></output></td></tr>
 <tr><th scope=row>lemma</th><td><output id=lemma-output></output></td></tr>
-<tr><th scope=row>sedes</th><td><output id=sedes-output></output></td></tr>
+<tr><th scope=row><i>sedes</i></th><td><output id=sedes-output></output></td></tr>
 <tr><th scope=row>Σ<var>x</var></th><td><output id=sumx-output></output></td></tr>
 </table>
 
