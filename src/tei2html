@@ -461,8 +461,8 @@ summary, .word {
 <table id=infobox>
 <tr><th scope=row>word</th><td><output id=word-output></output></td></tr>
 <tr><th scope=row>shape</th><td><output id=shape-output></output></td></tr>
-<tr><th scope=row>lemma</th><td><output id=lemma-output></output></td></tr>
 <tr><th scope=row><i>sedes</i></th><td><output id=sedes-output></output></td></tr>
+<tr><th scope=row>lemma</th><td><output id=lemma-output></output></td></tr>
 <tr><th scope=row>Σ<var>x</var></th><td><output id=sumx-output></output></td></tr>
 </table>
 
@@ -734,8 +734,8 @@ const POSSIBLE_SEDES = [1, 2, 2.5, 3, 4, 4.5, 5, 6, 6.5, 7, 8, 8.5, 9, 10, 10.5,
 const LOC_OUTPUT = document.getElementById("loc-output");
 const WORD_OUTPUT = document.getElementById("word-output");
 const SHAPE_OUTPUT = document.getElementById("shape-output");
-const LEMMA_OUTPUT = document.getElementById("lemma-output");
 const SEDES_OUTPUT = document.getElementById("sedes-output");
+const LEMMA_OUTPUT = document.getElementById("lemma-output");
 const SUMX_OUTPUT = document.getElementById("sumx-output");
 const SEDES_DIST = document.getElementById("sedes-dist");
 
@@ -772,8 +772,8 @@ function info(event) {
 
     WORD_OUTPUT.textContent = event.target.textContent;
     SHAPE_OUTPUT.textContent = event.target.getAttribute("data-shape") ?? "";
-    LEMMA_OUTPUT.textContent = lemma ?? "";
     SEDES_OUTPUT.textContent = sedes ?? "";
+    LEMMA_OUTPUT.textContent = lemma ?? "";
     SUMX_OUTPUT.textContent = sum_x ?? "";
 
     for (let elem of SEDES_DIST.getElementsByTagName("th"))
