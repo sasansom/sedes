@@ -221,6 +221,8 @@ OVERRIDES = (
     ("προΐαψεν", "προϊάπτω"),
     ("ἀπερείσι’", "ἀπερείσιος"),
     ("Ὀλύμπια", "Ὀλύμπιος"),
+    ("οἶκόνδε", "οἶκος"),
+    ("οῖκόνδ’", "οῖκος"),
 )
 
 # Looks for the rightmost sequence of one or more vowels and diacritics,
