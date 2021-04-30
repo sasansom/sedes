@@ -222,7 +222,7 @@ OVERRIDES = (
     ("ἀπερείσι’", "ἀπερείσιος"),
     ("Ὀλύμπια", "Ὀλύμπιος"),
     ("οἶκόνδε", "οἶκος"),
-    ("οῖκόνδ’", "οῖκος"),
+    ("οἶκόνδ’", "οῖκος"),
 )
 
 # Looks for the rightmost sequence of one or more vowels and diacritics,
