@@ -22,3 +22,30 @@ class TestTokenizeText(unittest.TestCase):
             line = tei.Line(tokens)
             self.assertEqual(line.text(), text)
             self.assertEqual(tuple(line.words()), tuple(text for (type, text) in expected_tokens if type == WORD))
+
+class TestTrimTokens(unittest.TestCase):
+    def test(self):
+        WORD = lambda text: tei.Token(tei.Token.Type.WORD, text)
+        NONWORD = lambda text: tei.Token(tei.Token.Type.NONWORD, text)
+        for tokens, expected in (
+            ((),
+             ()),
+            # only NONWORDs are trimmed
+            ((WORD(" a "),),
+             (WORD(" a "),)),
+            ((NONWORD(" * "),),
+             (NONWORD("*"),)),
+            # WORDs shield inner NONWORDs
+            ((NONWORD("<"), WORD("a"), NONWORD(" * "), WORD("b"), NONWORD(">")),
+             (NONWORD("<"), WORD("a"), NONWORD(" * "), WORD("b"), NONWORD(">"))),
+            # whitespace-only NONWORDs are removed completely
+            ((NONWORD(""), NONWORD("   "), WORD("a"), NONWORD(""), NONWORD("   ")),
+             (WORD("a"),)),
+            ((NONWORD(""),),
+             ()),
+            # left side is lstripped only, right side is rstripped only
+            ((NONWORD(" < "), WORD("a"), NONWORD(" > ")),
+             (NONWORD("< "), WORD("a"), NONWORD(" >"))),
+        ):
+            trimmed = tuple(tei.trim_tokens(tokens))
+            self.assertEqual(trimmed, expected)

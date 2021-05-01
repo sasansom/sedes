@@ -98,6 +98,9 @@ class Token:
         self.type = type
         self.text = text
 
+    def __eq__(self, other):
+        return (self.type, self.text) == (other.type, other.text)
+
     def __repr__(self):
         return f"Token({self.type}, {self.text!r})"
 
@@ -121,14 +124,14 @@ def tokenize_text(text):
 def trim_tokens(tokens):
     """Trim leading and trailing whitespace from a list of tokens."""
 
-    tokens = tokens[:]
+    tokens = list(tokens[:])
     while tokens and tokens[0].type == Token.Type.NONWORD:
-        tokens[0].text = tokens[0].text.strip()
+        tokens[0].text = tokens[0].text.lstrip()
         if tokens[0].text:
             break
         tokens.pop(0)
     while tokens and tokens[-1].type == Token.Type.NONWORD:
-        tokens[-1].text = tokens[-1].text.strip()
+        tokens[-1].text = tokens[-1].text.rstrip()
         if tokens[-1].text:
             break
         tokens.pop(-1)
