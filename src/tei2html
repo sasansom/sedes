@@ -241,6 +241,9 @@ h1 a, h2 a {
 summary, .word {
     cursor: pointer;
 }
+.word:target {
+    background-color: powderblue;
+}
 
 .line, .grid-markers {
     font-family: "Cardo";
