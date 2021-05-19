@@ -464,7 +464,7 @@ summary, .word {
 
 <hr>
 
-<span><output id=loc-output></output></span>
+<span><output id=loc-output></output> <a id=link-output></a></span>
 
 <table id=infobox>
 <tr><th scope=row>word</th><td><output id=word-output></output></td></tr>
@@ -740,6 +740,7 @@ summary, .word {
 const POSSIBLE_SEDES = [1, 2, 2.5, 3, 4, 4.5, 5, 6, 6.5, 7, 8, 8.5, 9, 10, 10.5, 11, 12].map(sedes => sedes.toString());
 
 const LOC_OUTPUT = document.getElementById("loc-output");
+const LINK_OUTPUT = document.getElementById("link-output");
 const WORD_OUTPUT = document.getElementById("word-output");
 const SHAPE_OUTPUT = document.getElementById("shape-output");
 const SEDES_OUTPUT = document.getElementById("sedes-output");
@@ -773,6 +774,8 @@ function info(event) {
         (lineno != null) && `line ${lineno}`,
         (wordno != null) && `word ${wordno}`,
     ].filter(x => x).join(", ");
+    LINK_OUTPUT.href = "#" + event.target.id;
+    LINK_OUTPUT.textContent = "link";
 
     let lemma = event.target.getAttribute("data-lemma");
     let sedes = event.target.getAttribute("data-sedes");
