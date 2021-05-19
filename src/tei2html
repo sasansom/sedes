@@ -758,10 +758,10 @@ function tone_map(z) {
     return 1.0 / (1.0 + Math.exp(-z * SHADE_MAPPING_ADJUST))
 }
 
-function info(event) {
+function info(target) {
     // Search upward for the containing book and line.
     let bookno, lineno, wordno;
-    for (let elem = event.target;
+    for (let elem = target;
          (bookno == null || lineno == null || wordno == null) && elem != null;
          elem = elem.parentElement)
     {
@@ -774,15 +774,15 @@ function info(event) {
         (lineno != null) && `line ${lineno}`,
         (wordno != null) && `word ${wordno}`,
     ].filter(x => x).join(", ");
-    LINK_OUTPUT.href = "#" + event.target.id;
+    LINK_OUTPUT.href = "#" + target.id;
     LINK_OUTPUT.textContent = "link";
 
-    let lemma = event.target.getAttribute("data-lemma");
-    let sedes = event.target.getAttribute("data-sedes");
+    let lemma = target.getAttribute("data-lemma");
+    let sedes = target.getAttribute("data-sedes");
     let sum_x = POSSIBLE_SEDES.map(sedes => EXPECTANCY.get(`${lemma}/${sedes}`)?.x ?? 0).reduce((a, b) => a + b);
 
-    WORD_OUTPUT.textContent = event.target.textContent;
-    SHAPE_OUTPUT.textContent = event.target.getAttribute("data-shape") ?? "";
+    WORD_OUTPUT.textContent = target.textContent;
+    SHAPE_OUTPUT.textContent = target.getAttribute("data-shape") ?? "";
     SEDES_OUTPUT.textContent = sedes ?? "";
     LEMMA_OUTPUT.textContent = lemma ?? "";
     SUMX_OUTPUT.textContent = sum_x ?? "";
@@ -815,7 +815,13 @@ function info(event) {
     }
 }
 for (let word of document.querySelectorAll("article .word"))
-    word.addEventListener("click", info);
+    word.addEventListener("click", event => info(event.target));
+// If there's a word selected in the URL hash, fill out the infobox.
+{
+    let elem = document.getElementById(window.location.hash.slice(1));
+    if (elem?.classList?.contains("word"))
+        info(elem);
+}
 
 const ALL_STYLES = [
     "shade-text",
