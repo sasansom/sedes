@@ -16,18 +16,19 @@ in a virtual environment:
 ```
 python3 -m venv venv
 source venv/bin/activate
+pip3 install -U pip setuptools wheel
 pip3 install cltk bs4 lxml
 ```
 
-Next, [install the `greek_models_cltk` corpus](https://docs.cltk.org/en/latest/importing_corpora.html):
+Next, [install the `grc_models_cltk` corpus](https://docs.cltk.org/en/latest/data.html):
 ```
-python3 -c 'from cltk.corpus.utils.importer import CorpusImporter; CorpusImporter("greek").import_corpus("greek_models_cltk")'
+python3 -c 'from cltk.data.fetch import FetchCorpus; FetchCorpus("grc").import_corpus("grc_models_cltk")'
 ```
 
 The corpus is stored in a `cltk_data` subdirectory of your home directory.
 The authors have used commit
-[a68b9837](https://github.com/cltk/grc_models_cltk/commit/a68b983734d34df16fd49661f11c4ea037ab173a)
-of the `greek_models_cltk` corpus.
+[94c04ac](https://github.com/cltk/grc_models_cltk/commit/94c04acac4405e264322d825978a2f2a80d01da5)
+of the `grc_models_cltk` corpus.
 
 You only need to do the steps above once.
 Thereafter, every time you start a new shell,
