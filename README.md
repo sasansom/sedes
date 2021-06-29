@@ -85,7 +85,7 @@ These are suitable for input to `tei2csv` and `tei2html`.
 If you have [GNU Make](https://www.gnu.org/software/make/) installed,
 you can analyze all the texts in the corpus using the command
 ```
-make
+make -j4
 ```
 
 The above command will run tei2csv, expectancy, and tei2html
