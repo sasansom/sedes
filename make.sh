@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This script generates all.csv, for systems that do not have GNU Make installed.
+# This script runs the commands that `make` would run, for systems that do not have GNU Make installed.
 
 set -e
 

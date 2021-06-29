@@ -88,8 +88,9 @@ you can analyze all the texts in the corpus using the command
 make
 ```
 
-The above command will produce a file `all.csv` that contains
-every word in every work, annotated with its work, line number, and sedes.
+The above command will run tei2csv, expectancy, and tei2html
+to produce HTML visualizations in the web-demo directory,
+as well as intermediary files.
 
 If you do not have GNU Make, the script `make.sh` runs the
 same commands as `make` would:

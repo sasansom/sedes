@@ -1,31 +1,30 @@
-# Usage: Rscript src/tables.R all.csv
+# Usage: Rscript src/tables.R corpus/*.csv
 #
 # Display tables of raw counts of καί/καὶ and ἀοιδ*, as in the Spring 2019
 # draft of "Where Words Belong: Sedes as Style in Greek Hexameter Poetry" by
 # Stephen Sansom.
 
 
-args <- commandArgs(trailingOnly=TRUE)
-if (length(args) != 1) {
-	stop("Need an input CSV filename.")
+data <- data.frame()
+for (csv_filename in commandArgs(trailingOnly=TRUE)) {
+	data <- rbind(data, read.csv(csv_filename, colClasses=c(
+		work="character",
+		book_n="character",
+		line_n="character",
+		word_n="integer",
+		word="character",
+		lemma="character",
+		sedes="numeric",
+		metrical_shape="character",
+		scanned="character",
+		num_scansions="integer"
+	)))
 }
-input_filename <- args[[1]]
-
-data <- read.csv(input_filename, colClasses=c(
-	work="character",
-	book_n="character",
-	line_n="character",
-	word_n="integer",
-	word="character",
-	num_scansions="integer",
-	sedes="character"
-))
 data$work <- factor(
 	data$work,
-	levels=c("Il.", "Od.", "Hymns", "Theog.", "WD", "Shield"),
+	levels=c("Il.", "Od.", "Hom.Hymn", "Theog.", "W.D.", "Sh."),
 	labels=c("Il.", "Od.", "Hy.", "Th.", "WD", "Sh.")
 )
-data[data$sedes == "", ]$sedes <- NA
 data$sedes <- factor(
 	data$sedes,
 	levels=c("1", "2", "2.5", "3", "4", "4.5", "5", "6", "6.5", "7", "8", "8.5", "9", "10", "10.5", "11", "12")
