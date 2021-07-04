@@ -74,6 +74,33 @@ def parse_expectancy(f):
 def esc(v):
     return html.escape(v, True)
 
+# Print an HTML start tag with escaped attributes. Entries in the attr list that
+# are None are ignored.
+def print_start_tag(name, attrs=(), end="\n", **kwargs):
+    print(f"<{esc(name)}", end="", **kwargs)
+    for attr in attrs:
+        if attr is None:
+            continue
+        k, v = attr
+        print(f' {esc(k)}="{esc(normalize(v))}"', end="", **kwargs)
+    print(">", end=end, **kwargs)
+
+# Print an HTML end tag.
+def print_end_tag(name, end="\n", **kwargs):
+    print(f"</{esc(name)}>", end=end, **kwargs)
+
+# Context manager that prints a start tag on enter and an end tag on exit.
+class html_element:
+    def __init__(self, name, attrs=(), **kwargs):
+        self.name = name
+        self.attrs = attrs
+        self.kwargs = kwargs
+    def __enter__(self):
+        print_start_tag(self.name, self.attrs, **self.kwargs)
+    def __exit__(self, *args):
+        print_end_tag(self.name, **self.kwargs)
+        return False
+
 # Return an escaped JavaScript string literal.
 def js_string(s):
     return '"' + "".join(("\\" + c if c in ("\\", "\"") else c) for c in s) + '"'
@@ -147,13 +174,16 @@ def assign_sedes_for_line(line):
 def process(f, expectancy):
     doc = tei.TEI(f)
 
-    print("<!DOCTYPE html>")
-    print("<html>")
-    print("<head>")
-    print("<meta charset=utf-8>")
-    print("<meta name=viewport content=\"width=device-width, initial-scale=1\">")
-    print(f"<title>{esc(doc.title)}</title>")
-    print("<style>")
+    print(f"""\
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width, initial-scale=1">
+<title>{esc(doc.title)}</title>
+<style>
+""")
+
     print("""\
 @font-face {
     font-family: "Cardo";
@@ -563,10 +593,12 @@ summary, .word {
 </div>
 </details>""".format(min = fmt_float(SHADE_SCALE_RANGE[0]), max = fmt_float(SHADE_SCALE_RANGE[1])))
 
-    print("<article>")
-    print("<header>")
-    print(f"<h1>{esc(doc.title)}</h1>")
-    print("</header>")
+    print_start_tag("article")
+
+    with html_element("header"):
+        with html_element("h1", end=""):
+            print(esc(normalize(doc.title)), end="")
+        print()
 
     # Lemmata whose expectancy entries actually needed for the words in this
     # text, built up as we go.
@@ -582,11 +614,18 @@ summary, .word {
     for loc, line in doc.lines():
         if loc.book_n != book_n:
             if book_n is not None:
-                print("</div>")
-                print("</section>")
+                print_end_tag("div")
+                print_end_tag("section")
             print()
-            print(f"<section id=\"book-{esc(loc.book_n)}\" data-bookno=\"{esc(loc.book_n)}\">")
-            print(f"<h2><a href=\"#book-{esc(loc.book_n)}\">{esc(loc.book_n)}</a></h2>")
+            # Begin book.
+            print_start_tag("section", (
+                ("id", f"book-{loc.book_n}"),
+                ("data-bookno", loc.book_n),
+            ))
+            with html_element("h2", end=""):
+                with html_element("a", (("href", f"#book-{loc.book_n}"),), end=""):
+                    print(esc(loc.book_n), end="")
+            print()
 
             print("""\
 <div class="grid-markers grid">
@@ -612,7 +651,11 @@ summary, .word {
         book_n = loc.book_n
 
         # Begin line.
-        print("<span id=\"book-{book_n}-line-{line_n}\" class=\"line\" data-lineno=\"{line_n}\">".format(book_n=esc(loc.book_n), line_n=esc(loc.line_n)), end="")
+        print_start_tag("span", (
+            ("id", f"book-{loc.book_n}-line-{loc.line_n}"),
+            ("class", "line"),
+            ("data-lineno", f"{loc.line_n}"),
+        ), end="")
 
         buffered_nonwords = []
         prev_sedes = None
@@ -659,13 +702,15 @@ summary, .word {
             else:
                 if prev_sedes is not None:
                     # Close the currently open sedes span.
-                    print("</span>", end="")
+                    print_end_tag("span", end="")
                 # The nonwords in between belong to neither sedes span.
                 print(esc(normalize(re.sub(r"\s+", "\n", "".join(token.text for token in buffered_nonwords)))), end="")
                 buffered_nonwords.clear()
                 if sedes is not None:
                     # Begin new sedes.
-                    print("<span class=\"sedes s{}\">".format(esc(sedes.replace(".", "_"))), end="")
+                    print_start_tag("span", (
+                        ("class", f"sedes s{sedes.replace('.', '_')}"),
+                    ), end="")
             prev_sedes = sedes
 
             title_attr = []
@@ -699,29 +744,27 @@ summary, .word {
                 word_attrs["title"] = " ".join(title_attr)
 
             # Span for a single word.
-            print("<span", end="")
-            for attr, value in word_attrs.items():
-                print(f" {esc(attr)}=\"{esc(value)}\"", end="")
-            print(f">{esc(normalize(token.text))}</span>", end="")
+            with html_element("span", word_attrs.items(), end=""):
+                print(esc(normalize(token.text)), end="")
 
         if word_entries:
             print(f"warning: book {loc.book_n} line {loc.line_n} word {word_n} leftover scansion words {word_entries}", file=sys.stderr)
 
         if prev_sedes is not None:
             # Close the last remaining open sedes span.
-            print("</span>", end="")
+            print_end_tag("span", end="")
         print(esc(normalize("".join(token.text for token in buffered_nonwords))), end="")
         buffered_nonwords.clear()
 
         # End line.
-        print("</span>")
-        print("<br>")
+        print_end_tag("span")
+        print_start_tag("br")
 
     if book_n is not None:
-        print("</div>")
-        print("</section>")
+        print_end_tag("div")
+        print_end_tag("section")
 
-    print("</article>")
+    print_end_tag("article")
 
     print("<script defer>")
     print("\"use strict\";")
