@@ -36,8 +36,7 @@ def assign_sedes_for_line(line):
         # If no scansions or multiple scansions, output "".
         return tuple((word, "", "", len(assignments)) for word in line.words())
 
-def process(f):
-    global csv_w, work_identifier
+def process(f, work_identifier):
     doc = tei.TEI(f)
     for loc, line in doc.lines():
         # print(repr(line.text()))
@@ -48,7 +47,7 @@ def process(f):
             scanned = "auto"
         for word_n, entry in enumerate(assign_sedes_for_line(line)):
             word, pos, shape, num_scansions = entry
-            csv_w.writerow({
+            yield {
                 "work": work_identifier,
                 "book_n": loc.book_n,
                 "line_n": loc.line_n,
@@ -59,7 +58,7 @@ def process(f):
                 "sedes": pos,
                 "metrical_shape": shape,
                 "lemma": lemma.lookup(word),
-            })
+            }
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
 for o, a in opts:
@@ -93,4 +92,5 @@ csv_w = csv.DictWriter(
 )
 csv_w.writeheader()
 with open(input_filename) as f:
-    process(f)
+    for row in process(f, work_identifier):
+        csv_w.writerow(row)
