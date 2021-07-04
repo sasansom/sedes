@@ -610,6 +610,10 @@ summary, .word {
         sum_x.setdefault(lemma, 0)
         sum_x[lemma] += expectancy_entry.x
 
+    # Cache of already emitted automatically generated HTML element ids, to
+    # avoid duplicated.
+    seen_ids = set()
+
     book_n = None
     for loc, line in doc.lines():
         if loc.book_n != book_n:
@@ -617,11 +621,19 @@ summary, .word {
                 print_end_tag("div")
                 print_end_tag("section")
             print()
+
+            book_id = f"book-{loc.book_n}"
+            if book_id in seen_ids:
+                book_id = None
+            else:
+                seen_ids.add(book_id)
+
             # Begin book.
             print_start_tag("section", (
-                ("id", f"book-{loc.book_n}"),
+                ("id", book_id) if book_id else None,
                 ("data-bookno", loc.book_n),
             ))
+
             with html_element("h2", end=""):
                 with html_element("a", (("href", f"#book-{loc.book_n}"),), end=""):
                     print(esc(loc.book_n), end="")
@@ -650,9 +662,15 @@ summary, .word {
             print("<div class=text>")
         book_n = loc.book_n
 
+        line_id = f"book-{loc.book_n}-line-{loc.line_n}"
+        if line_id in seen_ids:
+            line_id = None
+        else:
+            seen_ids.add(line_id)
+
         # Begin line.
         print_start_tag("span", (
-            ("id", f"book-{loc.book_n}-line-{loc.line_n}"),
+            ("id", line_id) if line_id else None,
             ("class", "line"),
             ("data-lineno", f"{loc.line_n}"),
         ), end="")
@@ -675,10 +693,18 @@ summary, .word {
                 continue
 
             word_n += 1
-            word_attrs = collections.OrderedDict({
-                "id": f"book-{loc.book_n}-line-{loc.line_n}-word-{word_n}",
-                "class": "word",
-            })
+
+            word_attrs = collections.OrderedDict()
+            if line_id is not None:
+                # We omit the per-word id for *all* words in a line that itself
+                # does not have an id; i.e., we check whether line_id is set,
+                # not whether the word id is in seen_ids. A None line_id means
+                # we have already emitted a line with that number, and we do not
+                # want to have ids on just the last few words of this line, when
+                # this line has more words than the already emitted one.
+                word_attrs["id"] = f"book-{loc.book_n}-line-{loc.line_n}-word-{word_n}"
+
+            word_attrs["class"] = "word"
 
             while True:
                 try:
@@ -733,7 +759,7 @@ summary, .word {
                     z_fmt = f"{expectancy_entry.z:+.8}"
                     title_attr.append(f"z={z_fmt.replace('-', '−')}")
                 else:
-                    word_attrs["class"] += " " + "undefined-expectancy"
+                    word_attrs["class"] += " undefined-expectancy"
             else:
                 print(f"warning: no expectancy score for book {loc.book_n} line {loc.line_n} word {word_n}: {word} {lemma!r}/{sedes}", file=sys.stderr)
                 word_attrs["class"] += " error"
