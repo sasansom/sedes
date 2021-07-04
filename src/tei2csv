@@ -37,8 +37,12 @@ def assign_sedes_for_line(line):
         return tuple((word, "", "", len(assignments)) for word in line.words())
 
 def process(f, work_identifier):
+    seen_lines = set()
     doc = tei.TEI(f)
     for loc, line in doc.lines():
+        if (loc.book_n, loc.line_n) in seen_lines:
+            print(f"warning: {work_identifier}: duplicate line {loc!r}", file=sys.stderr)
+        seen_lines.add((loc.book_n, loc.line_n))
         # print(repr(line.text()))
         # print(repr(line.text_without_quotes()))
         if line.text_without_quotes() in sedes.KNOWN_SCANSIONS:
