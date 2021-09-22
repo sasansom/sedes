@@ -58,10 +58,10 @@ as produced by `tei2csv` with statistics about expectancy for each word.
 
 The `tei2html` program produces an HTML representation of
 a TEI-encoded XML document, with visual highlighting of word expectancy.
-If you put the HTML file in the web-demo directory,
+If you put the HTML file in the sedes-web directory,
 it will have access to locally installed web fonts for Greek.
 ```
-./src/tei2html corpus/iliad.xml expectancy.all.csv > web-demo/iliad.html
+./src/tei2html corpus/iliad.xml expectancy.all.csv > sedes-web/iliad.html
 ```
 
 The `join-expectancy` program takes a work-specific CSV file (as
@@ -92,7 +92,7 @@ make -j4
 ```
 
 The above command will run tei2csv, expectancy, and tei2html
-to produce HTML visualizations in the web-demo directory,
+to produce HTML visualizations in the sedes-web directory,
 as well as intermediary files.
 
 If you do not have GNU Make, the script `make.sh` runs the

@@ -27,7 +27,7 @@ WORK_IDENTIFIER_worksanddays     = W.D.
 
 EXPECTANCY_FILES = expectancy.all.csv expectancy.hellenic+archaic.csv
 WORKS_CSV = $(addprefix corpus/,$(addsuffix .csv,$(WORKS)))
-WORKS_HTML = $(addprefix web-demo/,$(addsuffix .html,$(WORKS)))
+WORKS_HTML = $(addprefix sedes-web/,$(addsuffix .html,$(WORKS)))
 
 .PHONY: all
 all: $(EXPECTANCY_FILES) $(WORKS_HTML)
@@ -41,7 +41,7 @@ expectancy.hellenic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/home
 corpus/%.csv: corpus/%.xml
 	src/tei2csv "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
 
-web-demo/%.html: corpus/%.xml expectancy.all.csv
+sedes-web/%.html: corpus/%.xml expectancy.all.csv
 	src/tei2html $^ > "$@"
 
 PYTHON = python3
@@ -52,11 +52,11 @@ test:
 
 .PHONY: fonts
 fonts: \
-	web-demo/fonts/SIL\ Open\ Font\ License.txt \
-	web-demo/fonts/Cardo-Regular.woff \
-	web-demo/fonts/Cardo-Italic.woff
+	sedes-web/fonts/SIL\ Open\ Font\ License.txt \
+	sedes-web/fonts/Cardo-Regular.woff \
+	sedes-web/fonts/Cardo-Italic.woff
 
-web-demo/fonts/SIL\ Open\ Font\ License.txt: fonts/SIL\ Open\ Font\ License.txt
+sedes-web/fonts/SIL\ Open\ Font\ License.txt: fonts/SIL\ Open\ Font\ License.txt
 	cp -f "$^" "$@"
 
 .INTERMEDIATE: Cardo99s.ttf Cardoi99.ttf
@@ -65,11 +65,11 @@ Cardoi99.ttf: fonts/cardoita.zip
 Cardo99s.ttf Cardoi99.ttf:
 	unzip -D -o "$<" "$@"
 
-web-demo/fonts/Cardo-Regular.woff: Cardo99s.ttf
-web-demo/fonts/Cardo-Italic.woff: Cardoi99.ttf
+sedes-web/fonts/Cardo-Regular.woff: Cardo99s.ttf
+sedes-web/fonts/Cardo-Italic.woff: Cardoi99.ttf
 
-web-demo/fonts/Cardo-Regular.woff web-demo/fonts/Cardo-Italic.woff:
-	mkdir -p web-demo/fonts
+sedes-web/fonts/Cardo-Regular.woff sedes-web/fonts/Cardo-Italic.woff:
+	mkdir -p sedes-web/fonts
 	fontforge -lang ff -script fonts/subset-greek.ff "$<" "$@"
 
 .PHONY: clean
