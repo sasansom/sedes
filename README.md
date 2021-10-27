@@ -8,7 +8,7 @@ produced by this system.
 
 See the tag [tapa-version](https://github.com/sasansom/sedes/releases/tag/tapa-version)
 to reproduce the figures from the TAPA article,
-"Sedes as Style in Greek Hexameter: A Computational Approach."
+["Sedes as Style in Greek Hexameter: A Computational Approach."](https://muse.jhu.edu/article/819768)
 
 ## Setup
 
