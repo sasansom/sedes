@@ -45,7 +45,7 @@ class MultiDictReader:
         for filename in self.filenames[1:]:
             with open(filename) as f:
                 reader = csv.DictReader(f)
-                assert reader.fieldnames == self.fieldnames, (reader.fieldnames, self.fieldnames)
+                assert reader.fieldnames == self.fieldnames, (self.filenames[0], reader.fieldnames, filename, self.fieldnames)
                 for row in reader:
                     yield row
 
