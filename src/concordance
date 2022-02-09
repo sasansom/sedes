@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+
+# Displays words that match a word or lemma.
+#
+# Usage:
+#   concordance [OPTIONS] WORD [FILENAME.xml...]
+# Options:
+#   --betacode  decode WORD from Beta Code
+#   --lemma     lemmatize WORD and match by lemma
+
+import getopt
+import sys
+
+import betacode
+import sedes
+import tei
+
+def usage(file=sys.stdout):
+    print(f"""\
+Usage: {sys.argv[0]} WORD [FILENAME.xml...]
+
+IDENTIFIER is a short text identifier for the work; e.g., "Il.".
+FILENAME.XML is a TEI XML document containing the text of the work.
+
+  --betacode  decode WORD from Beta Code
+  --lemma     lemmatize WORD and match by lemma
+  -h, --help  show this help
+""", end="", file=file)
+
+# TODO: factor out
+def assign_sedes_for_line(line):
+    """From a line, return a sequence of (word, sedes, shape, num_scansions)
+    tuples. sedes will be non-blank if and only if num_scansions is equal to 1."""
+    assignments = sedes.analyze(line.text_without_quotes())
+    if len(assignments) == 1:
+        return tuple((word, sedes, shape, len(assignments)) for (word, sedes, shape) in assignments[0])
+    else:
+        # If no scansions or multiple scansions, output "".
+        return tuple((word, "", "", len(assignments)) for word in line.words())
+
+def process(f, work_id, search_word, match_lemma = True):
+    doc = tei.TEI(f)
+    for loc, line in doc.lines():
+        for (word, pos, shape, _) in assign_sedes_for_line(line):
+            if match_lemma:
+                matched = search_word == (lemma.lookup(word) or word)
+            else:
+                matched = search_word == word
+            if matched:
+                print("\t".join((
+                    work_id,
+                    str(loc),
+                    pos,
+                    word,
+                    line.text(),
+                )))
+
+LEMMATIZE = False
+BETACODE = False
+opts, args = getopt.gnu_getopt(sys.argv[1:], "h", [
+    "help",
+    "betacode",
+    "lemma",
+])
+for o, a in opts:
+    if o in ("-h", "--help"):
+        usage()
+        sys.exit(0)
+    elif o in ("--betacode",):
+        BETACODE = True
+    elif o in ("--lemma",):
+        LEMMATIZE = True
+
+try:
+    word, *input_filenames = args
+except ValueError:
+    print("error: usage error", file=sys.stderr)
+    print(file=sys.stderr)
+    usage(sys.stderr)
+    sys.exit(1)
+
+if BETACODE:
+    word = betacode.decode(word)
+if LEMMATIZE:
+    # Import lemma only if we need it, because it's slow.
+    import lemma
+    word = lemma.lookup(word) or word
+
+for input_filename in input_filenames:
+    with open(input_filename) as f:
+        process(f, input_filename, word, LEMMATIZE)
