@@ -10,6 +10,7 @@
 
 import getopt
 import sys
+import unicodedata
 
 import betacode
 import sedes
@@ -85,6 +86,7 @@ if LEMMATIZE:
     # Import lemma only if we need it, because it's slow.
     import lemma
     word = lemma.lookup(word) or word
+word = unicodedata.normalize("NFD", word)
 
 for input_filename in input_filenames:
     with open(input_filename) as f:
