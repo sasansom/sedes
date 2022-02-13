@@ -62,6 +62,7 @@ def process(f, work_identifier):
                 "sedes": pos,
                 "metrical_shape": shape,
                 "lemma": lemma.lookup(word),
+                "line_text": line.text(),
             }
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
@@ -91,6 +92,7 @@ csv_w = csv.DictWriter(
         "metrical_shape",
         "scanned",
         "num_scansions",
+        "line_text",
     ],
     lineterminator="\n",
 )
