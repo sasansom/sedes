@@ -81,7 +81,11 @@ for o, _ in opts:
         usage()
         sys.exit(0)
 
-(*work_filenames, expectancy_filename) = args
+try:
+    (*work_filenames, expectancy_filename) = args
+except ValueError:
+    usage(sys.stderr)
+    sys.exit(1)
 if not work_filenames:
     usage(sys.stderr)
     sys.exit(1)
