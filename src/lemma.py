@@ -233,6 +233,7 @@ OVERRIDES = (
     ("ἀΐδῃ", "ἅιδης"),
     ("ἀΐδην", "ἅιδης"),
     ("ἄϊδος", "ἅιδης"),
+    ("περ", "περ"),
 )
 
 # Looks for the rightmost sequence of one or more vowels and diacritics,
