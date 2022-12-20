@@ -243,6 +243,7 @@ OVERRIDES = (
     ("ἀεικέϊ", "ἀεικής"),
     ("ἀταρβέϊ", "ἀραρβής"),
     ("ἔτ’", "ἔτι"),
+    ("ὀϊόμεθ’", "οἴομαι"),
 )
 
 # Looks for the rightmost sequence of one or more vowels and diacritics,
