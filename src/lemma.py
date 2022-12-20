@@ -241,6 +241,7 @@ OVERRIDES = (
     ("πάρ᾽", "παρά"),
     ("τόθ᾽", "τότε"),
     ("ἀεικέϊ", "ἀεικής"),
+    ("ἀταρβέϊ", "ἀραρβής"),
 )
 
 # Looks for the rightmost sequence of one or more vowels and diacritics,
