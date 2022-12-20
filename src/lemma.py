@@ -242,6 +242,7 @@ OVERRIDES = (
     ("τόθ᾽", "τότε"),
     ("ἀεικέϊ", "ἀεικής"),
     ("ἀταρβέϊ", "ἀραρβής"),
+    ("ἔτ’", "ἔτι"),
 )
 
 # Looks for the rightmost sequence of one or more vowels and diacritics,
