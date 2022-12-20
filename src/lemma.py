@@ -244,6 +244,7 @@ OVERRIDES = (
     ("ἀταρβέϊ", "ἀραρβής"),
     ("ἔτ’", "ἔτι"),
     ("ὀϊόμεθ’", "οἴομαι"),
+    ("πέρ", "περ"),
 )
 
 # Looks for the rightmost sequence of one or more vowels and diacritics,
