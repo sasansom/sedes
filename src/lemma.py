@@ -239,6 +239,7 @@ OVERRIDES = (
     ("ἔθ᾽", "ἔτι"),
     ("κάτ᾽", "κατά"),
     ("πάρ᾽", "παρά"),
+    ("τόθ᾽", "τότε"),
 )
 
 # Looks for the rightmost sequence of one or more vowels and diacritics,
