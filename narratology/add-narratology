@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+
+# Augments a CSV file (containing `work`, `book_n`, `line_n` columns) with
+# speaker information from a narratology CSV file (containing `work`,
+# `start book`, `start verse`, `end book`, `end verse`, `speaker` columns).
+#
+# Usage: ./add-narratology narratology.csv ../corpus/iliad.csv
+
+import collections
+import csv
+import getopt
+import os
+import re
+import sys
+
+def usage(file=sys.stdout):
+    print(f"""\
+Usage: {sys.argv[0]} NARRATOLOGY.CSV OTHER.CSV
+
+NARRATOLOGY.CSV must have columns `work`, `start book`, `start verse`, `end
+book`, `end verse`, and `speaker`.
+OTHER.CSV must have columns `work`, `book_n`, and `line_n`.
+""", end="", file=file)
+
+class LineNumberFormatError(Exception):
+    pass
+
+# Split a line number into a pair (n, appendix), where n is an integer and
+# appendix is a string (possibly empty). Raises LineNumberFormatError if the
+# input cannot be so split.
+def parse_line_n(line_n):
+    m = re.match(r'^(\d+)(.*)$', line_n, flags=re.ASCII)
+    if not m:
+        raise LineNumberFormatError(f"bad line number format: {line_n!r}")
+    n, appendix = m.groups()
+    n = int(n)
+    return (n, appendix)
+
+Speech = collections.namedtuple("Speech", (
+    "start_loc",
+    "end_loc",
+    "speaker",
+))
+Loc = collections.namedtuple("Loc", (
+    "work",
+    "book_n",
+    "line_n",
+))
+
+def read_narratology_csv(f):
+    narratology = []
+    for row in csv.DictReader(f):
+        start_loc = Loc(row["work"], int(row["start book"]), parse_line_n(row["start verse"]))
+        end_loc = Loc(row["work"], int(row["end book"]), parse_line_n(row["end verse"]))
+        if start_loc > end_loc:
+            raise ValueError(f"backwards range {start_loc} {end_loc}")
+        narratology.append(Speech(
+            start_loc,
+            end_loc,
+            row["speaker"],
+        ))
+    narratology.sort(key = lambda x: x.end_loc, reverse = True)
+    narratology.sort(key = lambda x: x.start_loc, reverse = False)
+    return narratology
+
+opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
+for opt, _ in opts:
+    if opt in ("-h", "--help"):
+        usage()
+        sys.exit()
+try:
+    narratology_csv_path, other_csv_path = args
+except ValueError:
+    usage(sys.stderr)
+    sys.exit(1)
+
+with open(narratology_csv_path) as f:
+    narratology = read_narratology_csv(f)
+
+with open(other_csv_path) as f:
+    r = csv.DictReader(f)
+    w = csv.DictWriter(
+        sys.stdout,
+        fieldnames = r.fieldnames + ["speaker"],
+        lineterminator = "\n",
+    )
+    w.writeheader()
+
+    for row in r:
+        loc = Loc(row["work"], int(row["book_n"]), parse_line_n(row["line_n"]))
+        speakers = []
+        for s in narratology:
+            if s.start_loc <= loc <= s.end_loc:
+                speakers.append(s.speaker)
+        w.writerow(dict(row, **{
+            "speaker": ">".join(speakers),
+        }))
