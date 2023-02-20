@@ -77,6 +77,28 @@ except ValueError:
 with open(narratology_csv_path) as f:
     narratology = read_narratology_csv(f)
 
+# Hack to visualize speech nesting.
+# def range_str(start_loc, end_loc):
+#     assert start_loc.work == end_loc.work, (start_loc, end_loc)
+#     start_line_n = "".join(str(x) for x in start_loc.line_n)
+#     end_line_n = "".join(str(x) for x in end_loc.line_n)
+#     if start_loc.book_n == end_loc.book_n:
+#         if start_loc.line_n == end_loc.line_n:
+#             return f"{start_loc[0]} {start_loc[1]}.{start_line_n}"
+#         else:
+#             return f"{start_loc[0]} {start_loc[1]}.{start_line_n}–{end_line_n}"
+#     else:
+#         return f"{start_loc[0]} {start_loc[1]}.{start_line_n}–{end_loc[1]}.{end_line_n}"
+# def print_nested(narratology, start_loc = None, end_loc = None, i = 0, depth = 0):
+#     while i < len(narratology):
+#         sp = narratology[i]
+#         if not ((start_loc is None or start_loc <= sp.start_loc) and (end_loc is None or sp.end_loc <= end_loc)):
+#             break
+#         print(f"{'> ' * (depth + 1)}{range_str(sp.start_loc, sp.end_loc)} {sp.speaker}")
+#         i = print_nested(narratology, sp.start_loc, sp.end_loc, i + 1, depth + 1)
+#     return i
+# print_nested(narratology)
+
 with open(other_csv_path) as f:
     r = csv.DictReader(f)
     w = csv.DictWriter(
