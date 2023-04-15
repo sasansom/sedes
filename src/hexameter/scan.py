@@ -255,7 +255,7 @@ def _followed_by_vowel_in_same_word(clusters, i):
     return (next_cluster_type == _VOWEL)
 
 ###
-### identify ceasura
+### identify caesura
 ###
 
 def _merge_scansion(metrical_analysis, scansion):
