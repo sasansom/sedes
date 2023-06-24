@@ -11,7 +11,7 @@ to reproduce the figures from the TAPA article,
 ["Sedes as Style in Greek Hexameter: A Computational Approach."](https://muse.jhu.edu/article/819768)
 
 See support [here](https://sasansom.github.io/sedes/dhq2023/)
-for the DHQ article, ["SEDES: Metrical Position in Greek Hexameter."](http://digitalhumanities.org:8081/dhq/vol/17/2/000675/000675.html)
+for the DHQ article, ["SEDES: Metrical Position in Greek Hexameter."](https://digitalhumanities.org/dhq/vol/17/2/000675/000675.html)
 
 ## Setup
 
