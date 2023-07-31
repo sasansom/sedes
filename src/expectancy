@@ -15,30 +15,6 @@ import getopt
 import math
 import sys
 
-# We're deliberately not using modules outside the standard library, like numpy
-# or pandas, in order to make the program easier to run (see
-# https://github.com/sasansom/sedes/issues/24). This program is a translation to
-# Python of the following R program:
-#
-#   library(data.table)
-#
-#   sd_pop <- function(x) {
-#       sd(x) * sqrt((length(x) - 1) / length(x))
-#   }
-#
-#   data <- data.table()
-#   for (csv_filename in commandArgs(trailingOnly=TRUE)) {
-#       data <- rbind(data, fread(csv_filename, na.strings=c("")))
-#   }
-#
-#   data[is.na(lemma), lemma := word]
-#
-#   data <- data[, .(x = .N), by = .(lemma, sedes)]
-#   data[, z := (x - mean(rep(x, x))) / sd_pop(rep(x, x)), by = .(lemma)]
-#
-#   setkey(data, "lemma", "sedes")
-#   write.csv(data, "", row.names=FALSE)
-
 def usage(file=sys.stdout):
     print(f"""\
 Usage: {sys.argv[0]} [INPUT.csv...] > OUTPUT.csv
