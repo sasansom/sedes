@@ -63,8 +63,8 @@ def weighted_sd_pop(x):
 INPUT_TRANSFORMS = {
     # Infer known lemmata to be the same as the word.
     "lemma": lambda val, row: val if val else row["word"],
-    # Change unknown sedes from an empty string to None.
-    "sedes": lambda val, row: val if val else None,
+    # Parse numeric sedes if present, otherwise set to None.
+    "sedes": lambda val, row: float(val) if val else None,
 }
 
 def read_input(f):
@@ -96,13 +96,20 @@ def group_by(x, *fieldnames):
 def format_float(f):
     return "{:+.15g}".format(f)
 
+# Special treatment for certain columns with certain names before writing to
+# CSV.
+OUTPUT_TRANSFORMS = {
+    # Remove trailing ".0" from integer sedes.
+    "sedes": lambda val: "{:g}".format(val) if val is not None else "",
+}
+
 # Has the side effect of sorting input by lemma and sedes.
 def process(input, output):
     expectancy = []
 
     # The sedes may be None, so add a None-checking element to the key, to avoid
     # an error caused by trying to compare None and a float.
-    input.sort(key = lambda row: (row["lemma"], row["sedes"] is not None, row["sedes"] is not None and float(row["sedes"])))
+    input.sort(key = lambda row: (row["lemma"], row["sedes"] is not None, row["sedes"]))
 
     # Count the unique lemma/sedes pairs.
     for (lemma, sedes), group in group_by(input, "lemma", "sedes"):
@@ -120,6 +127,13 @@ def process(input, output):
             x = inst["x"]
             if σ != 0:
                 inst["z"] = format_float((x - μ) / σ)
+
+    # Run OUTPUT_TRANSFORMS on each row.
+    for row in expectancy:
+        for k in row:
+            f = OUTPUT_TRANSFORMS.get(k)
+            if f is not None:
+                row[k] = f(row[k])
 
     output = csv.DictWriter(output, [
         "lemma",
