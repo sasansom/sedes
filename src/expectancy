@@ -58,16 +58,23 @@ def weighted_sd_pop(x):
     μ = weighted_mean(x)
     return math.sqrt(sum(e*(e - μ)**2 for e in x) / sum(x))
 
+# We special-case certain column names to transform their contained values on
+# input.
+INPUT_TRANSFORMS = {
+    # Infer known lemmata to be the same as the word.
+    "lemma": lambda val, row: val if val else row["word"],
+    # Change unknown sedes from an empty string to None.
+    "sedes": lambda val, row: val if val else None,
+}
+
 def read_input(f):
     rows = []
     r = csv.DictReader(f)
     for row in r:
-        # Infer known lemmata to be the same as the word.
-        if not row["lemma"]:
-            assert row["word"], row
-            row["lemma"] = row["word"]
-        if not row["sedes"]:
-            row["sedes"] = None
+        for k in row:
+            f = INPUT_TRANSFORMS.get(k)
+            if f is not None:
+                row[k] = f(row[k], row)
         rows.append(row)
     return rows
 
