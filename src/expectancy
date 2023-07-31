@@ -93,14 +93,13 @@ def group_by(x, *fieldnames):
         j += 1
     yield key, x[i:]
 
-def format_float(f):
-    return "{:+.15g}".format(f)
-
 # Special treatment for certain columns with certain names before writing to
 # CSV.
 OUTPUT_TRANSFORMS = {
     # Remove trailing ".0" from integer sedes.
     "sedes": lambda val: "{:g}".format(val) if val is not None else "",
+    # Always add a sign and keep fractional digits in z.
+    "z": lambda val: "{:+.15g}".format(val)
 }
 
 # Has the side effect of sorting input by lemma and sedes.
@@ -126,7 +125,7 @@ def process(input, output):
         for inst in group:
             x = inst["x"]
             if σ != 0:
-                inst["z"] = format_float((x - μ) / σ)
+                inst["z"] = (x - μ) / σ
 
     # Run OUTPUT_TRANSFORMS on each row.
     for row in expectancy:
