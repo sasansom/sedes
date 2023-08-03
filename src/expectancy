@@ -99,7 +99,7 @@ OUTPUT_TRANSFORMS = {
     # Remove trailing ".0" from integer sedes.
     "sedes": lambda val: "{:g}".format(val) if val is not None else "",
     # Always add a sign and keep fractional digits in z.
-    "z": lambda val: "{:+.15g}".format(val)
+    "z": lambda val: "{:+.15g}".format(val),
 }
 
 # Has the side effect of sorting input by lemma and sedes.
