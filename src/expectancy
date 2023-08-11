@@ -66,6 +66,13 @@ def group_by(x, *fieldnames):
         j += 1
     yield key, x[i:]
 
+def unique(a):
+    result = []
+    for x in a:
+        if x not in result:
+            result.append(x)
+    return tuple(result)
+
 # Special treatment for certain columns with certain names before writing to
 # CSV.
 OUTPUT_TRANSFORMS = {
@@ -75,23 +82,29 @@ OUTPUT_TRANSFORMS = {
     "z": lambda val: "{:+.15g}".format(val),
 }
 
-# Has the side effect of sorting input by lemma and sedes.
-def process(input, output):
+# Has the side effect of sorting input by the variables in
+# cond_vars + dist_vars.
+def process(input, output, cond_vars, dist_vars):
     expectancy = []
 
-    # The sedes may be None, so add a None-checking element to the key, to avoid
-    # an error caused by trying to compare None and a float.
-    input.sort(key = lambda row: (row["lemma"], row["sedes"] is not None, row["sedes"]))
+    # Sort input so elements that are identical in cond_vars + dist_vars are
+    # contiguous.
+    #
+    # Values (in particular sedes) may be None, so add a None-checking guard
+    # before each one, in order to avoid comparing NoneType to float, for
+    # example.
+    input.sort(key = lambda row:
+        tuple(x for v in cond_vars + dist_vars for x in (row[v] is not None, row[v]))
+    )
 
-    # Count the unique lemma/sedes pairs.
-    for (lemma, sedes), group in group_by(input, "lemma", "sedes"):
-        expectancy.append({
-            "lemma": lemma,
-            "sedes": sedes,
-            "x": len(group),
-        })
+    # Count unique cond_vars+dist_vars tuples.
+    for vals, group in group_by(input, *unique(cond_vars + dist_vars)):
+        expectancy.append(dict(
+            zip(unique(cond_vars + dist_vars), vals),
+            x = len(group),
+        ))
 
-    for (lemma,), group in group_by(expectancy, "lemma"):
+    for _, group in group_by(expectancy, *cond_vars):
         xvec = [inst["x"] for inst in group]
         μ = weighted_mean(xvec)
         σ = weighted_sd_pop(xvec)
@@ -107,12 +120,10 @@ def process(input, output):
             if f is not None:
                 row[k] = f(row[k])
 
-    output = csv.DictWriter(output, [
-        "lemma",
-        "sedes",
+    output = csv.DictWriter(output, unique(cond_vars + dist_vars) + (
         "x",
         "z",
-    ], lineterminator="\n")
+    ), lineterminator="\n")
     output.writeheader()
     output.writerows(expectancy)
 
@@ -128,7 +139,7 @@ def main():
         with open(filename) as f:
             input.extend(read_input(f))
 
-    process(input, sys.stdout)
+    process(input, sys.stdout, ("lemma",), ("sedes",))
 
 if __name__ == "__main__":
     main()
