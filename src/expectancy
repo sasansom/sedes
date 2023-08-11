@@ -6,8 +6,7 @@
 # Usage:
 #   expectancy corpus/*.csv > expectancy.csv
 #
-# Writes CSV to standard output. Besides lemma and sedes, there are three
-# columns:
+# Writes CSV to standard output. Besides lemma and sedes, there are two columns:
 #   x: The number of times this lemma/sedes pair appears
 #   z: The expectancy score, weighted as if each x value were repeated x times.
 
