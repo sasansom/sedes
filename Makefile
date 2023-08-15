@@ -32,15 +32,17 @@ WORKS_HTML = $(addprefix sedes-web/,$(addsuffix .html,$(WORKS)))
 .PHONY: all
 all: $(EXPECTANCY_FILES) $(WORKS_HTML)
 
+$(EXPECTANCY_FILES): .EXTRA_PREREQS = src/expectancy
 expectancy.all.csv: $(WORKS_CSV)
 	src/expectancy $^ > "$@"
-
 expectancy.hellenic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/homerichymns.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv
 	src/expectancy $^ > "$@"
 
+$(WORKS_CSV): .EXTRA_PREREQS = src/tei2csv
 corpus/%.csv: corpus/%.xml
 	src/tei2csv "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
 
+$(WORKS_HTML): .EXTRA_PREREQS = src/tei2html
 sedes-web/%.html: corpus/%.xml expectancy.all.csv
 	src/tei2html $^ > "$@"
 
