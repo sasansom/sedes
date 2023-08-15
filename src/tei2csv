@@ -65,38 +65,42 @@ def process(f, work_identifier):
                 "line_text": line.text(),
             }
 
-opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
-for o, a in opts:
-    if o in ("-h", "--help"):
-        usage()
-        sys.exit(0)
+def main():
+    opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
+    for o, a in opts:
+        if o in ("-h", "--help"):
+            usage()
+            sys.exit(0)
 
-try:
-    work_identifier, input_filename = args
-except ValueError:
-    print("error: usage error", file=sys.stderr)
-    print(file=sys.stderr)
-    usage(sys.stderr)
-    sys.exit(1)
+    try:
+        work_identifier, input_filename = args
+    except ValueError:
+        print("error: usage error", file=sys.stderr)
+        print(file=sys.stderr)
+        usage(sys.stderr)
+        sys.exit(1)
 
-csv_w = csv.DictWriter(
-    sys.stdout,
-    [
-        "work",
-        "book_n",
-        "line_n",
-        "word_n",
-        "word",
-        "lemma",
-        "sedes",
-        "metrical_shape",
-        "scanned",
-        "num_scansions",
-        "line_text",
-    ],
-    lineterminator="\n",
-)
-csv_w.writeheader()
-with open(input_filename) as f:
-    for row in process(f, work_identifier):
-        csv_w.writerow(row)
+    csv_w = csv.DictWriter(
+        sys.stdout,
+        [
+            "work",
+            "book_n",
+            "line_n",
+            "word_n",
+            "word",
+            "lemma",
+            "sedes",
+            "metrical_shape",
+            "scanned",
+            "num_scansions",
+            "line_text",
+        ],
+        lineterminator="\n",
+    )
+    csv_w.writeheader()
+    with open(input_filename) as f:
+        for row in process(f, work_identifier):
+            csv_w.writerow(row)
+
+if __name__ == "__main__":
+    main()

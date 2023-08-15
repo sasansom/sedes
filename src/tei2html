@@ -935,24 +935,28 @@ CONTROLS["show-undefined-expectancy"].dispatchEvent(new Event("change"));
     print("</body>")
     print("</html>")
 
-opts, args = getopt.gnu_getopt(sys.argv[1:], "hs:", ["help", "shade-mapping-adjust="])
-for o, a in opts:
-    if o in ("-h", "--help"):
-        usage()
-        sys.exit(0)
-    elif o in ("-s", "--shade-mapping-adjust"):
-        SHADE_MAPPING_ADJUST = float(a)
+def main():
+    opts, args = getopt.gnu_getopt(sys.argv[1:], "hs:", ["help", "shade-mapping-adjust="])
+    for o, a in opts:
+        if o in ("-h", "--help"):
+            usage()
+            sys.exit(0)
+        elif o in ("-s", "--shade-mapping-adjust"):
+            SHADE_MAPPING_ADJUST = float(a)
 
-try:
-    tei_filename, expectancy_filename = args
-except ValueError:
-    print("error: usage error", file=sys.stderr)
-    print(file=sys.stderr)
-    usage(sys.stderr)
-    sys.exit(1)
+    try:
+        tei_filename, expectancy_filename = args
+    except ValueError:
+        print("error: usage error", file=sys.stderr)
+        print(file=sys.stderr)
+        usage(sys.stderr)
+        sys.exit(1)
 
-with open(expectancy_filename) as expectancy_file:
-    expectancy = parse_expectancy(expectancy_file)
+    with open(expectancy_filename) as expectancy_file:
+        expectancy = parse_expectancy(expectancy_file)
 
-with open(tei_filename) as tei_file:
-    process(tei_file, expectancy)
+    with open(tei_filename) as tei_file:
+        process(tei_file, expectancy)
+
+if __name__ == "__main__":
+    main()
