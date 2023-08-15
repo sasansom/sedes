@@ -1,12 +1,37 @@
 #!/usr/bin/env python3
 
-# Computes an expectancy score for each unique lemma/sedes pair in the input
-# files, as produced by tei2csv.
+# Computes expectancy z-scores for unique values of grouping variables in input
+# produced by tei2csv.
 #
 # Usage:
 #   expectancy corpus/*.csv > expectancy.csv
 #
-# Writes CSV to standard output. Besides lemma and sedes, there are two columns:
+# Expectancy is computed relative to two sets of grouping variables: The
+# "distribution variables" and the "condition variables". The input is first
+# partitioned into separate subsets according to distinct values of the
+# condition variables. Then, within each subset, expectancy is computed
+# according to the counts of distinct values of the distribution variables.
+#
+# You can control the condition variables and distribution variables with the
+# --by option. The default value of the option is "sedes/lemma". The format is
+# a comma-separated list of distribution variables on the left, then a slash
+# character, then a comma-separated list of condition variables on the right.
+# Use a backslash to escape commas, slashes, and backslashes in variable names.
+#
+# This command line is equivalent to the default:
+#   expectancy --by sedes/lemma corpus/*.csv
+# This command will get the expectancy of lemmata within each book of each work:
+#   expectancy --by lemma/work,book_n corpus/*.csv
+# The list of variables before or after the slash may be empty, which means that
+# every input row should be considered equivalent according to that set. If the
+# slash is omitted, it means the list of condition variables is empty. For
+# example, these two equivalent commands get the overall sedes expectancy,
+# without first partitioning by lemma or any other variable:
+#   expectancy --by sedes/ corpus/*.csv
+#   expectancy --by sedes corpus/*.csv
+#
+# Writes CSV to standard output. The columns are the names of the grouping
+# variables, plus two more:
 #   x: The number of times this lemma/sedes pair appears
 #   z: The expectancy score, weighted as if each x value were repeated x times.
 
@@ -15,12 +40,31 @@ import getopt
 import math
 import sys
 
+import common
+
 def usage(file=sys.stdout):
     print(f"""\
-Usage: {sys.argv[0]} [INPUT.csv...] > OUTPUT.csv
+Usage: {sys.argv[0]} [OPTIONS...] [INPUT.csv...] > OUTPUT.csv
 
-Computes expectancy z-scores for every unique lemma/sedes pair found in
-the corpus of INPUT.csv files. The INPUT.csv files are the output of tei2csv.
+Computes expectancy z-scores for unique values of grouping variables
+(by default lemma and sedes) found in the corpus of INPUT.csv files.
+The INPUT.csv files are the output of tei2csv.
+
+Use the --by option to control the variables according to which
+expectancy is computed. The default value of --by is "sedes/lemma". The
+syntax is a comma-separated list of "distribution variables" on the
+left, then a slash, then a comma-separated list of "condition variables"
+on the right. Use a backslash to escape commas, slashes, and backslashes
+in variable names.
+
+The input is first partitioned into groups according to unique values of
+the condition variables. Then, within each group, expectancy is computed
+according to distinct values of the distribution variables.
+
+  --by DIST_VARS.../COND_VARS...
+              Set the grouping variables according to which expectancy
+              is computed. Default: "sedes/lemma".
+  -h, --help  Show this help.
 """, end="", file=file)
 
 # Return the mean of the sequence that arises from repeating each element e of
@@ -83,11 +127,11 @@ OUTPUT_TRANSFORMS = {
 }
 
 # Has the side effect of sorting input by the variables in
-# cond_vars + dist_vars.
-def process(input, output, cond_vars, dist_vars):
+# dist_vars + cond_vars.
+def process(input, output, dist_vars, cond_vars):
     expectancy = []
 
-    # Sort input so elements that are identical in cond_vars + dist_vars are
+    # Sort input so elements that are identical in cond_vars+dist_vars are
     # contiguous.
     #
     # Values (in particular sedes) may be None, so add a None-checking guard
@@ -128,18 +172,32 @@ def process(input, output, cond_vars, dist_vars):
     output.writerows(expectancy)
 
 def main():
-    opts, filenames = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
-    for o, _ in opts:
-        if o in ("-h", "--help"):
+    # Default grouping variables if not specified with --by.
+    dist_cond_vars_spec = "sedes/lemma"
+
+    opts, filenames = getopt.gnu_getopt(sys.argv[1:], "h", (
+        "by=",
+        "help",
+    ))
+    for o, a in opts:
+        if o == "--by":
+            dist_cond_vars_spec = a
+        elif o in ("-h", "--help"):
             usage()
             sys.exit(0)
+
+    try:
+        dist_vars, cond_vars = common.parse_dist_cond_vars_spec(dist_cond_vars_spec)
+    except ValueError as e:
+        print(f"error parsing --by specification {dist_cond_vars_spec!r}: {e}")
+        sys.exit(1)
 
     input = []
     for filename in filenames:
         with open(filename) as f:
             input.extend(read_input(f))
 
-    process(input, sys.stdout, ("lemma",), ("sedes",))
+    process(input, sys.stdout, dist_vars, cond_vars)
 
 if __name__ == "__main__":
     main()
