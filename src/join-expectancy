@@ -75,20 +75,24 @@ def join(left, right_file, fieldnames, output):
             for match in matches:
                 output.writerow({**row, **match})
 
-opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
-for o, _ in opts:
-    if o in ("-h", "--help"):
-        usage()
-        sys.exit(0)
+def main():
+    opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
+    for o, _ in opts:
+        if o in ("-h", "--help"):
+            usage()
+            sys.exit(0)
 
-try:
-    (*work_filenames, expectancy_filename) = args
-except ValueError:
-    usage(sys.stderr)
-    sys.exit(1)
-if not work_filenames:
-    usage(sys.stderr)
-    sys.exit(1)
-works = MultiDictReader(work_filenames)
-with open(expectancy_filename) as expectancy:
-    join(works, expectancy, COMMON_FIELDS, sys.stdout)
+    try:
+        (*work_filenames, expectancy_filename) = args
+    except ValueError:
+        usage(sys.stderr)
+        sys.exit(1)
+    if not work_filenames:
+        usage(sys.stderr)
+        sys.exit(1)
+    works = MultiDictReader(work_filenames)
+    with open(expectancy_filename) as expectancy:
+        join(works, expectancy, COMMON_FIELDS, sys.stdout)
+
+if __name__ == "__main__":
+    main()
