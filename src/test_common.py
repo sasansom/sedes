@@ -40,3 +40,20 @@ class TestParse(unittest.TestCase):
         ):
             with self.assertRaises(ValueError, msg = spec):
                 common.parse_dist_cond_vars_spec(spec)
+
+class TestRoundtrip(unittest.TestCase):
+    def test_roundtrip(self):
+        for dist_vars, cond_vars in (
+            ((), ()),
+            (("aaa",), ()),
+            ((), ("aaa",)),
+            (("aaa",), ("bbb",)),
+            (("aaa", "bbb"), ("ccc", "ddd")),
+            (("a/a,a\\a",), ()),
+        ):
+            spec = common.format_dist_cond_vars_spec(dist_vars, cond_vars)
+            try:
+                dist_vars_roundtrip, cond_vars_roundtrip = common.parse_dist_cond_vars_spec(spec)
+            except ValueError as e:
+                self.fail((dist_vars, cond_vars, spec))
+            self.assertEqual((dist_vars, cond_vars), (dist_vars_roundtrip, cond_vars_roundtrip), spec)

@@ -1,3 +1,5 @@
+import re
+
 # Parse a dist/cond variables specification. The syntax is a comma-separated
 # list of dist_vars, optionally followed by a slash and a comma-separated list
 # of cond_vars. A backslash escapes the character that follows it.
@@ -48,3 +50,14 @@ def parse_dist_cond_vars_spec(spec):
 
     assert not var, var
     return tuple(dist_vars), tuple(cond_vars)
+
+_ESCAPE_RE = re.compile(r"[,/\\]")
+def _escape(x):
+    return _ESCAPE_RE.sub(lambda m: f"\\{m.group()}", x)
+
+# Serialize dist_vars and cond_vars lists into the comma- and slash-delimited
+# form.
+def format_dist_cond_vars_spec(dist_vars, cond_vars):
+    return ",".join(_escape(x) for x in dist_vars) + \
+        "/" + \
+        ",".join(_escape(x) for x in cond_vars)
