@@ -12,6 +12,7 @@ import sys
 import re
 import unicodedata
 
+import common
 import lemma as lemma_mod
 import sedes as sedes_mod
 import tei
@@ -59,13 +60,19 @@ def float_or_none(s):
     else:
         return float(s)
 
-def parse_expectancy(f):
+# Parse an expectancy CSV file (as output by the expectancy program). dist_vars
+# and cond_vars are the columns to use as a key for looking up x and z values.
+# Returns a two-level dict whose top level maps cond_vars to another dict that
+# maps dist_vars to ExpectancyEntry.
+def parse_expectancy(f, dist_vars, cond_vars):
     stats = {}
     for row in csv.DictReader(f):
-        key = (row["lemma"], row["sedes"])
-        if key in stats:
-            raise ValueError(f"duplicate lemma/sedes pair {key}")
-        stats[key] = ExpectancyEntry(
+        dist_key = tuple(row[k] for k in dist_vars)
+        cond_key = tuple(row[k] for k in cond_vars)
+        dist_map = stats.setdefault(cond_key, {})
+        if dist_key in dist_map:
+            raise ValueError(f"duplicate {common.format_dist_cond_vars_spec(dist_vars, cond_vars)} key {(dist_key, cond_key)}")
+        dist_map[dist_key] = ExpectancyEntry(
             x = int(row["x"]),
             z = float_or_none(row["z"]),
         )
@@ -171,7 +178,7 @@ def assign_sedes_for_line(line):
     else:
         return tuple((word, None, None) for word in line.words())
 
-def process(f, expectancy):
+def process(f, expectancy, dist_vars, cond_vars):
     doc = tei.TEI(f)
 
     print(f"""\
@@ -600,15 +607,14 @@ summary, .word {
             print(esc(normalize(doc.title)), end="")
         print()
 
-    # Lemmata whose expectancy entries actually needed for the words in this
+    # Values of cond_vars whose expectancy entries we actually need for this
     # text, built up as we go.
     expectancy_needed = set()
 
-    # Sum of x per lemma.
+    # Sum of x per unique values of cond_vars.
     sum_x = {}
-    for (lemma, _), expectancy_entry in expectancy.items():
-        sum_x.setdefault(lemma, 0)
-        sum_x[lemma] += expectancy_entry.x
+    for cond_key, dist_map in expectancy.items():
+        sum_x[cond_key] = sum(expectancy_entry.x for expectancy_entry in dist_map.values())
 
     # Cache of already emitted automatically generated HTML element ids, to
     # avoid duplicated.
@@ -749,11 +755,31 @@ summary, .word {
             if sedes is not None:
                 word_attrs["data-sedes"] = sedes;
                 title_attr.append(f"sedes={sedes}")
-            expectancy_needed.add(lemma)
-            expectancy_entry = expectancy.get((lemma, sedes))
+
+            # These are the variables whose values we know how to produce and
+            # are usable in dist_vars and cond_vars lookups.
+            VAR_VALUES = {
+                # We don't actually know the work_id of the text we are
+                # processing--but it doesn't matter, because this program
+                # currently processes just one work at a time. We can use any
+                # value here that compares equal to itself.
+                "work": "work",
+
+                "book_n": loc.book_n,
+                "line_n": loc.line_n,
+                "word_n": word_n,
+                "word": word,
+                "lemma": lemma,
+                "sedes": sedes,
+                "metrical_shape": shape,
+            }
+            dist_key = tuple(VAR_VALUES[var] for var in dist_vars)
+            cond_key = tuple(VAR_VALUES[var] for var in cond_vars)
+            expectancy_needed.add(cond_key)
+            expectancy_entry = expectancy.get(cond_key, {}).get(dist_key)
             if expectancy_entry is not None:
                 title_attr.append(f"x={expectancy_entry.x}")
-                title_attr.append(f"Σx={sum_x[lemma]}")
+                title_attr.append(f"Σx={sum_x[cond_key]}")
                 word_attrs["class"] += " " + esc(z_css(expectancy_entry.z))
                 if expectancy_entry.z is not None:
                     z_fmt = f"{expectancy_entry.z:+.8}"
@@ -761,7 +787,7 @@ summary, .word {
                 else:
                     word_attrs["class"] += " undefined-expectancy"
             else:
-                print(f"warning: no expectancy score for book {loc.book_n} line {loc.line_n} word {word_n}: {word} {lemma!r}/{sedes}", file=sys.stderr)
+                print(f"warning: no expectancy score for book {loc.book_n} line {loc.line_n} word {word_n}: {common.format_dist_cond_vars_spec(dist_vars, cond_vars)} {(dist_key, cond_key)}", file=sys.stderr)
                 word_attrs["class"] += " error"
             if shape is not None:
                 word_attrs["data-shape"] = normalize(shape)
@@ -795,22 +821,32 @@ summary, .word {
     print("<script defer>")
     print("\"use strict\";")
 
+    print("const DIST_VARS = [" + ", ".join(js_string(var) for var in dist_vars) + "];")
+    print("const COND_VARS = [" + ", ".join(js_string(var) for var in cond_vars) + "];")
+
+    escape_re = re.compile(r"[,\\]")
+    def escape(values):
+        return ",".join(normalize(escape_re.sub(lambda m: f"\\{m.group()}", x)) for x in values)
+
     print("const EXPECTANCY = new Map([");
-    for lemma, sedes in ((lemma, sedes) for lemma, sedes in expectancy.keys() if lemma in expectancy_needed):
-        expectancy_entry = expectancy.get((lemma, sedes))
-        fields = [("x", str(expectancy_entry.x)),]
-        if expectancy_entry.z is not None:
-            fields.append(("z", f"{expectancy_entry.z:+.8}"))
-        key = f"{normalize(lemma)}/{sedes}"
-        value = ", ".join(f"{name}: {value}" for name, value in fields)
-        print(f"[{js_string(key)}, {{{value}}}],")
+    for cond_key in sorted(expectancy.keys()):
+        if cond_key not in expectancy_needed:
+            continue
+        dist_map = expectancy[cond_key]
+        print(f"[{js_string(escape(cond_key))}, new Map([")
+        for dist_key in sorted(dist_map.keys()):
+            expectancy_entry = dist_map[dist_key]
+            fields = [("x", str(expectancy_entry.x)),]
+            if expectancy_entry.z is not None:
+                fields.append(("z", f"{expectancy_entry.z:+.8}"))
+            value = ", ".join(f"{name}: {value}" for name, value in fields)
+            print(f"  [{js_string(escape(dist_key))}, {{{value}}}],")
+        print("])],")
     print("]);");
 
     print(f"const SHADE_MAPPING_ADJUST = {SHADE_MAPPING_ADJUST};")
 
     print("""
-const POSSIBLE_SEDES = [1, 2, 2.5, 3, 4, 4.5, 5, 6, 6.5, 7, 8, 8.5, 9, 10, 10.5, 11, 12].map(sedes => sedes.toString());
-
 const LOC_OUTPUT = document.getElementById("loc-output");
 const LINK_OUTPUT = document.getElementById("link-output");
 const WORD_OUTPUT = document.getElementById("word-output");
@@ -828,6 +864,13 @@ function format_signed_float(x, digits) {
 // name.
 function tone_map(z) {
     return 1.0 / (1.0 + Math.exp(-z * SHADE_MAPPING_ADJUST))
+}
+
+// Backslash-escape commas every element in values, then join the escaped
+// strings with a comma as separator. This function provides a way of using
+// arrays of strings as Map keys.
+function escape(values) {
+    return values.map(x => x.replace(/[,\\\\]/, m => "\\\\"+m)).join(",");
 }
 
 function info(target) {
@@ -849,23 +892,58 @@ function info(target) {
     LINK_OUTPUT.href = "#" + target.id;
     LINK_OUTPUT.textContent = "link";
 
-    let lemma = target.getAttribute("data-lemma");
-    let sedes = target.getAttribute("data-sedes");
-    let sum_x = POSSIBLE_SEDES.map(sedes => EXPECTANCY.get(`${lemma}/${sedes}`)?.x ?? 0).reduce((a, b) => a + b);
+    // These are the variables whose values we know how to produce and are
+    // usable in DIST_VARS and COND_VARS lookups.
+    const VAR_VALUES = new Map([
+        // We don't actually know the work_id of the text we are processing--but
+        // it doesn't matter, because this program currently processes just one
+        // work at a time. We can use any value here that compares equal to
+        // itself.
+        ["work", "work"],
 
-    WORD_OUTPUT.textContent = target.textContent;
-    SHAPE_OUTPUT.textContent = target.getAttribute("data-shape") ?? "";
-    SEDES_OUTPUT.textContent = sedes ?? "";
-    LEMMA_OUTPUT.textContent = lemma ?? "";
+        ["book_n", bookno],
+        ["line_n", lineno],
+        ["word_n", wordno],
+        ["word", target.textContent],
+        ["lemma", target.getAttribute("data-lemma")],
+        ["sedes", target.getAttribute("data-sedes")],
+        ["metrical_shape", target.getAttribute("data-shape")],
+    ]);
+
+    const dist_key = DIST_VARS.map(x => VAR_VALUES.get(x));
+    const cond_key = COND_VARS.map(x => VAR_VALUES.get(x));
+    let sum_x = 0;
+    for (const entry of EXPECTANCY.get(escape(cond_key))?.values())
+        sum_x += entry.x;
+
+    WORD_OUTPUT.textContent = VAR_VALUES.get("word");
+    SHAPE_OUTPUT.textContent = VAR_VALUES.get("metrical_shape") ?? "";
+    SEDES_OUTPUT.textContent = VAR_VALUES.get("sedes") ?? "";
+    LEMMA_OUTPUT.textContent = VAR_VALUES.get("lemma") ?? "";
     SUMX_OUTPUT.textContent = sum_x ?? "";
 
     for (let elem of SEDES_DIST.getElementsByTagName("th"))
         elem.classList.toggle("selected", false);
+    let sedes = VAR_VALUES.get("sedes");
     if (sedes != null)
         document.getElementById(`sedes-dist-header-${sedes}`).classList.toggle("selected", true);
 
-    for (let sedes of POSSIBLE_SEDES) {
-        let {x, z} = EXPECTANCY.get(`${lemma}/${sedes}`) ?? {};
+    // Fill out the sedes distribution table. This is a special case: the table
+    // does not generalize to show distributions over other variables. When
+    // dist_key and cond_key do not mention sedes, all the columns in the table
+    // will be the same.
+    const POSSIBLE_SEDES = [1, 2, 2.5, 3, 4, 4.5, 5, 6, 6.5, 7, 8, 8.5, 9, 10, 10.5, 11, 12].map(sedes => sedes.toString());
+    for (const sedes of POSSIBLE_SEDES) {
+        // Compute dist_key and cond_key as above, but override sedes with each
+        // element of POSSIBLE_SEDES in turn.
+        const dist_key = DIST_VARS.map(x => x == "sedes" ? sedes : VAR_VALUES.get(x));
+        const cond_key = COND_VARS.map(x => x == "sedes" ? sedes : VAR_VALUES.get(x));
+        let {x, z} = EXPECTANCY.get(escape(cond_key))?.get(escape(dist_key)) ?? {};
+        // Recompute sum_x for each column.
+        let sum_x = 0;
+        for (const entry of EXPECTANCY.get(escape(cond_key))?.values())
+            sum_x += entry.x;
+
         let output_x = document.getElementById(`output-x-${sedes}`);
         let output_fracx = document.getElementById(`output-fracx-${sedes}`);
         let output_z = document.getElementById(`output-z-${sedes}`);
@@ -944,6 +1022,9 @@ def main():
         elif o in ("-s", "--shade-mapping-adjust"):
             SHADE_MAPPING_ADJUST = float(a)
 
+    dist_vars = ("sedes",)
+    cond_vars = ("lemma",)
+
     try:
         tei_filename, expectancy_filename = args
     except ValueError:
@@ -953,10 +1034,10 @@ def main():
         sys.exit(1)
 
     with open(expectancy_filename) as expectancy_file:
-        expectancy = parse_expectancy(expectancy_file)
+        expectancy = parse_expectancy(expectancy_file, dist_vars, cond_vars)
 
     with open(tei_filename) as tei_file:
-        process(tei_file, expectancy)
+        process(tei_file, expectancy, dist_vars, cond_vars)
 
 if __name__ == "__main__":
     main()
