@@ -3,12 +3,23 @@
 # Usage:
 #   join-expectancy corpus/work.csv expectancy.all.csv > joined.csv
 #
-# Outputs work.csv, augmented with rows from expectancy.all.csv that match in
-# the "lemma" and "sedes" columns (left outer join).
+# Outputs work.csv, augmented with rows from expectancy.all.csv (left outer
+# join) that match in certain columns ("lemma" and "sedes" by default).
+#
+# The --by option controls the grouping variables. The format is a
+# comma-separated list of variable names. You may also use up to one slash
+# character between variable names, in order to match the --by syntax understood
+# by other programs (though this program makes no distinction between the
+# "distribution" variables on the left and the "condition" variables on the
+# right). Use a backslash to escape commas, slashes, and backslashes in variable
+# names. Example:
+#   join-expectancy --by sedes,lemma corpus/work.csv expectancy.all.csv > joined.csv
 
 import csv
 import getopt
 import sys
+
+import common
 
 def usage(file = sys.stdout):
     print(f"""\
@@ -17,8 +28,6 @@ Usage: {sys.argv[0]} WORK.CSV [WORK.CSV...] EXPECTANCY.CSV > JOINED.CSV
 Outputs the contents of the WORK.CSV inputs, augmented with the rows from
 EXPECTANCY.CSV that match on the "lemma" and "sedes" columns.
 """, end="", file=file)
-
-COMMON_FIELDS = ("lemma", "sedes")
 
 def unique(s):
     result = []
@@ -72,11 +81,26 @@ def join(left, right_file, fieldnames, output):
                 output.writerow({**row, **match})
 
 def main():
-    opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
-    for o, _ in opts:
-        if o in ("-h", "--help"):
+    # Default common variables if not specified with --by.
+    common_vars_spec = "sedes/lemma"
+
+    opts, args = getopt.gnu_getopt(sys.argv[1:], "h", (
+        "by=",
+        "help",
+    ))
+    for o, a in opts:
+        if o == "--by":
+            common_vars_spec = a
+        elif o in ("-h", "--help"):
             usage()
             sys.exit(0)
+
+    try:
+        dist_vars, cond_vars = common.parse_dist_cond_vars_spec(common_vars_spec)
+    except ValueError as e:
+        print(f"error parsing --by specification {common_vars_spec!r}: {e}")
+        sys.exit(1)
+    common_vars = unique(dist_vars + cond_vars)
 
     try:
         (*work_filenames, expectancy_filename) = args
@@ -88,7 +112,7 @@ def main():
         sys.exit(1)
     works = MultiDictReader(work_filenames)
     with open(expectancy_filename) as expectancy:
-        join(works, expectancy, COMMON_FIELDS, sys.stdout)
+        join(works, expectancy, common_vars, sys.stdout)
 
 if __name__ == "__main__":
     main()
