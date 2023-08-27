@@ -2,6 +2,14 @@
 
 # Usage:
 #   tei2html corpus/shield.xml expectancy.hellenic+archaic.csv > shield.html
+#
+# The --by option controls the selection of variables according to which
+# expectancy is computed. The value passed to --by must match the one that was
+# given to the expectancy program earlier. The default value of --by is
+# "sedes/lemma". The format is a comma-separated list of distribution variables
+# on the left, then a slash character, then a comma-separated list of condition
+# variables on the right. Use a backslash to escape commas, slashes, and
+# backslashes in variable names. See the expectancy program for examples.
 
 import collections
 import csv
@@ -46,8 +54,20 @@ WORK.XML is a TEI XML document containing the text of the work.
 STATS.csv is statistics on a corpus of text as produced by
 the tei2csv and expectancy programs.
 
-  -s NUM, --shade-mapping-adjust=NUM  change steepness of shade mapping
-                                      (default {SHADE_MAPPING_ADJUST:.1f})
+Use the --by option to control the variables according to which
+expectancy is computed. This must match the --by value that was provided
+to the expectancy program. The default value of --by is "sedes/lemma".
+The syntax is a comma-separated list of "distribution variables" on the
+left, then a slash, then a comma-separated list of "condition variables"
+on the right. Use a backslash to escape commas, slashes, and backslashes
+in variable names.
+
+  --by DIST_VARS.../COND_VARS...
+              set the grouping variables according to which expectancy
+                is computed (default: "sedes/lemma")
+  -s NUM, --shade-mapping-adjust=NUM
+              change steepness of shade mapping
+                (default {SHADE_MAPPING_ADJUST:.1f})
   -h, --help  show this help
 """, end="", file=file)
 
@@ -760,11 +780,8 @@ summary, .word {
             # are usable in dist_vars and cond_vars lookups.
             VAR_VALUES = {
                 # We don't actually know the work_id of the text we are
-                # processing--but it doesn't matter, because this program
-                # currently processes just one work at a time. We can use any
-                # value here that compares equal to itself.
-                "work": "work",
-
+                # processing, so we cannot use work as a grouping variable.
+                # "work": None,
                 "book_n": loc.book_n,
                 "line_n": loc.line_n,
                 "word_n": word_n,
@@ -895,16 +912,17 @@ function info(target) {
     // These are the variables whose values we know how to produce and are
     // usable in DIST_VARS and COND_VARS lookups.
     const VAR_VALUES = new Map([
-        // We don't actually know the work_id of the text we are processing--but
-        // it doesn't matter, because this program currently processes just one
-        // work at a time. We can use any value here that compares equal to
-        // itself.
-        ["work", "work"],
-
+        // We don't actually know the work_id of the text we are processing, so
+        // we cannot use work as a grouping variable.
+        // ["work", null],
         ["book_n", bookno],
         ["line_n", lineno],
         ["word_n", wordno],
-        ["word", target.textContent],
+        // Lowercase the literal word from the text, to match what
+        // hexameter.analyze_line_metrical does internally and what is stored in
+        // tei2csv output.
+        // https://github.com/sasansom/sedes/blob/526941f65bf88efb82db7d3bfbfe632e4f0d40ff/src/hexameter/scan.py#L378
+        ["word", target.textContent.toLowerCase()],
         ["lemma", target.getAttribute("data-lemma")],
         ["sedes", target.getAttribute("data-sedes")],
         ["metrical_shape", target.getAttribute("data-shape")],
@@ -1014,16 +1032,28 @@ CONTROLS["show-undefined-expectancy"].dispatchEvent(new Event("change"));
     print("</html>")
 
 def main():
-    opts, args = getopt.gnu_getopt(sys.argv[1:], "hs:", ["help", "shade-mapping-adjust="])
+    # Default grouping variables if not specified with --by.
+    dist_cond_vars_spec = "sedes/lemma"
+
+    opts, args = getopt.gnu_getopt(sys.argv[1:], "hs:", (
+        "by=",
+        "help",
+        "shade-mapping-adjust=",
+    ))
     for o, a in opts:
-        if o in ("-h", "--help"):
+        if o == "--by":
+            dist_cond_vars_spec = a
+        elif o in ("-h", "--help"):
             usage()
             sys.exit(0)
         elif o in ("-s", "--shade-mapping-adjust"):
             SHADE_MAPPING_ADJUST = float(a)
 
-    dist_vars = ("sedes",)
-    cond_vars = ("lemma",)
+    try:
+        dist_vars, cond_vars = common.parse_dist_cond_vars_spec(dist_cond_vars_spec)
+    except ValueError as e:
+        print(f"error parsing --by specification {dist_cond_vars_spec!r}: {e}")
+        sys.exit(1)
 
     try:
         tei_filename, expectancy_filename = args
