@@ -889,7 +889,7 @@ function info(target) {
 for (let word of document.querySelectorAll("article .word"))
     word.addEventListener("click", event => info(event.target));
 // If there's a word selected in the URL hash, fill out the infobox.
-{
+if (window.location.hash != "") {
     let elem = document.getElementById(window.location.hash.slice(1));
     if (elem?.classList?.contains("word"))
         info(elem);
