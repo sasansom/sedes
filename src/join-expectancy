@@ -82,7 +82,7 @@ def join(left, right_file, fieldnames, output):
 
 def main():
     # Default common variables if not specified with --by.
-    common_vars_spec = "sedes/lemma"
+    common_vars_spec = common.DEFAULT_DIST_COND_VARS_SPEC
 
     opts, args = getopt.gnu_getopt(sys.argv[1:], "h", (
         "by=",

@@ -1033,7 +1033,7 @@ CONTROLS["show-undefined-expectancy"].dispatchEvent(new Event("change"));
 
 def main():
     # Default grouping variables if not specified with --by.
-    dist_cond_vars_spec = "sedes/lemma"
+    dist_cond_vars_spec = common.DEFAULT_DIST_COND_VARS_SPEC
 
     opts, args = getopt.gnu_getopt(sys.argv[1:], "hs:", (
         "by=",

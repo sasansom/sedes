@@ -1,5 +1,10 @@
 import re
 
+# Various programs use this as the default specification of distribution
+# variables and condition variables for the purpose of grouping for expectancy
+# computation.
+DEFAULT_DIST_COND_VARS_SPEC = "sedes/lemma"
+
 # Parse a dist/cond variables specification. The syntax is a comma-separated
 # list of dist_vars, optionally followed by a slash and a comma-separated list
 # of cond_vars. A backslash escapes the character that follows it.

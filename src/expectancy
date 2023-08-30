@@ -173,7 +173,7 @@ def process(input, output, dist_vars, cond_vars):
 
 def main():
     # Default grouping variables if not specified with --by.
-    dist_cond_vars_spec = "sedes/lemma"
+    dist_cond_vars_spec = common.DEFAULT_DIST_COND_VARS_SPEC
 
     opts, filenames = getopt.gnu_getopt(sys.argv[1:], "h", (
         "by=",
