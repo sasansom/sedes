@@ -61,7 +61,7 @@ def process(f, work_identifier):
                 "num_scansions": num_scansions,
                 "sedes": pos,
                 "metrical_shape": shape,
-                "lemma": lemma.lookup(word),
+                "lemma": lemma.lookup(word) or word, # Use the word itself as lemma if lemmatization fails.
                 "line_text": line.text(),
             }
 

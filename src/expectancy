@@ -60,8 +60,6 @@ def weighted_sd_pop(x):
 # We special-case certain column names to transform their contained values on
 # input.
 INPUT_TRANSFORMS = {
-    # Infer unknown lemmata to be the same as the word.
-    "lemma": lambda val, row: val if val else row["word"],
     # Parse numeric sedes if present, otherwise set to None.
     "sedes": lambda val, row: float(val) if val else None,
 }

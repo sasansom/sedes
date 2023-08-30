@@ -740,7 +740,7 @@ summary, .word {
             prev_sedes = sedes
 
             title_attr = []
-            lemma = lemma_mod.lookup(word) or word
+            lemma = lemma_mod.lookup(word) or word # Use the word itself as lemma if lemmatization fails.
             assert lemma, (word, lemma)
             word_attrs["data-wordno"] = str(word_n)
             if lemma is not None:
