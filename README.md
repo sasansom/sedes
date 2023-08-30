@@ -105,6 +105,56 @@ same commands as `make` would:
 ```
 
 
+## Controlling the variables used to calculate expectancy
+
+You can control what variables are used to group the input
+for expectancy calculation using the
+`--by` command-line option of the expectancy and tei2html programs.
+By default the programs compute the *sedes* expectancy of each distinct lemma,
+as if you had used `--by sedes/lemma`.
+
+The syntax of the `--by` option is
+<code><var>dist_vars</var>/<var>cond_vars</var></code>,
+with "distribution variables" on the left of the slash and
+"condition variables" on the right.
+On either side of the slash, there may be zero or more variable names,
+separated by commas.
+To calculate expectancy, the programs first partition the input
+into groups according to distinct values of the condition variables.
+Then, they find the expectancy of each of the distinct values
+of the distribution variables.
+
+For example, by default, the programs first divide the input
+into groups, where each group represents one distinct lemma.
+Then, within each lemma group, they find what *sedes*
+are more and less expected.
+
+To use variables other than the default,
+you will have to run the component programs manually,
+rather than using `make`.
+
+This is an example of calculating *sedes* expectancy
+after first grouping by metrical shape, rather than lemma:
+```
+src/expectancy --by sedes/metrical_shape corpus/*.csv > expectancy.sedes-metrical_shape.csv
+src/tei2html --by sedes/metrical_shape corpus/aratus.xml expectancy.sedes-metrical_shape.csv > aratus.sedes-metrical_shape.html
+```
+
+If you want a summary of the expectancy of a single variable
+across the entire input, without any grouping at all,
+you can do that too.
+For example, to count the number of occurrences of each unique word:
+```
+src/expectancy --by word/ corpus/*.csv
+```
+
+Or to calculate the overall *sedes* expectancy,
+without first grouping by lemma or any other variable:
+```
+src/expectancy --by sedes/ corpus/*.csv
+```
+
+
 ## Data format
 
 The output of `tei2csv` is
