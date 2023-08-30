@@ -38,11 +38,11 @@ expectancy.all.csv: $(WORKS_CSV)
 expectancy.hellenic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/homerichymns.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv
 	src/expectancy $^ > "$@"
 
-$(WORKS_CSV): .EXTRA_PREREQS = src/tei2csv
+$(WORKS_CSV): .EXTRA_PREREQS = src/tei2csv src/known.py src/lemma.py
 corpus/%.csv: corpus/%.xml
 	src/tei2csv "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
 
-$(WORKS_HTML): .EXTRA_PREREQS = src/tei2html
+$(WORKS_HTML): .EXTRA_PREREQS = src/tei2html src/known.py src/lemma.py
 sedes-web/%.html: corpus/%.xml expectancy.all.csv
 	src/tei2html $^ > "$@"
 
