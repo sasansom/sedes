@@ -282,6 +282,9 @@ def process(f, expectancy, dist_vars, cond_vars):
 #sedes-dist td {
     text-align: right;
 }
+#sedes-dist caption {
+    text-align: left;
+}
 
 h1 a, h2 a {
     color: inherit;
@@ -535,6 +538,7 @@ summary, .word {
 </table>
 
 <table id=sedes-dist>
+<caption>Expectancy according to {expectancy_vars}</caption>
 <tr>
   <td></td>
   <th scope=col id=sedes-dist-header-1>1</th>
@@ -618,7 +622,13 @@ summary, .word {
 </table>
 
 </div>
-</details>""".format(min = fmt_float(SHADE_SCALE_RANGE[0]), max = fmt_float(SHADE_SCALE_RANGE[1])))
+</details>""".format(
+    min = fmt_float(SHADE_SCALE_RANGE[0]),
+    max = fmt_float(SHADE_SCALE_RANGE[1]),
+    expectancy_vars = ", ".join(f"<var>{esc(var)}</var>" for var in dist_vars) +
+                      " / " +
+                      ", ".join(f"<var>{esc(var)}</var>" for var in cond_vars),
+))
 
     print_start_tag("article")
 
