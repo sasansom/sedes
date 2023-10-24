@@ -1,3 +1,4 @@
+import copy
 import unittest
 
 import tei
@@ -47,5 +48,9 @@ class TestTrimTokens(unittest.TestCase):
             ((NONWORD(" < "), WORD("a"), NONWORD(" > ")),
              (NONWORD("< "), WORD("a"), NONWORD(" >"))),
         ):
-            trimmed = tuple(tei.trim_tokens(tokens))
+            tokens_copy = copy.deepcopy(tokens)
+            trimmed = tuple(tei.trim_tokens(tokens_copy))
+            # check output of trim_tokens
             self.assertEqual(trimmed, expected)
+            # check that input is unmodified
+            self.assertEqual(tokens, tokens_copy)

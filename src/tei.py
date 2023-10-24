@@ -124,7 +124,7 @@ def tokenize_text(text):
 def trim_tokens(tokens):
     """Trim leading and trailing whitespace from a list of tokens."""
 
-    tokens = list(tokens[:])
+    tokens = list(copy.deepcopy(tokens))
     while tokens and tokens[0].type == Token.Type.NONWORD:
         tokens[0].text = tokens[0].text.lstrip()
         if tokens[0].text:
