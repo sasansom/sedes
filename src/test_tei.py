@@ -47,6 +47,13 @@ class TestTrimTokens(unittest.TestCase):
             # left side is lstripped only, right side is rstripped only
             ((NONWORD(" < "), WORD("a"), NONWORD(" > ")),
              (NONWORD("< "), WORD("a"), NONWORD(" >"))),
+            # WORDS and NONWORDS are consolidated
+            ((NONWORD("<"), NONWORD("<"),
+              WORD("a"), WORD("b"),
+              NONWORD("|"),
+              WORD("c"), WORD("d"),
+              NONWORD(">"), NONWORD(">")),
+             (NONWORD("<<"), WORD("ab"), NONWORD("|"), WORD("cd"), NONWORD(">>"))),
         ):
             tokens_copy = copy.deepcopy(tokens)
             trimmed = tuple(tei.trim_tokens(tokens_copy))

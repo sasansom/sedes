@@ -121,20 +121,33 @@ def tokenize_text(text):
     if nonword:
         yield Token(Token.Type.NONWORD, nonword)
 
-def trim_tokens(tokens):
-    """Trim leading and trailing whitespace from a list of tokens."""
+def consolidate_tokens(tokens):
+    """Consolidate runs of consecutive WORD and NONWORD tokens."""
 
-    tokens = list(copy.deepcopy(tokens))
-    while tokens and tokens[0].type == Token.Type.NONWORD:
+    cur = None
+    for token in tokens:
+        if cur is not None and token.type == cur.type and token.type in (Token.Type.NONWORD, Token.Type.WORD):
+            cur.text += token.text
+        else:
+            if cur is not None:
+                yield cur
+            cur = copy.deepcopy(token)
+    if cur is not None:
+        yield cur
+
+def trim_tokens(tokens):
+    """Trim leading and trailing whitespace from a list of tokens, and
+    consolidate runs of consecutive WORD and NONWORD tokens."""
+
+    tokens = list(consolidate_tokens(tokens))
+    if tokens and tokens[0].type is Token.Type.NONWORD:
         tokens[0].text = tokens[0].text.lstrip()
-        if tokens[0].text:
-            break
-        tokens.pop(0)
-    while tokens and tokens[-1].type == Token.Type.NONWORD:
+        if not tokens[0].text:
+            tokens.pop(0)
+    if tokens and tokens[-1].type is Token.Type.NONWORD:
         tokens[-1].text = tokens[-1].text.rstrip()
-        if tokens[-1].text:
-            break
-        tokens.pop(-1)
+        if not tokens[-1].text:
+            tokens.pop(-1)
     return tokens
 
 class Line:
