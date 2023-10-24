@@ -813,9 +813,8 @@ Homeric Hymns</title>
 <lb />ou)/ se/ g' e)/peit' i)/sxon xru/seoi stro/foi a)spai/ronta,
 <lb />ou)d' e)/ti de/smat' e)/ruke, lu/onto de\ pei/rata pa/nta.
 <lb rend="displayNum" n="130" />au)ti/ka d' a)qana/th|si methu/da *foi=bos *)apo/llwn:
-
-<q direct="unspecified"><milestone ed="P" n="131" unit="card" />
-<lb /><milestone ed="P" unit="Para" />ei)/h moi ki/qari/s te fi/lh kai\ kampu/la to/ca,
+<milestone ed="P" n="131" unit="card" />
+<lb /><milestone ed="P" unit="Para" /><q direct="unspecified">ei)/h moi ki/qari/s te fi/lh kai\ kampu/la to/ca,
 <lb />xrh/sw d' a)nqrw/poisi *dio\s nhmerte/a boulh/n.</q></p></sp>
 <p>
 <lb /><milestone ed="P" unit="Para" />w(\s ei)pw\n e)bi/basken e)pi\ xqono\s eu)ruodei/hs
@@ -940,7 +939,7 @@ Homeric Hymns</title>
 <lb /><milestone ed="P" unit="Para" />bh=s d' e)pi\ *telfou/shs: to/qi toi a(/de xw=ros a)ph/mwn
 <lb rend="displayNum" n="245" />teu/casqai nho/n te kai\ a)/lsea dendrh/enta:
 <lb />sth=s de\ ma/l' a)/gx' au)th=s kai\ min pro\s mu=qon e)/eipes:
-<q direct="unspecified"><lb /><milestone ed="P" unit="Para" />*telfou=s', e)nqa/de dh\ frone/w perikalle/a nho\n
+<lb /><milestone ed="P" unit="Para" /><q direct="unspecified">*telfou=s', e)nqa/de dh\ frone/w perikalle/a nho\n
 <lb />a)nqrw/pwn teu=cai xrhsth/rion, oi(/te moi ai)ei\
 <lb />e)nqa/d' a)ginh/sousi telhe/ssas e(kato/mbas,
 <lb rend="displayNum" n="250" />h)me\n o(/soi *pelopo/nnhson pi/eiran e)/xousin
@@ -951,7 +950,7 @@ Homeric Hymns</title>
 <lb /><milestone ed="P" unit="Para" />w(\s ei)pw\n die/qhke qemei/lia *foi=bos *)apo/llwn
 <lb rend="displayNum" n="255" />eu)re/a kai\ ma/la makra\ dihneke/s: h(\ de\ i)dou=sa
 <lb />*telfou=sa kradi/hn e)xolw/sato ei)=pe/ te mu=qon:
-<q direct="unspecified"><lb /><milestone ed="P" unit="Para" />foi=be a)/nac e(ka/erge, e)/pos ti/ toi e)n fresi\ qh/sw.
+<lb /><milestone ed="P" unit="Para" /><q direct="unspecified">foi=be a)/nac e(ka/erge, e)/pos ti/ toi e)n fresi\ qh/sw.
 <lb />e)nqa/d' e)pei\ frone/eis teu=cai perikalle/a nho\n
 <lb />e)/mmenai a)nqrw/pois xrhsth/rion, oi(/te toi ai)ei\
 <lb rend="displayNum" n="260" />e)nqa/d' a)ginh/sousi telhe/ssas e(kato/mbas:
@@ -1177,8 +1176,7 @@ Homeric Hymns</title>
 <lb />no/stou i(e/menoi, a)/llhn o(do/n, a)/lla ke/leuqa:
 <lb />a)lla/ tis a)qana/twn deu=r' h)/gagen ou)k e)qe/lontas.
 <lb /><milestone ed="P" unit="Para" />tou\s d' a)pameibo/menos prose/fh e(ka/ergos *)apo/llwn:
-<q direct="unspecified">
-<lb rend="displayNum" n="475" />cei=noi,  toi\ *knwso\n polude/ndreon a)mfenemesqe
+<lb rend="displayNum" n="475" /><q direct="unspecified">cei=noi,  toi\ *knwso\n polude/ndreon a)mfenemesqe
 <lb />to\ pri/n, a)ta\r nu=n ou)k e)/q' u(po/tropoi au)=tis e)/sesqe
 <lb />e)/s te po/lin e)rath\n kai\ dw/mata kala\ e(/kastos
 <lb />e)/s te fi/las a)lo/xous: a)ll' e)nqa/de pi/ona nho\n
@@ -1238,7 +1236,7 @@ Homeric Hymns</title>
 <lb rend="displayNum" n="530" />w(/st' a)po/ t' eu)= zw/ein kai\ a(/m' a)nqrw/poisin o)pa/zein.
 <milestone ed="P" n="531" unit="card" />
 <lb /><milestone ed="P" unit="Para" />tou\s d' e)pimeidh/sas prose/fh *dio\s ui(o\s *)apo/llwn:
-<q direct="unspecified"><lb /><milestone ed="P" unit="Para" />nh/pioi a)/nqrwpoi, dustlh/mones, oi(\ meledw=nas
+<lb /><milestone ed="P" unit="Para" /><q direct="unspecified">nh/pioi a)/nqrwpoi, dustlh/mones, oi(\ meledw=nas
 <lb />bou/lesq' a)rgale/ous te po/nous kai\ stei/nea qumw=|:
 <lb />r(hi/dion e)/pos u)/mm' e)re/w kai\ e)pi\ fresi\ qh/sw,
 <lb rend="displayNum" n="535" />deciterh=| ma/l' e(/kastos e)/xwn e)n xeiri\ ma/xairan,
