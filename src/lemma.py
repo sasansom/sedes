@@ -312,6 +312,7 @@ OVERRIDES = (
     ("ἀεθλητῆρι", "ἀθλητής"),
     ("ἀεθλητῆρος", "ἀθλητής"),
     ("ἀεθλητῆρσιν", "ἀθλητής"),
+    ("οὐδ’", "οὐδέ"),
 )
 
 # Looks for the rightmost sequence of one or more vowels and diacritics,
