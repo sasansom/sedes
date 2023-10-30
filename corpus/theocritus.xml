@@ -2124,9 +2124,9 @@
 <sp><speaker>*(Etai=ros</speaker><p>
 <lb />kai\ su/ge ti/ tre/sseis; ou)k w)/mosas: ou)de\ ga\r i)xqu\n
 <lb />xru/seon w(s i)/des eu(=res, i)/sa d' h)=n yeu/desin o)/yis,
-<lb />e)lpi\s tw=n u(/pnwn. za/tei to\n sa/rkinon i)xqu/n,
+<lb rend="displayNum" n="66" />e)lpi\s tw=n u(/pnwn. za/tei to\n sa/rkinon i)xqu/n,
 <lb rend="displayNum" n="65" />ei) ga/r pa| knw/sswn e)/t' e)tw/sia tau=ta mateu/seis,
-<lb />mh\ su\ qa/nh|s limw=| kai/toi xrusoi=sin o)nei/rois.
+<lb rend="displayNum" n="67" />mh\ su\ qa/nh|s limw=| kai/toi xrusoi=sin o)nei/rois.
 </p></sp></div1>
 <div1 type="poem" n="22" org="uniform" sample="complete">
 <head>*dio/skouroi</head>
@@ -2931,10 +2931,10 @@
 <sp><speaker><add>*ko/rh</add></speaker><p><lb rend="displayNum" n="5" />to\ sto/ma meu plu/nw kai\ a)poptu/w to\ fi/lama.</p></sp>
 <sp><speaker>*Da/fnis</speaker><p><lb />plu/neis xei/lea sei=o; di/dou pa/lin o)/fra fila/sw.</p></sp>
 <sp><speaker>*ko/rh</speaker><p><lb />kalo/n soi dama/las file/ein, ou)k a)/zuga kw/ran.</p></sp>
-<sp><speaker>*Da/fnis</speaker><p><lb />mh\ kauxw=: ta/xa ga/r se pare/rxetai w(s o)/nar h(/bh.</p></sp>
-<sp><speaker>*ko/rh</speaker><p><lb />h)\n de/ ti ghra/skw, to/de pou me/li kai\ ga/la pi/nw.</p></sp>
+<sp><speaker>*Da/fnis</speaker><p><lb rend="displayNum" n="8" />mh\ kauxw=: ta/xa ga/r se pare/rxetai w(s o)/nar h(/bh.</p></sp>
+<sp><speaker>*ko/rh</speaker><p><lb rend="displayNum" n="8a" />h)\n de/ ti ghra/skw, to/de pou me/li kai\ ga/la pi/nw.</p></sp>
 <sp><speaker>*Da/fnis</speaker><p><lb /><gap /></p></sp>
-<sp><speaker>*ko/rh</speaker><p><lb />a( stafuli\s stafi/s e)sti kai\ ou) r(o/don au)=on o)lei=tai.</p></sp>
+<sp><speaker>*ko/rh</speaker><p><lb rend="displayNum" n="9b" />a( stafuli\s stafi/s e)sti kai\ ou) r(o/don au)=on o)lei=tai.</p></sp>
 <sp><speaker>*Da/fnis</speaker><p><lb rend="displayNum" n="10" />deu=r' u(po\ ta\s koti/nous, i(/na soi/ tina mu=qon e)ni/yw.</p></sp>
 <sp><speaker>*ko/rh</speaker><p><lb />ou)k e)qe/lw: kai\ pri/n me parh/pafes a(de/i mu/qw|.</p></sp>
 <sp><speaker>*Da/fnis</speaker><p><lb />deu=r' u(po\ ta\s ptele/as, i(/n' e)ma=s su/riggos a)kou/sh|s.</p></sp>
