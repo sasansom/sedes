@@ -262,7 +262,7 @@ class TEI:
 
                     if elem.name in ("milestone", "head", "gap", "pb", "note", "speaker"):
                         pass
-                    elif elem.name in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name"):
+                    elif elem.name in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name", "supplied"):
                         for x in do_elem(elem, sub_env):
                             yield x
                     elif elem.name == "q":
