@@ -1,7 +1,29 @@
 import copy
+import io
 import unittest
 
 import tei
+
+class TestParser(unittest.TestCase):
+    # "Make `tei.TEI` parser raise an error when XML is not well-formed"
+    # https://github.com/sasansom/sedes/issues/89
+    def test_non_well_formed(self):
+        with self.assertRaises(ValueError): # TODO: replace with concrete error
+            # Unclosed <supplied> element.
+            doc = tei.TEI(io.StringIO("""\
+<?xml version="1.0" encoding="utf-8"?>
+<TEI.2>
+<text><body>
+<div1 type="Book" n="1">
+<lb rend="displayNum" n="1"/>i(/ppous t' a)mfipo/leue kai\ h(mio/nous talaergou/s.
+<lb/> <supplied reason="lost">w(s e)/fat': ou)rano/qen de\ path\\r *zeu\s au)to\s e)/pessi
+<lb/> qh=ke te/los: pa=sin d' a)/r' o(/ g' oi)wnoi=si ke/leusen
+</div1>
+</body></text>
+</TEI.2>
+"""))
+            for loc, line in doc.lines():
+                pass
 
 class TestTokenizeText(unittest.TestCase):
     def test(self):
