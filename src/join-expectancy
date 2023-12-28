@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 # Usage:
-#   join-expectancy corpus/work.csv expectancy.all.csv > joined.csv
+#   join-expectancy corpus/work.csv [corpus/work2.csv...] expectancy.all.csv > joined.csv
 #
-# Outputs work.csv, augmented with rows from expectancy.all.csv (left outer
+# Outputs work.csv etc., augmented with rows from expectancy.csv (left outer
 # join) that match in certain columns ("lemma" and "sedes" by default).
 #
 # The --by option controls the grouping variables. The format is a
@@ -26,7 +26,15 @@ def usage(file = sys.stdout):
 Usage: {sys.argv[0]} WORK.CSV [WORK.CSV...] EXPECTANCY.CSV > JOINED.CSV
 
 Outputs the contents of the WORK.CSV inputs, augmented with the rows from
-EXPECTANCY.CSV that match on the "lemma" and "sedes" columns.
+EXPECTANCY.CSV that match on certain columns ("lemma" and "sedes" by
+default).
+
+Use the --by option to control what columns are used for joining. The
+format of --by is the same as for the expectancy program:
+comma-separated variable names optionally on either side of a slash.
+Unlike in the expectancy program, which variables are on which side of
+the slash makes no difference: the set of columns to join on is the
+union of the variables on both sides.
 """, end="", file=file)
 
 def unique(s):
