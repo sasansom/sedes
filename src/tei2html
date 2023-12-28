@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Usage:
-#   tei2html corpus/shield.xml expectancy.hellenic+archaic.csv > shield.html
+#   tei2html corpus/shield.xml expectancy.hellenistic+archaic.csv > shield.html
 #
 # The --by option controls the selection of variables according to which
 # expectancy is computed. The value passed to --by must match the one that was

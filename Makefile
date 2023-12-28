@@ -25,7 +25,7 @@ WORK_IDENTIFIER_theocritus       = Theoc.
 WORK_IDENTIFIER_theogony         = Theog.
 WORK_IDENTIFIER_worksanddays     = W.D.
 
-EXPECTANCY_FILES = expectancy.all.csv expectancy.hellenic+archaic.csv
+EXPECTANCY_FILES = expectancy.all.csv expectancy.hellenistic+archaic.csv
 WORKS_CSV = $(addprefix corpus/,$(addsuffix .csv,$(WORKS)))
 WORKS_HTML = $(addprefix sedes-web/,$(addsuffix .html,$(WORKS)))
 
@@ -35,7 +35,7 @@ all: $(EXPECTANCY_FILES) $(WORKS_HTML)
 $(EXPECTANCY_FILES): .EXTRA_PREREQS = src/expectancy
 expectancy.all.csv: $(WORKS_CSV)
 	src/expectancy $^ > "$@"
-expectancy.hellenic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/homerichymns.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv
+expectancy.hellenistic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/homerichymns.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv
 	src/expectancy $^ > "$@"
 
 $(WORKS_CSV): .EXTRA_PREREQS = src/tei2csv src/known.py src/lemma.py
