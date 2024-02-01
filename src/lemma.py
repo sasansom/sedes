@@ -329,6 +329,7 @@ OVERRIDES = (
     ("κάταντες", "κατάντης"),
     ("μετεστεναχίζετ’", "μεταστοναχίζομαι"),
     ("ὀϊστοῖς", "ὀιστός"),
+    ("ἦ", "ἦ")
 )
 
 # Looks for the rightmost sequence of one or more vowels and diacritics,
