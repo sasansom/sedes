@@ -190,13 +190,12 @@ def normalize(s):
     return unicodedata.normalize("NFC", s)
 
 def assign_sedes_for_line(line):
-    """From a line, return a sequence of (word, sedes, shape) tuples. sedes will
-    be non-blank if and only if num_scansions is equal to 1."""
+    """From a line, return a sequence of (word, word_n, sedes, shape) tuples."""
     assignments = sedes_mod.analyze(line.text_without_quotes())
     if len(assignments) == 1:
         return tuple(assignments[0])
     else:
-        return tuple((word, None, None) for word in line.words())
+        return tuple((word, word_n+1, None, None) for (word_n, word) in enumerate(line.words()))
 
 def process(f, expectancy, dist_vars, cond_vars):
     doc = tei.TEI(f)
@@ -713,7 +712,6 @@ summary, .word {
 
         buffered_nonwords = []
         prev_sedes = None
-        word_n = 0
         # We will walk word_entries and line.tokens in parallel, popping an
         # entry from word_entries every time a token has type WORD.
         word_entries = list(assign_sedes_for_line(line))
@@ -728,23 +726,9 @@ summary, .word {
                     buffered_nonwords.append(token)
                 continue
 
-            word_n += 1
-
-            word_attrs = collections.OrderedDict()
-            if line_id is not None:
-                # We omit the per-word id for *all* words in a line that itself
-                # does not have an id; i.e., we check whether line_id is set,
-                # not whether the word id is in seen_ids. A None line_id means
-                # we have already emitted a line with that number, and we do not
-                # want to have ids on just the last few words of this line, when
-                # this line has more words than the already emitted one.
-                word_attrs["id"] = f"book-{loc.book_n}-line-{loc.line_n}-word-{word_n}"
-
-            word_attrs["class"] = "word"
-
             while True:
                 try:
-                    word, sedes, shape = word_entries.pop(0)
+                    word, word_n, sedes, shape = word_entries.pop(0)
                 except IndexError:
                     sedes = None
                     shape = None
@@ -774,6 +758,18 @@ summary, .word {
                         ("class", f"sedes s{sedes.replace('.', '_')}"),
                     ), end="")
             prev_sedes = sedes
+
+            word_attrs = collections.OrderedDict()
+            if line_id is not None:
+                # We omit the per-word id for *all* words in a line that itself
+                # does not have an id; i.e., we check whether line_id is set,
+                # not whether the word id is in seen_ids. A None line_id means
+                # we have already emitted a line with that number, and we do not
+                # want to have ids on just the last few words of this line, when
+                # this line has more words than the already emitted one.
+                word_attrs["id"] = f"book-{loc.book_n}-line-{loc.line_n}-word-{word_n}"
+
+            word_attrs["class"] = "word"
 
             title_attr = []
             lemma = lemma_mod.lookup(word) or word # Use the word itself as lemma if lemmatization fails.

@@ -117,16 +117,16 @@ def assign(scansion):
     return tuple(result)
 
 def recover_known(known):
-    """Recovers a sequence of (word, sedes, shape) from a sequence of (word,
-    shape)."""
+    """Recovers a sequence of (word, word_n, sedes, shape) from a sequence of
+    (word, shape)."""
     sedes = 1.0
     result = []
-    for (word, shape) in known:
+    for (word_n, (word, shape)) in enumerate(known):
         # Ignore empty words; this is a hack to permit a line to start at a
         # sedes other than 1, for example when one metrical line is split across
         # multiple printed lines, as in Theoc 5.66–68.
         if word:
-            result.append((word, "{:g}".format(sedes), format_shape(shape)))
+            result.append((word, word_n+1, "{:g}".format(sedes), format_shape(shape)))
         for value in shape:
             if value == "-":
                 sedes += 0.5
@@ -140,4 +140,7 @@ def analyze(text):
     if known is not None:
         return (recover_known(known),)
     # Otherwise analyze it.
-    return tuple(assign(scansion) for scansion in hexameter.scan.analyze_line_metrical(text))
+    result = []
+    for scansion in hexameter.scan.analyze_line_metrical(text):
+        result.append(tuple((word, word_n+1, sedes, shape) for (word_n, (word, sedes, shape)) in enumerate(assign(scansion))))
+    return result

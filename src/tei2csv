@@ -27,14 +27,14 @@ FILENAME.XML is a TEI XML document containing the text of the work.
 """, end="", file=file)
 
 def assign_sedes_for_line(line):
-    """From a line, return a sequence of (word, sedes, shape, num_scansions)
+    """From a line, return a sequence of (word, word_n, sedes, shape, num_scansions)
     tuples. sedes will be non-blank if and only if num_scansions is equal to 1."""
     assignments = sedes.analyze(line.text_without_quotes())
     if len(assignments) == 1:
-        return tuple((word, sedes, shape, len(assignments)) for (word, sedes, shape) in assignments[0])
+        return tuple((word, word_n, sedes, shape, len(assignments)) for (word, word_n, sedes, shape) in assignments[0])
     else:
         # If no scansions or multiple scansions, output "".
-        return tuple((word, "", "", len(assignments)) for word in line.words())
+        return tuple((word, word_n+1, "", "", len(assignments)) for (word_n, word) in enumerate(line.words()))
 
 def process(f, work_identifier):
     seen_lines = set()
@@ -49,13 +49,13 @@ def process(f, work_identifier):
             scanned = "manual"
         else:
             scanned = "auto"
-        for word_n, entry in enumerate(assign_sedes_for_line(line)):
-            word, pos, shape, num_scansions = entry
+        for entry in assign_sedes_for_line(line):
+            word, word_n, pos, shape, num_scansions = entry
             yield {
                 "work": work_identifier,
                 "book_n": loc.book_n,
                 "line_n": loc.line_n,
-                "word_n": word_n + 1,
+                "word_n": word_n,
                 "word": word,
                 "scanned": scanned,
                 "num_scansions": num_scansions,
