@@ -21,13 +21,28 @@ except ModuleNotFoundError as e:
 
 __all__ = ["lookup"]
 
-OVERRIDES = {}
+SPECIFIC_OVERRIDES = {}
+GENERAL_OVERRIDES = {}
 with open(os.path.join(os.path.dirname(__file__), "lemma-overrides.csv")) as f:
     for row in csv.DictReader(f):
         word = unicodedata.normalize("NFD", row["word"])
         lemma = unicodedata.normalize("NFD", row["lemma"])
-        assert word not in OVERRIDES, word
-        OVERRIDES[word] = lemma
+        coord = (row["work"], row["book_n"], row["line_n"], row["word_n"])
+        if all(var != "" for var in coord):
+            # If all of work, book_n, line_n, and word_n are non-empty, this is
+            # a specific lemma, to be used for just one instance of the word at
+            # a specific location.
+            assert coord not in SPECIFIC_OVERRIDES, coord
+            # Store the original word along with the lemma, as a sanity check.
+            SPECIFIC_OVERRIDES[coord] = (lemma, word)
+        elif all(var == "" for var in coord):
+            # If all of work, book_n, line_n, and word_n are empty, this is a
+            # default lemma for this word, to be used when no specific rule
+            # applies.
+            assert word not in GENERAL_OVERRIDES, word
+            GENERAL_OVERRIDES[word] = lemma
+        else:
+            raise ValueError(f"inconsistent coord: {row!r}")
 
 # Looks for the rightmost sequence of one or more vowels and diacritics,
 # followed by zero or more non-vowels.
@@ -72,15 +87,26 @@ def pre_transformations(word):
 # lemma would otherwise prevent us from trying the next pre-transformation.
 lemmatizer = GreekBackoffLemmatizer(verbose = True)
 
-# Returns None if no lemma was found.
-def lookup(word):
+# Returns None if no lemma was found. coord is either None, or a
+# (work, book_n, line_n, word_n) tuple.
+def lookup(word, coord = None):
     word = unicodedata.normalize("NFD", word)
-    # First check our custom overrides.
+    if coord is not None:
+        # First check for a specific override at this coord.
+        # Convert coord elements to str.
+        coord = tuple(str(var) for var in coord)
+        entry = SPECIFIC_OVERRIDES.get(coord)
+        if entry is not None:
+            lemma, orig_word = entry
+            if word != orig_word:
+                raise KeyError(word)
+            return lemma
+    # Then check for a general override.
     for transformed in pre_transformations(word):
-        lemma = OVERRIDES.get(transformed)
+        lemma = GENERAL_OVERRIDES.get(transformed)
         if lemma is not None:
             return lemma
-    # If no match in the overrides, use the CTLK lemmatizer.
+    # If no match in our own overrides, use the CTLK lemmatizer.
     for transformed in pre_transformations(word):
         # The CLTK lemmatizer expects its input to be normalized according to
         # cltk_normalize, but our convention elsewhere is to always use NFD

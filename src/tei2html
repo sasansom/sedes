@@ -777,7 +777,7 @@ summary, .word {
             word_attrs["class"] = "word"
 
             title_attr = []
-            lemma = lemma_mod.lookup(word)
+            lemma = lemma_mod.lookup(word, (work_identifier, loc.book_n, loc.line_n, word_n))
             if lemma is None:
                 lemma = word # Use the word itself as lemma if lemmatization fails.
             word_attrs["data-wordno"] = str(word_n)

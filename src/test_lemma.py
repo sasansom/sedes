@@ -15,6 +15,22 @@ class TestLemma(unittest.TestCase):
                 # Output should be NFD.
                 self.assertEqual(lemma, unicodedata.normalize("NFD", expected_lemma))
 
+    def test_normalization_coord(self):
+        for word, expected_lemma, coord in (
+            ("ἦ", "ἦ",   ("Argon.", "1", "134", "2")),
+            ("ἦ", "ἠμί", ("Argon.", "1", "306", "1")),
+            ("ἦ", "ἠμί", ("Argon.", 1, 306, 1)), # Should be robust to non-str coord.
+        ):
+            for norm in "NFC", "NFKC", "NFD", "NFKD":
+                # Should be able to look up in any normalization.
+                lemma = lemma_mod.lookup(unicodedata.normalize(norm, word), coord)
+                # Output should be NFD.
+                self.assertEqual(lemma, unicodedata.normalize("NFD", expected_lemma), (norm, word, coord))
+        with self.assertRaises(KeyError):
+            # Lookup by coord should raise an exception if the word at that
+            # position is not as expected.
+            lemma_mod.lookup("XXX", ("Argon.", "1", "306", "1"))
+
     def test_pre_transformations(self):
         for word, expected in (
             # Non-letters.
