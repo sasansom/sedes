@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 # Usage:
-#   tei2html [OPTION...] FILENAME.xml EXPECTANCY.csv > FILENAME.html
+#   tei2html [OPTION...] IDENTIFIER FILENAME.xml EXPECTANCY.csv > FILENAME.html
 #
-# FILENAME.xml is the name of the XML document containing the text of the
-# work. EXPECTANCY is an expectancy CSV file as produced by the expectancy
-# program.
+# IDENTIFIER is a short text identifier for the work that will be copied to the
+# output; e.g., "Il.". FILENAME.xml is the name of the XML document containing
+# the text of the work. EXPECTANCY is an expectancy CSV file as produced by the
+# expectancy program.
 #
 # The --by option controls the selection of variables according to which
 # expectancy is computed. The value passed to --by must match the one that was
@@ -201,7 +202,7 @@ def assign_sedes_for_line(line):
     else:
         return tuple((word, word_n+1, None, None) for (word_n, word) in enumerate(line.words()))
 
-def process(f, expectancy, dist_vars, cond_vars):
+def process(f, work_identifier, expectancy, dist_vars, cond_vars):
     doc = tei.TEI(f)
 
     print(f"""\
@@ -790,9 +791,7 @@ summary, .word {
             # These are the variables whose values we know how to produce and
             # are usable in dist_vars and cond_vars lookups.
             VAR_VALUES = {
-                # We don't actually know the work_id of the text we are
-                # processing, so we cannot use work as a grouping variable.
-                # "work": None,
+                "work": work_identifier,
                 "book_n": loc.book_n,
                 "line_n": loc.line_n,
                 "word_n": word_n,
@@ -849,6 +848,7 @@ summary, .word {
     print("<script defer>")
     print("\"use strict\";")
 
+    print("const WORK = " + js_string(work_identifier) + ";")
     print("const DIST_VARS = [" + ", ".join(js_string(var) for var in dist_vars) + "];")
     print("const COND_VARS = [" + ", ".join(js_string(var) for var in cond_vars) + "];")
 
@@ -923,9 +923,7 @@ function info(target) {
     // These are the variables whose values we know how to produce and are
     // usable in DIST_VARS and COND_VARS lookups.
     const VAR_VALUES = new Map([
-        // We don't actually know the work_id of the text we are processing, so
-        // we cannot use work as a grouping variable.
-        // ["work", null],
+        ["work", WORK],
         ["book_n", bookno],
         ["line_n", lineno],
         ["word_n", wordno],
@@ -1067,7 +1065,7 @@ def main():
         sys.exit(1)
 
     try:
-        tei_filename, expectancy_filename = args
+        work_identifier, tei_filename, expectancy_filename = args
     except ValueError:
         print("error: usage error", file=sys.stderr)
         print(file=sys.stderr)
@@ -1078,7 +1076,7 @@ def main():
         expectancy = parse_expectancy(expectancy_file, dist_vars, cond_vars)
 
     with open(tei_filename) as tei_file:
-        process(tei_file, expectancy, dist_vars, cond_vars)
+        process(tei_file, work_identifier, expectancy, dist_vars, cond_vars)
 
 if __name__ == "__main__":
     main()

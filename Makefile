@@ -44,7 +44,7 @@ corpus/%.csv: corpus/%.xml
 
 $(WORKS_HTML): .EXTRA_PREREQS = src/tei2html src/known.py src/lemma.py src/lemma-overrides.csv
 sedes-web/%.html: corpus/%.xml expectancy.all.csv
-	src/tei2html $^ > "$@"
+	src/tei2html "$(WORK_IDENTIFIER_$*)" $^ > "$@"
 
 PYTHON = python3
 

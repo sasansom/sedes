@@ -64,7 +64,7 @@ a TEI-encoded XML document, with visual highlighting of word expectancy.
 If you put the HTML file in the sedes-web directory,
 it will have access to locally installed web fonts for Greek.
 ```
-./src/tei2html corpus/iliad.xml expectancy.all.csv > sedes-web/iliad.html
+./src/tei2html "Il." corpus/iliad.xml expectancy.all.csv > sedes-web/iliad.html
 ```
 
 The `join-expectancy` program takes a work-specific CSV file (as
@@ -137,7 +137,7 @@ This is an example of calculating *sedes* expectancy
 after first grouping by metrical shape, rather than lemma:
 ```
 src/expectancy --by sedes/metrical_shape corpus/*.csv > expectancy.sedes-metrical_shape.csv
-src/tei2html --by sedes/metrical_shape corpus/aratus.xml expectancy.sedes-metrical_shape.csv > aratus.sedes-metrical_shape.html
+src/tei2html --by sedes/metrical_shape "Phaen." corpus/aratus.xml expectancy.sedes-metrical_shape.csv > aratus.sedes-metrical_shape.html
 ```
 
 If you want a summary of the expectancy of a single variable
