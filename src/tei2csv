@@ -14,7 +14,7 @@ import getopt
 import re
 import sys
 
-import lemma
+import lemma as lemma_mod
 import sedes
 import tei
 
@@ -51,6 +51,9 @@ def process(f, work_identifier):
             scanned = "auto"
         for entry in assign_sedes_for_line(line):
             word, word_n, pos, shape, num_scansions = entry
+            lemma = lemma_mod.lookup(word)
+            if lemma is None:
+                lemma = word # Use the word itself as lemma if lemmatization fails.
             yield {
                 "work": work_identifier,
                 "book_n": loc.book_n,
@@ -61,7 +64,7 @@ def process(f, work_identifier):
                 "num_scansions": num_scansions,
                 "sedes": pos,
                 "metrical_shape": shape,
-                "lemma": lemma.lookup(word) or word, # Use the word itself as lemma if lemmatization fails.
+                "lemma": lemma,
                 "line_text": line.text(),
             }
 

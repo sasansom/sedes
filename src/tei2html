@@ -772,8 +772,9 @@ summary, .word {
             word_attrs["class"] = "word"
 
             title_attr = []
-            lemma = lemma_mod.lookup(word) or word # Use the word itself as lemma if lemmatization fails.
-            assert lemma, (word, lemma)
+            lemma = lemma_mod.lookup(word)
+            if lemma is None:
+                lemma = word # Use the word itself as lemma if lemmatization fails.
             word_attrs["data-wordno"] = str(word_n)
             if lemma is not None:
                 word_attrs["data-lemma"] = normalize(lemma);
