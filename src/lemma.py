@@ -24,8 +24,8 @@ __all__ = ["lookup"]
 OVERRIDES = {}
 with open(os.path.join(os.path.dirname(__file__), "lemma-overrides.csv")) as f:
     for row in csv.DictReader(f):
-        word = cltk_normalize(row["word"])
-        lemma = cltk_normalize(row["lemma"])
+        word = unicodedata.normalize("NFD", row["word"])
+        lemma = unicodedata.normalize("NFD", row["lemma"])
         assert word not in OVERRIDES, word
         OVERRIDES[word] = lemma
 
@@ -70,13 +70,17 @@ def pre_transformations(word):
 # is responsible for the returned result. We want to ignore lemmata that come
 # from IdentityLemmatizer in the lookup loop below, because a returned identity
 # lemma would otherwise prevent us from trying the next pre-transformation.
-cltk_lemmatizer = GreekBackoffLemmatizer(verbose = True)
-# Insert our own lookup of hardcoded lemmata before the CTLK process.
-lemmatizer = DictLemmatizer(OVERRIDES,
-    source = "Sedes overrides", backoff = cltk_lemmatizer.lemmatizer, verbose = cltk_lemmatizer.VERBOSE)
+lemmatizer = GreekBackoffLemmatizer(verbose = True)
 
 # Returns None if no lemma was found.
 def lookup(word):
+    word = unicodedata.normalize("NFD", word)
+    # First check our custom overrides.
+    for transformed in pre_transformations(word):
+        lemma = OVERRIDES.get(transformed)
+        if lemma is not None:
+            return lemma
+    # If no match in the overrides, use the CTLK lemmatizer.
     for transformed in pre_transformations(word):
         # The CLTK lemmatizer expects its input to be normalized according to
         # cltk_normalize, but our convention elsewhere is to always use NFD
