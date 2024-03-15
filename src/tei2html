@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
 # Usage:
-#   tei2html corpus/shield.xml expectancy.hellenistic+archaic.csv > shield.html
+#   tei2html [OPTION...] FILENAME.xml EXPECTANCY.csv > FILENAME.html
+#
+# FILENAME.xml is the name of the XML document containing the text of the
+# work. EXPECTANCY is an expectancy CSV file as produced by the expectancy
+# program.
 #
 # The --by option controls the selection of variables according to which
 # expectancy is computed. The value passed to --by must match the one that was
@@ -48,11 +52,11 @@ LUMINANCE_INVERSION_THRESHOLD = 0.3
 
 def usage(file=sys.stdout):
     print(f"""\
-Usage: {sys.argv[0]} [OPTION] WORK.xml STATS.csv > WORK.html
+Usage: {sys.argv[0]} [OPTION...] FILENAME.xml EXPECTANCY.csv > FILENAME.html
 
 WORK.XML is a TEI XML document containing the text of the work.
-STATS.csv is statistics on a corpus of text as produced by
-the tei2csv and expectancy programs.
+EXPECTANCY.csv is statistics on a corpus of text as produced by
+the expectancy program.
 
 Use the --by option to control the variables according to which
 expectancy is computed. This must match the --by value that was provided
