@@ -53,7 +53,7 @@ LUMINANCE_INVERSION_THRESHOLD = 0.3
 
 def usage(file=sys.stdout):
     print(f"""\
-Usage: {sys.argv[0]} [OPTION...] FILENAME.xml EXPECTANCY.csv > FILENAME.html
+Usage: {sys.argv[0]} [OPTION...] IDENTIFIER FILENAME.xml EXPECTANCY.csv > FILENAME.html
 
 WORK.XML is a TEI XML document containing the text of the work.
 EXPECTANCY.csv is statistics on a corpus of text as produced by
