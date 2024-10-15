@@ -24,15 +24,15 @@ FILENAME.XML is a TEI XML document containing the text of the work.
 def process(f):
     global work_identifier
     doc = tei.TEI(f)
-    for line in doc.lines():
-        assignments = sedes.analyze(line.text)
+    for loc, line in doc.lines():
+        assignments = sedes.analyze(line.text_without_quotes())
         if len(assignments) == 1:
             continue
 
         print()
-        print("    {!r}: # {} {}.{}".format(line.text, work_identifier, line.book_n, line.line_n))
+        print("    {!r}: # {} {}.{}".format(line.text(), work_identifier, loc.book_n, loc.line_n))
         for assignment in assignments:
-            print("        {},".format(tuple((word, shape) for (word, _, shape) in assignment)))
+            print("        {},".format(tuple((word, shape) for (word, _, _, shape) in assignment)))
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
 for o, a in opts:
