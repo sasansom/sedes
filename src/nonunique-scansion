@@ -32,7 +32,7 @@ def process(f):
         print()
         print("    {!r}: # {} {}.{}".format(line.text(), work_identifier, loc.book_n, loc.line_n))
         for assignment in assignments:
-            print("        {},".format(tuple((word, shape) for (word, _, _, shape) in assignment)))
+            print("        {},".format(tuple((word, metrical_shape) for (word, _, _, metrical_shape) in assignment)))
 
 opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
 for o, a in opts:

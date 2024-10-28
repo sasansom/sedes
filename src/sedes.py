@@ -8,7 +8,7 @@ from known import KNOWN_SCANSIONS
 KNOWN_SCANSIONS = dict(
     (
         unicodedata.normalize("NFD", key),
-        tuple((unicodedata.normalize("NFD", word), shape) for (word, shape) in value),
+        tuple((unicodedata.normalize("NFD", word), metrical_shape) for (word, metrical_shape) in value),
     )
     for key, value in KNOWN_SCANSIONS.items()
 )
@@ -52,7 +52,7 @@ def partition_scansion_into_words(scansion):
     if current:
         yield current
 
-def format_shape(shape):
+def format_metrical_shape(shape):
     """
     Converts the hexameter module's internal long/short notation ('+'/'-') to
     Unicode '–'/'⏑'.
@@ -64,7 +64,7 @@ def assign(scansion):
     """From a metrical scansion (sequence of (character cluster, preliminary
     metrical analysis, final metrical analysis) tuples as output by
     hexameter.scan.analyze_line_metrical), produce a sequence of (word, sedes,
-    shape) tuples."""
+    metrical_shape) tuples."""
     # Output list of tuples.
     result = []
     # Sedes of the current word -- the first sedes seen after a word break.
@@ -74,7 +74,7 @@ def assign(scansion):
     # the following word.
     words = []
     # Buffer of metrical shapes seen up until a sedes after a word break.
-    shapes = []
+    metrical_shapes = []
     sedes = 1.0
 
     for sub_scansion in partition_scansion_into_words(scansion):
@@ -82,11 +82,11 @@ def assign(scansion):
         word = []
         # List of "-" and "+" symbols indicating the metrical shape of the current
         # word.
-        shape = []
+        metrical_shape = []
         for c, _, value in sub_scansion:
             word.append(c)
             if value in ("-", "+"):
-                shape.append(value)
+                metrical_shape.append(value)
                 if word_sedes is None:
                     # The first vowel in a word, remember the sedes for the whole word.
                     word_sedes = sedes
@@ -99,16 +99,16 @@ def assign(scansion):
         # sedes.
         word = "".join(word)
         words.append(word)
-        shape = "".join(shape)
-        shapes.append(shape)
+        metrical_shape = "".join(metrical_shape)
+        metrical_shapes.append(metrical_shape)
 
         if word_sedes is not None:
             # Once we know the sedes, output all the words seen since the
             # last time we saw a sedes.
-            for (w, s) in zip(words, shapes):
-                result.append((w, "{:g}".format(word_sedes), format_shape(s)))
+            for (w, m) in zip(words, metrical_shapes):
+                result.append((w, "{:g}".format(word_sedes), format_metrical_shape(m)))
             words = []
-            shapes = []
+            metrical_shapes = []
             word_sedes = None
 
     assert sedes == 13.0, sedes
@@ -117,17 +117,17 @@ def assign(scansion):
     return tuple(result)
 
 def recover_known(known):
-    """Recovers a sequence of (word, word_n, sedes, shape) from a sequence of
-    (word, shape)."""
+    """Recovers a sequence of (word, word_n, sedes, metrical_shape)
+    from a sequence of (word, metrical_shape)."""
     sedes = 1.0
     result = []
-    for (word_n, (word, shape)) in enumerate(known):
+    for (word_n, (word, metrical_shape)) in enumerate(known):
         # Ignore empty words; this is a hack to permit a line to start at a
         # sedes other than 1, for example when one metrical line is split across
         # multiple printed lines, as in Theoc 5.66–68.
         if word:
-            result.append((word, word_n+1, "{:g}".format(sedes), format_shape(shape)))
-        for value in shape:
+            result.append((word, word_n+1, "{:g}".format(sedes), format_metrical_shape(metrical_shape)))
+        for value in metrical_shape:
             if value == "-":
                 sedes += 0.5
             elif value == "+":
@@ -142,5 +142,5 @@ def analyze(text):
     # Otherwise analyze it.
     result = []
     for scansion in hexameter.scan.analyze_line_metrical(text):
-        result.append(tuple((word, word_n+1, sedes, shape) for (word_n, (word, sedes, shape)) in enumerate(assign(scansion))))
+        result.append(tuple((word, word_n+1, sedes, metrical_shape) for (word_n, (word, sedes, metrical_shape)) in enumerate(assign(scansion))))
     return result

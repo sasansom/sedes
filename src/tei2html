@@ -195,7 +195,7 @@ def normalize(s):
     return unicodedata.normalize("NFC", s)
 
 def assign_sedes_for_line(line):
-    """From a line, return a sequence of (word, word_n, sedes, shape) tuples."""
+    """From a line, return a sequence of (word, word_n, sedes, metrical_shape) tuples."""
     assignments = sedes_mod.analyze(line.text_without_quotes())
     if len(assignments) == 1:
         return tuple(assignments[0])
@@ -249,7 +249,7 @@ def process(f, work_identifier, expectancy, dist_vars, cond_vars):
 #word-output, #lemma-output {
     font-family: "Cardo";
 }
-.shape {
+.metrical-shape {
     /* Prevent longa from running together: https://github.com/sasansom/sedes/issues/58 */
     letter-spacing: 0.5ex;
 }
@@ -535,7 +535,7 @@ summary, .word {
 
 <table id=infobox>
 <tr><th scope=row>word</th><td><output id=word-output></output></td></tr>
-<tr><th scope=row>shape</th><td class=shape><output id=shape-output></output></td></tr>
+<tr><th scope=row>metrical shape</th><td class=shape><output id=metrical-shape-output></output></td></tr>
 <tr><th scope=row><i>sedes</i></th><td><output id=sedes-output></output></td></tr>
 <tr><th scope=row>lemma</th><td><output id=lemma-output></output></td></tr>
 <tr><th scope=row>Σ<var>x</var></th><td><output id=sumx-output></output></td></tr>
@@ -733,10 +733,10 @@ summary, .word {
 
             while True:
                 try:
-                    word, word_n, sedes, shape = word_entries.pop(0)
+                    word, word_n, sedes, metrical_shape = word_entries.pop(0)
                 except IndexError:
                     sedes = None
-                    shape = None
+                    metrical_shape = None
                     break
                 if word:
                     if word.lower() != token.text.lower():
@@ -798,7 +798,7 @@ summary, .word {
                 "word": word,
                 "lemma": lemma,
                 "sedes": sedes,
-                "metrical_shape": shape,
+                "metrical_shape": metrical_shape,
             }
             dist_key = tuple(VAR_VALUES[var] for var in dist_vars)
             cond_key = tuple(VAR_VALUES[var] for var in cond_vars)
@@ -816,9 +816,9 @@ summary, .word {
             else:
                 print(f"warning: no expectancy score for book {loc.book_n} line {loc.line_n} word {word_n}: {common.format_dist_cond_vars_spec(dist_vars, cond_vars)} {(dist_key, cond_key)}", file=sys.stderr)
                 word_attrs["class"] += " error"
-            if shape is not None:
-                word_attrs["data-shape"] = normalize(shape)
-                title_attr.append(f"shape={normalize(shape)}")
+            if metrical_shape is not None:
+                word_attrs["data-metrical_shape"] = normalize(metrical_shape)
+                title_attr.append(f"shape={normalize(metrical_shape)}")
             if title_attr:
                 word_attrs["title"] = " ".join(title_attr)
 
@@ -878,7 +878,7 @@ summary, .word {
 const LOC_OUTPUT = document.getElementById("loc-output");
 const LINK_OUTPUT = document.getElementById("link-output");
 const WORD_OUTPUT = document.getElementById("word-output");
-const SHAPE_OUTPUT = document.getElementById("shape-output");
+const METRICAL_SHAPE_OUTPUT = document.getElementById("metrical-shape-output");
 const SEDES_OUTPUT = document.getElementById("sedes-output");
 const LEMMA_OUTPUT = document.getElementById("lemma-output");
 const SUMX_OUTPUT = document.getElementById("sumx-output");
@@ -934,7 +934,7 @@ function info(target) {
         ["word", target.textContent.toLowerCase()],
         ["lemma", target.getAttribute("data-lemma")],
         ["sedes", target.getAttribute("data-sedes")],
-        ["metrical_shape", target.getAttribute("data-shape")],
+        ["metrical_shape", target.getAttribute("data-metrical_shape")],
     ]);
 
     const dist_key = DIST_VARS.map(x => VAR_VALUES.get(x));
@@ -944,7 +944,7 @@ function info(target) {
         sum_x += entry.x;
 
     WORD_OUTPUT.textContent = VAR_VALUES.get("word");
-    SHAPE_OUTPUT.textContent = VAR_VALUES.get("metrical_shape") ?? "";
+    METRICAL_SHAPE_OUTPUT.textContent = VAR_VALUES.get("metrical_shape") ?? "";
     SEDES_OUTPUT.textContent = VAR_VALUES.get("sedes") ?? "";
     LEMMA_OUTPUT.textContent = VAR_VALUES.get("lemma") ?? "";
     SUMX_OUTPUT.textContent = sum_x ?? "";
