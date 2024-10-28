@@ -7,14 +7,14 @@ web-based visualizations
 produced by this system.
 
 See the tag [tapa-version](https://github.com/sasansom/sedes/releases/tag/tapa-version)
-to reproduce the figures from the TAPA article,
+to reproduce the figures from the _TAPA_ article,
 ["Sedes as Style in Greek Hexameter: A Computational Approach."](https://muse.jhu.edu/article/819768)
 
 See support [here](https://sasansom.github.io/sedes/dhq2023/)
-for the DHQ article, ["SEDES: Metrical Position in Greek Hexameter."](https://digitalhumanities.org/dhq/vol/17/2/000675/000675.html)
+for the _DHQ_ article, ["SEDES: Metrical Position in Greek Hexameter."](https://digitalhumanities.org/dhq/vol/17/2/000675/000675.html)
 
 See support [here](https://sasansom.github.io/epic-rhythm/)
-for the GRBS article, ["Epic Rhythm: Metrical Shapes in Greek Hexameter."](https://grbs.library.duke.edu/index.php/grbs/article/view/17015)
+for the _GRBS_ article, ["Epic Rhythm: Metrical Shapes in Greek Hexameter."](https://grbs.library.duke.edu/index.php/grbs/article/view/17015)
 
 ## Setup
 
