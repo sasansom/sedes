@@ -60,6 +60,18 @@ def format_metrical_shape(shape):
     """
     return "".join({"+": "–", "-": "⏑"}[c] for c in shape)
 
+def extract_diacritic(s):
+    """Extracts a diacritic character (acute, grave, or circumflex) from the
+    string s. Returns "" if there is no diacritic. Raises ValueError if there
+    are more than one diacritic in the string."""
+    diacritics = re.findall(r'[\u0300\u0301\u0342]', s)
+    if len(diacritics) == 0:
+        return ""
+    elif len(diacritics) == 1:
+        return diacritics[0]
+    else:
+        raise ValueError(f"multiple tone diacritics: {c!r} {sub_scansion!r}")
+
 def assign(scansion):
     """From a metrical scansion (sequence of (character cluster, preliminary
     metrical analysis, final metrical analysis) tuples as output by
@@ -101,13 +113,7 @@ def assign(scansion):
             elif value == "+":
                 sedes += 1.0
             # Tone shape.
-            diacritics = re.findall(r'[\u0301\u0342\u0300]', c)
-            if len(diacritics) == 0:
-                diacritic = ""
-            elif len(diacritics) == 1:
-                diacritic = diacritics[0]
-            else:
-                raise ValueError(f"multiple tone diacritics: {c!r} {sub_scansion!r}")
+            diacritic = extract_diacritic(c)
             t = ""
             if value == ".":
                 pass
