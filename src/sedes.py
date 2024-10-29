@@ -24,7 +24,7 @@ def partition_scansion_into_words(scansion):
     scansion = scansion[:]
     while scansion:
         element = scansion.pop(0)
-        c, mid, value = element
+        c, value = element
 
         if value == "|":
             # This is just a foot marker, ignore it.
@@ -36,7 +36,7 @@ def partition_scansion_into_words(scansion):
         parts = c.split(" ", 1)
         trimmed = trim(parts[0])
         if trimmed:
-            current.append((trimmed, mid, value))
+            current.append((trimmed, value))
         if (len(parts) == 1 and trimmed != c) or len(parts) > 1:
             # There's a word break here. Yield the current word.
             if current:
@@ -48,7 +48,7 @@ def partition_scansion_into_words(scansion):
             if len(parts) > 1:
                 trimmed = trim(parts[1])
                 if trimmed:
-                    scansion.insert(0, (trimmed, mid, value))
+                    scansion.insert(0, (trimmed, value))
     if current:
         yield current
 
@@ -88,7 +88,7 @@ def assign(scansion):
         # List of encoded tone shape markers for the tone shape of the current
         # word.
         tone_shape = []
-        for c, _, value in sub_scansion:
+        for c, value in sub_scansion:
             word.append(c)
             if value in ("-", "+"):
                 metrical_shape.append(value)
@@ -182,5 +182,8 @@ def analyze(text):
     # Otherwise analyze it.
     result = []
     for scansion in hexameter.scan.analyze_line_metrical(text):
+        # Discard the "preliminary metrical analysis" element of each scansion
+        # tuple.
+        scansion = list((c, value) for (c, prelim, value) in scansion)
         result.append(tuple((word, word_n+1, sedes, metrical_shape, tone_shape) for (word_n, (word, sedes, metrical_shape, tone_shape)) in enumerate(assign(scansion))))
     return result
