@@ -64,7 +64,7 @@ def assign(scansion):
     """From a metrical scansion (sequence of (character cluster, preliminary
     metrical analysis, final metrical analysis) tuples as output by
     hexameter.scan.analyze_line_metrical), produce a sequence of (word, sedes,
-    metrical_shape) tuples."""
+    metrical_shape, tone_shape) tuples."""
     # Output list of tuples.
     result = []
     # Sedes of the current word -- the first sedes seen after a word break.
@@ -75,6 +75,8 @@ def assign(scansion):
     words = []
     # Buffer of metrical shapes seen up until a sedes after a word break.
     metrical_shapes = []
+    # Buffer of tone shapes seen up until a sedes after a word break.
+    tone_shapes = []
     sedes = 1.0
 
     for sub_scansion in partition_scansion_into_words(scansion):
@@ -83,6 +85,9 @@ def assign(scansion):
         # List of "-" and "+" symbols indicating the metrical shape of the current
         # word.
         metrical_shape = []
+        # List of encoded tone shape markers for the tone shape of the current
+        # word.
+        tone_shape = []
         for c, _, value in sub_scansion:
             word.append(c)
             if value in ("-", "+"):
@@ -95,20 +100,55 @@ def assign(scansion):
                 sedes += 0.5
             elif value == "+":
                 sedes += 1.0
+            # Tone shape.
+            diacritics = re.findall(r'[\u0301\u0342\u0300]', c)
+            if len(diacritics) == 0:
+                diacritic = ""
+            elif len(diacritics) == 1:
+                diacritic = diacritics[0]
+            else:
+                raise ValueError(f"multiple tone diacritics: {c!r} {sub_scansion!r}")
+            t = ""
+            if value == ".":
+                pass
+            elif value == "" and diacritic == "":
+                pass
+            elif value == "-" and diacritic == "":
+                t = "."   # short, no accent
+            elif value == "-" and diacritic == "\u0301": # COMBINING ACUTE ACCENT
+                t = "/"   # short acute
+            elif value == "-" and diacritic == "\u0300": # COMBINING GRAVE ACCENT
+                t = "\\"  # short grave
+            elif value == "-" and diacritic == "\u0342": # COMBINING GREEK PERISPOMENI
+                t = "~"   # short circumflex
+            elif value == "+" and diacritic == "":
+                t = ".-"  # long, no accent
+            elif value == "+" and diacritic == "\u0301": # COMBINING ACUTE ACCENT
+                t = "/-"  # long acute
+            elif value == "+" and diacritic == "\u0300": # COMBINING GRAVE ACCENT
+                t = "\\-" # long grave
+            elif value == "+" and diacritic == "\u0342": # COMBINING GREEK PERISPOMENI
+                t = "~-"  # long circumflex
+            else:
+                raise ValueError(f"unknown tone diacritic combination: {(value, diacritic)!a} {sub_scansion!r}")
+            tone_shape.append(t)
         # Append this word to the list of words that share the current
         # sedes.
         word = "".join(word)
         words.append(word)
         metrical_shape = "".join(metrical_shape)
         metrical_shapes.append(metrical_shape)
+        tone_shape = "".join(tone_shape)
+        tone_shapes.append(tone_shape)
 
         if word_sedes is not None:
             # Once we know the sedes, output all the words seen since the
             # last time we saw a sedes.
-            for (w, m) in zip(words, metrical_shapes):
-                result.append((w, "{:g}".format(word_sedes), format_metrical_shape(m)))
+            for (w, m, t) in zip(words, metrical_shapes, tone_shapes):
+                result.append((w, "{:g}".format(word_sedes), format_metrical_shape(m), t))
             words = []
             metrical_shapes = []
+            tone_shapes = []
             word_sedes = None
 
     assert sedes == 13.0, sedes
@@ -117,7 +157,7 @@ def assign(scansion):
     return tuple(result)
 
 def recover_known(known):
-    """Recovers a sequence of (word, word_n, sedes, metrical_shape)
+    """Recovers a sequence of (word, word_n, sedes, metrical_shape, tone_shape)
     from a sequence of (word, metrical_shape)."""
     sedes = 1.0
     result = []
@@ -126,7 +166,7 @@ def recover_known(known):
         # sedes other than 1, for example when one metrical line is split across
         # multiple printed lines, as in Theoc 5.66–68.
         if word:
-            result.append((word, word_n+1, "{:g}".format(sedes), format_metrical_shape(metrical_shape)))
+            result.append((word, word_n+1, "{:g}".format(sedes), format_metrical_shape(metrical_shape), "TODO"))
         for value in metrical_shape:
             if value == "-":
                 sedes += 0.5
@@ -142,5 +182,5 @@ def analyze(text):
     # Otherwise analyze it.
     result = []
     for scansion in hexameter.scan.analyze_line_metrical(text):
-        result.append(tuple((word, word_n+1, sedes, metrical_shape) for (word_n, (word, sedes, metrical_shape)) in enumerate(assign(scansion))))
+        result.append(tuple((word, word_n+1, sedes, metrical_shape, tone_shape) for (word_n, (word, sedes, metrical_shape, tone_shape)) in enumerate(assign(scansion))))
     return result

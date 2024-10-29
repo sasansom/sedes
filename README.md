@@ -186,3 +186,17 @@ After UTF-8 encoding, this sequence is
 The characters that mark long and short metrical values
 are respectively `–` U+2013 EN DASH
 and `⏑` U+23D1 METRICAL BREVE.
+
+The `tone_shape` column represents the "tone shape" of the word
+(the accents and length of each syllable) using the following encoding:
+
+|code|meaning|
+|----|-------|
+|`.` |short syllable, no accent|
+|`/` |short syllable, acute accent|
+|`\` |short syllable, grave accent|
+|`~` |short syllable, circumflex accent|
+|`.-`|long syllable, no accent|
+|`/-`|long syllable, acute accent|
+|`\-`|long syllable, grave accent|
+|`~-`|long syllable, circumflex accent|
