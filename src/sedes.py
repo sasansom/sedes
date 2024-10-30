@@ -162,17 +162,64 @@ def assign(scansion):
     assert word_sedes is None, word_sedes
     return tuple(result)
 
-def recover_known(known):
+def recover_known(text, known):
     """Recovers a sequence of (word, word_n, sedes, metrical_shape, tone_shape)
-    from a sequence of (word, metrical_shape)."""
+    from the text of a line and its corresponding sequence of (word, metrical_shape)."""
+    # Call hexameter.scan._local_metrical_analysis, which is used internally by
+    # hexameter.scan.analyze_line_metrical. Presumably the line doesn't scan,
+    # which is why we're looking it up in database of known scansions. But we
+    # still use the local metrical analysis in inferring a tone_shape for the
+    # words in the line.
+    local = hexameter.scan._local_metrical_analysis(text)
+    sub_scansions = partition_scansion_into_words(local)
     sedes = 1.0
     result = []
-    for (word_n, (word, metrical_shape)) in enumerate(known):
+    for (word_n, ((word, metrical_shape), sub_scansion)) in enumerate(zip(known, sub_scansions)):
         # Ignore empty words; this is a hack to permit a line to start at a
         # sedes other than 1, for example when one metrical line is split across
         # multiple printed lines, as in Theoc 5.66–68.
         if word:
-            result.append((word, word_n+1, "{:g}".format(sedes), format_metrical_shape(metrical_shape), "TODO"))
+            # Isolate the vowels picked out by
+            # hexameter.scan._local_metrical_analysis and find the diacritic
+            # attached to each.
+            tones = []
+            for c, value in sub_scansion:
+                if value in ("-", "+", "?", "c"):
+                    pass
+                elif value == "":
+                    continue
+                else:
+                    assert ValueError(f"unknown preliminary scansion value {c!a}")
+                diacritic = extract_diacritic(c)
+                t = ""
+                if diacritic == "":
+                    t = "."
+                elif diacritic == "\u0301": # COMBINING ACUTE ACCENT
+                    t = "/"
+                elif diacritic == "\u0300": # COMBINING GRAVE ACCENT
+                    t = "\\"
+                elif diacritic == "\u0342": # COMBINING GREEK PERISPOMENI
+                    t = "~"
+                else:
+                    raise ValueError(f"unknown diacritic: {diacritic!a} {(c, value)}")
+                tones.append(t)
+            if len(tones) == len(metrical_shape):
+                # If we got the same number of diacritic codes as metrical
+                # length codes, create a tone_shape by appending a "-" to the
+                # diacritic code for long syllables, and leaving just the
+                # diacritic code for short syllables.
+                tone_shapes = []
+                for t, m in zip(tones, metrical_shape):
+                    if m == "-":
+                        tone_shapes.append(t)
+                    elif m == "+":
+                        tone_shapes.append(t + "-")
+                    else:
+                        raise ValueError(f"unknown metrical shape code {m!a}")
+                tone_shape = "".join(tone_shapes)
+            else:
+                tone_shape = "TODO"
+            result.append((word, word_n+1, "{:g}".format(sedes), format_metrical_shape(metrical_shape), tone_shape))
         for value in metrical_shape:
             if value == "-":
                 sedes += 0.5
@@ -184,7 +231,7 @@ def analyze(text):
     # First check if this is a hard-coded override.
     known = KNOWN_SCANSIONS.get(text)
     if known is not None:
-        return (recover_known(known),)
+        return (recover_known(text, known),)
     # Otherwise analyze it.
     result = []
     for scansion in hexameter.scan.analyze_line_metrical(text):
