@@ -116,7 +116,7 @@ def assign(scansion):
             diacritic = extract_diacritic(c)
             t = ""
             if value == ".":
-                pass
+                t = "(S{})".format({"": ".", "\u0301": "/", "\u0300": "\\", "\u0342": "~"}[diacritic])
             elif value == "" and diacritic == "":
                 pass
             elif value == "-" and diacritic == "":
