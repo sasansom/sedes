@@ -100,6 +100,7 @@ def assign(scansion):
         # List of encoded tone shape markers for the tone shape of the current
         # word.
         tone_shape = []
+        skipped_diacritic = ""
         for c, value in sub_scansion:
             word.append(c)
             if value in ("-", "+"):
@@ -114,30 +115,45 @@ def assign(scansion):
                 sedes += 1.0
             # Tone shape.
             diacritic = extract_diacritic(c)
-            t = ""
             if value == ".":
-                t = "(S{})".format({"": ".", "\u0301": "/", "\u0300": "\\", "\u0342": "~"}[diacritic])
-            elif value == "" and diacritic == "":
-                pass
-            elif value == "-" and diacritic == "":
-                t = "."   # short, no accent
-            elif value == "-" and diacritic == "\u0301": # COMBINING ACUTE ACCENT
-                t = "/"   # short acute
-            elif value == "-" and diacritic == "\u0300": # COMBINING GRAVE ACCENT
-                t = "\\"  # short grave
-            elif value == "-" and diacritic == "\u0342": # COMBINING GREEK PERISPOMENI
-                t = "~"   # short circumflex
-            elif value == "+" and diacritic == "":
-                t = ".-"  # long, no accent
-            elif value == "+" and diacritic == "\u0301": # COMBINING ACUTE ACCENT
-                t = "/-"  # long acute
-            elif value == "+" and diacritic == "\u0300": # COMBINING GRAVE ACCENT
-                t = "\\-" # long grave
-            elif value == "+" and diacritic == "\u0342": # COMBINING GREEK PERISPOMENI
-                t = "~-"  # long circumflex
+                # A value of "." means SKIPPED, which, in hexameter/hexameter.py,
+                # is "not used in input, but are used in output analysis".
+                # SKIPPED syllables do not have metrical quantity, but they may
+                # have a diacritic that we want to preserve for the tone_shape.
+                # Remember the skipped_diacritic, to be applied to an
+                # immediately succeeding quantity-bearing syllable that has no
+                # diacritic of its own.
+                skipped_diacritic = diacritic
             else:
-                raise ValueError(f"unknown tone diacritic combination: {(value, diacritic)!a} {sub_scansion!r}")
-            tone_shape.append(t)
+                # Make sure we don't have a diacritic that conflicts with a
+                # preceding skipped_diacritic.
+                assert not (diacritic and skipped_diacritic), (diacritic, skipped_diacritic)
+                # If this syllable has no diacritic, inherit an immediately
+                # preceding skipped_diacritic.
+                diacritic = diacritic or skipped_diacritic
+                skipped_diacritic = ""
+                t = ""
+                if value == "" and diacritic == "":
+                    pass
+                elif value == "-" and diacritic == "":
+                    t = "."   # short, no accent
+                elif value == "-" and diacritic == "\u0301": # COMBINING ACUTE ACCENT
+                    t = "/"   # short acute
+                elif value == "-" and diacritic == "\u0300": # COMBINING GRAVE ACCENT
+                    t = "\\"  # short grave
+                elif value == "-" and diacritic == "\u0342": # COMBINING GREEK PERISPOMENI
+                    t = "~"   # short circumflex
+                elif value == "+" and diacritic == "":
+                    t = ".-"  # long, no accent
+                elif value == "+" and diacritic == "\u0301": # COMBINING ACUTE ACCENT
+                    t = "/-"  # long acute
+                elif value == "+" and diacritic == "\u0300": # COMBINING GRAVE ACCENT
+                    t = "\\-" # long grave
+                elif value == "+" and diacritic == "\u0342": # COMBINING GREEK PERISPOMENI
+                    t = "~-"  # long circumflex
+                else:
+                    raise ValueError(f"unknown tone diacritic combination: {(value, diacritic)!a} {sub_scansion!r}")
+                tone_shape.append(t)
         # Append this word to the list of words that share the current
         # sedes.
         word = "".join(word)
