@@ -154,6 +154,7 @@ def assign(scansion):
                 else:
                     raise ValueError(f"unknown tone diacritic combination: {(value, diacritic)!a} {sub_scansion!r}")
                 tone_shape.append(t)
+        assert skipped_diacritic == "", skipped_diacritic
         # Append this word to the list of words that share the current
         # sedes.
         word = "".join(word)
