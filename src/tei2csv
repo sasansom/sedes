@@ -14,9 +14,14 @@ import getopt
 import re
 import sys
 
+import appositive
 import lemma as lemma_mod
 import sedes
 import tei
+
+MERGE_WORD_OPTIONS = {
+    "word": appositive.merge_word,
+}
 
 def usage(file=sys.stdout):
     print(f"""\
@@ -25,7 +30,9 @@ Usage: {sys.argv[0]} IDENTIFIER FILENAME.xml > FILENAME.csv
 IDENTIFIER is a short text identifier for the work; e.g., "Il.".
 FILENAME.XML is a TEI XML document containing the text of the work.
 
-  -h, --help  show this help
+  --word-unit=UNIT  merge words according to the given unit (default "word")
+                    known units: {', '.join(sorted(MERGE_WORD_OPTIONS.keys()))}
+  -h, --help        show this help
 """, end="", file=file)
 
 def assign_sedes_for_line(line):
@@ -38,7 +45,7 @@ def assign_sedes_for_line(line):
         # If no scansions or multiple scansions, output "".
         return len(assignments), tuple((word, word_n+1, "", "") for (word_n, word) in enumerate(line.words()))
 
-def process(f, work_identifier):
+def process(f, work_identifier, merge_word):
     seen_lines = set()
     doc = tei.TEI(f)
     for loc, line in doc.lines():
@@ -52,30 +59,44 @@ def process(f, work_identifier):
         else:
             scanned = "auto"
         num_scansions, assignment = assign_sedes_for_line(line)
+        lemmata = []
+        entries = []
         for word, word_n, pos, shape in assignment:
             lemma = lemma_mod.lookup(word, (work_identifier, loc.book_n, loc.line_n, word_n))
             if lemma is None:
                 lemma = word # Use the word itself as lemma if lemmatization fails.
+            lemmata.append(lemma)
+            entries.append(appositive.Entry(word_n, word, lemma))
+        groups = merge_word(entries, work_identifier, loc.book_n, loc.line_n)
+        for group in groups:
             yield {
                 "work": work_identifier,
                 "book_n": loc.book_n,
                 "line_n": loc.line_n,
-                "word_n": word_n,
-                "word": word,
+                "word_n": group[0][1],
+                "word": " ".join(assignment[i][0] for i, _entry in group),
                 "scanned": scanned,
                 "num_scansions": num_scansions,
-                "sedes": pos,
-                "metrical_shape": shape,
-                "lemma": lemma,
+                "sedes": assignment[group[0][0]][2],
+                "metrical_shape": "".join(assignment[i][3] for i, _entry in group),
+                "lemma": " ".join(lemmata[i] for i, _entry in group),
                 "line_text": line.text(),
             }
 
 def main():
-    opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help"])
+    merge_word = appositive.merge_word
+    opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ["help", "word-unit="])
     for o, a in opts:
         if o in ("-h", "--help"):
             usage()
             sys.exit(0)
+        elif o in ("--word-unit"):
+            try:
+                merge_word = MERGE_WORD_OPTIONS[a]
+            except KeyError:
+                print(f"error: unknown --word-unit {a!r}", file=sys.stderr)
+                print("known units:", ", ".join(sorted(MERGE_WORD_OPTIONS.keys())), file=sys.stderr)
+                sys.exit(1)
 
     try:
         work_identifier, input_filename = args
@@ -104,7 +125,7 @@ def main():
     )
     csv_w.writeheader()
     with open(input_filename) as f:
-        for row in process(f, work_identifier):
+        for row in process(f, work_identifier, merge_word):
             csv_w.writerow(row)
 
 if __name__ == "__main__":
