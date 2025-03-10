@@ -24,6 +24,8 @@ Usage: {sys.argv[0]} IDENTIFIER FILENAME.xml > FILENAME.csv
 
 IDENTIFIER is a short text identifier for the work; e.g., "Il.".
 FILENAME.XML is a TEI XML document containing the text of the work.
+
+  -h, --help  show this help
 """, end="", file=file)
 
 def assign_sedes_for_line(line):
