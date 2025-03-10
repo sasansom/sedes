@@ -195,12 +195,14 @@ def normalize(s):
     return unicodedata.normalize("NFC", s)
 
 def assign_sedes_for_line(line):
-    """From a line, return a sequence of (word, word_n, sedes, shape) tuples."""
+    """From a line, return num_scansions and a sequence of (word, word_n, sedes, shape)
+    tuples. sedes will be non-blank if and only if num_scansions is equal to 1."""
     assignments = sedes_mod.analyze(line.text_without_quotes())
     if len(assignments) == 1:
-        return tuple(assignments[0])
+        return len(assignments), tuple((word, word_n, sedes, shape) for (word, word_n, sedes, shape) in assignments[0])
     else:
-        return tuple((word, word_n+1, None, None) for (word_n, word) in enumerate(line.words()))
+        # If no scansions or multiple scansions, output "".
+        return len(assignments), tuple((word, word_n+1, "", "") for (word_n, word) in enumerate(line.words()))
 
 def process(f, work_identifier, expectancy, dist_vars, cond_vars):
     doc = tei.TEI(f)
@@ -719,7 +721,8 @@ summary, .word {
         prev_sedes = None
         # We will walk word_entries and line.tokens in parallel, popping an
         # entry from word_entries every time a token has type WORD.
-        word_entries = list(assign_sedes_for_line(line))
+        _, word_entries = assign_sedes_for_line(line)
+        word_entries = list(word_entries)
         for token in line.tokens:
             if token.type != tei.Token.Type.WORD:
                 if prev_sedes is None:
