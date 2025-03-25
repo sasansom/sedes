@@ -21,6 +21,7 @@ import tei
 
 MERGE_WORD_OPTIONS = {
     "word": appositive.merge_word,
+    "appositive-group": appositive.merge_appositive_group,
 }
 
 def usage(file=sys.stdout):
