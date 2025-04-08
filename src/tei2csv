@@ -74,13 +74,13 @@ def process(f, work_identifier, merge_word):
                 "work": work_identifier,
                 "book_n": loc.book_n,
                 "line_n": loc.line_n,
-                "word_n": group[0][1],
-                "word": " ".join(assignment[i][0] for i, _entry in group),
+                "word_n": assignment[group[0]][1],
+                "word": " ".join(assignment[i][0] for i in group),
                 "scanned": scanned,
                 "num_scansions": num_scansions,
-                "sedes": assignment[group[0][0]][2],
-                "metrical_shape": "".join(assignment[i][3] for i, _entry in group),
-                "lemma": " ".join(lemmata[i] for i, _entry in group),
+                "sedes": assignment[group[0]][2],
+                "metrical_shape": "".join(assignment[i][3] for i in group),
+                "lemma": " ".join(lemmata[i] for i in group),
                 "line_text": line.text(),
             }
 

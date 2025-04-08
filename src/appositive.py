@@ -8,7 +8,7 @@ Entry = collections.namedtuple("Entry", (
 ))
 
 def merge_word(entries, work, book_n, line_n):
-    return tuple(((i, entry.word_n),) for i, entry in enumerate(entries))
+    return tuple((i,) for i, entry in enumerate(entries))
 
 # Load hardcoded appositive exceptions from an auxiliary CSV file.
 ExceptionalAppositive = collections.namedtuple("ExceptionalAppositive",
@@ -371,7 +371,7 @@ def merge_appositive_group(entries, work, book_n, line_n):
             offset -= 1
 
         prev_is_prepositive = is_prepositive
-    return tuple(tuple((i, entries[i].word_n) for i in run) for run in runs(indices))
+    return tuple(tuple(run) for run in runs(indices))
 
 if __name__ == "__main__":
     for k, v in EXCEPTIONAL_APPOSITIVES.items():
