@@ -16,6 +16,7 @@
 # variables on the right. Use a backslash to escape commas, slashes, and
 # backslashes in variable names. See the expectancy program for examples.
 
+import appositive
 import collections
 import csv
 import getopt
@@ -204,7 +205,25 @@ def assign_sedes_for_line(line):
         # If no scansions or multiple scansions, output "".
         return len(assignments), tuple((word, word_n+1, "", "") for (word_n, word) in enumerate(line.words()))
 
-def process(f, work_identifier, expectancy, dist_vars, cond_vars):
+# Return an iterator of sliding windows of size n over seq. At the left and
+# right, it is as if seq were padded with None.
+def windows(seq, n):
+    slice = [None] * n
+    for x in iter(seq):
+        slice.pop(0)
+        slice.append(x)
+        yield tuple(slice)
+    for _ in range(n - 1):
+        slice.pop(0)
+        slice.append(None)
+        yield tuple(slice)
+
+# Return an iterator of sliding windows of size 2 over seq. At the left and
+# right, it is as if seq were padded with None.
+def windows_2(seq):
+    return windows(seq, 2)
+
+def process(f, work_identifier, expectancy, dist_vars, cond_vars, merge_word):
     doc = tei.TEI(f)
 
     print(f"""\
@@ -717,126 +736,167 @@ summary, .word {
             ("data-lineno", f"{loc.line_n}"),
         ), end="")
 
-        buffered_nonwords = []
-        prev_sedes = None
-        # We will walk word_entries and line.tokens in parallel, popping an
-        # entry from word_entries every time a token has type WORD.
-        _, word_entries = assign_sedes_for_line(line)
-        word_entries = list(word_entries)
-        for token in line.tokens:
-            if token.type != tei.Token.Type.WORD:
-                if prev_sedes is None:
-                    print(esc(normalize(token.text)), end="")
-                else:
-                    # These nonwords may or may not belong to the currently open
-                    # sedes span--it depends on whether the sedes of the next
-                    # word is the same or not.
-                    buffered_nonwords.append(token)
-                continue
-
-            while True:
-                try:
-                    word, word_n, sedes, shape = word_entries.pop(0)
-                except IndexError:
-                    sedes = None
-                    shape = None
-                    break
-                if word:
-                    if word.lower() != token.text.lower():
-                        print(f"warning: book {loc.book_n} line {loc.line_n} word {word_n} {token.text!r} does not match scansion word {word!r}", file=sys.stderr)
-                    break
-                # Ignore empty metrical placeholder words (as found in known.py).
-
-            # Is the sedes for this word the the same as the sedes of the
-            # previous word (if any)?
-            if sedes is not None and sedes == prev_sedes:
-                # Include these nonwords in the currently open sedes span.
-                print(esc("".join(token.text for token in buffered_nonwords)), end="")
-                buffered_nonwords.clear()
+        # tokens_between returns a sequence of tokens in line.tokens between the
+        # indices i and j, not including the endpoints.
+        def tokens_between(i, j):
+            return line.tokens[None if i is None else i + 1:j]
+        # nonword_tokens_between is like tokens_between, but it returns the
+        # tokens only if every token in between is not a word token; otherwise
+        # it returns an empty sequence. Technically, the merge_word function
+        # could return groups that have words out of order, or repeat words, or
+        # do other such things -- in those cases we do not attempt to output any
+        # nonword tokens between the words in a group. Only in the clear case
+        # where two words are adjacent except for nonwords do we try to output
+        # the nonwords.
+        def nonword_tokens_between(i, j):
+            tokens = tokens_between(i, j)
+            if all(token.type != tei.Token.Type.WORD for token in tokens):
+                return tuple(tokens)
             else:
-                if prev_sedes is not None:
-                    # Close the currently open sedes span.
-                    print_end_tag("span", end="")
-                # The nonwords in between belong to neither sedes span.
-                print(esc(normalize(re.sub(r"\s+", "\n", "".join(token.text for token in buffered_nonwords)))), end="")
-                buffered_nonwords.clear()
-                if sedes is not None:
-                    # Begin new sedes.
-                    print_start_tag("span", (
-                        ("class", f"sedes s{sedes.replace('.', '_')}"),
-                    ), end="")
-            prev_sedes = sedes
+                return ()
 
-            word_attrs = collections.OrderedDict()
-            if line_id is not None:
-                # We omit the per-word id for *all* words in a line that itself
-                # does not have an id; i.e., we check whether line_id is set,
-                # not whether the word id is in seen_ids. A None line_id means
-                # we have already emitted a line with that number, and we do not
-                # want to have ids on just the last few words of this line, when
-                # this line has more words than the already emitted one.
-                word_attrs["id"] = f"book-{loc.book_n}-line-{loc.line_n}-word-{word_n}"
-
-            word_attrs["class"] = "word"
-
-            title_attr = []
+        # Figure out all the necessary stats for the line. This includes the
+        # sedes (`assignment`) and lemma (`lemmata`) for each word, as well as
+        # words possibly merged into appositive groups or what have you
+        # (`groups`, via `entries`).
+        _, assignment = assign_sedes_for_line(line)
+        # Get the lemma for each word in the assignment, meanwhile also building
+        # up the list of appositive.Entry that will be given to the merge_word
+        # function.
+        lemmata = []
+        entries = []
+        for word, word_n, pos, shape in assignment:
             lemma = lemma_mod.lookup(word, (work_identifier, loc.book_n, loc.line_n, word_n))
             if lemma is None:
                 lemma = word # Use the word itself as lemma if lemmatization fails.
-            word_attrs["data-wordno"] = str(word_n)
-            if lemma is not None:
-                word_attrs["data-lemma"] = normalize(lemma);
-                title_attr.append(f"lemma={normalize(lemma)}")
-            if sedes is not None:
-                word_attrs["data-sedes"] = sedes;
-                title_attr.append(f"sedes={sedes}")
+            lemmata.append(lemma)
+            entries.append(appositive.Entry(word_n, word, lemma))
+        groups = merge_word(entries, work_identifier, loc.book_n, loc.line_n)
+        groups_iter = iter(groups)
+        # `groups` contains indexes into the `assignment` list, which contains
+        # only word tokens. We will also need to map those indices back to
+        # indices in the link.tokens list, because the HTML visualization
+        # contains not only word tokens, but also nonwords (e.g. spaces and
+        # punctuation) between them. `tokens_word_index` contains the mapping.
+        tokens_word_index = tuple(i for i, token in enumerate(line.tokens) if token.type == tei.Token.Type.WORD)
 
-            # These are the variables whose values we know how to produce and
-            # are usable in dist_vars and cond_vars lookups.
-            VAR_VALUES = {
-                "work": work_identifier,
-                "book_n": loc.book_n,
-                "line_n": loc.line_n,
-                "word_n": word_n,
-                "word": word,
-                "lemma": lemma,
-                "sedes": sedes,
-                "metrical_shape": shape,
-            }
-            dist_key = tuple(VAR_VALUES[var] for var in dist_vars)
-            cond_key = tuple(VAR_VALUES[var] for var in cond_vars)
-            expectancy_needed.add(cond_key)
-            expectancy_entry = expectancy.get(cond_key, {}).get(dist_key)
-            if expectancy_entry is not None:
-                title_attr.append(f"x={expectancy_entry.x}")
-                title_attr.append(f"Σx={sum_x[cond_key]}")
-                word_attrs["class"] += " " + esc(z_css(expectancy_entry.z))
-                if expectancy_entry.z is not None:
-                    z_fmt = f"{expectancy_entry.z:+.8}"
-                    title_attr.append(f"z={z_fmt.replace('-', '−')}")
-                else:
-                    word_attrs["class"] += " undefined-expectancy"
+        # Iterate over the merged word groups. On the first iteration of this
+        # loop, `prev_group` will be None; on the last iteration, `group` will
+        # be None. In all iterations but the first, we'll output a <span> for
+        # the group. We'll additionally output a <span> for the sedes whenever
+        # it changes. On every iteration, we'll output the nonword tokens that
+        # lie between prev_group and group.
+        for prev_group, group in windows_2(groups):
+            # Indices into line.tokens of the last word in the previous group
+            # and the first word of the current group.
+            prev_group_end_index   = None if prev_group is None else tokens_word_index[prev_group[-1]]
+            this_group_start_index = None if      group is None else tokens_word_index[     group[ 0]]
+
+            prev_sedes = None if prev_group is None else assignment[prev_group[0]][2]
+            sedes      = None if      group is None else assignment[     group[0]][2]
+            if prev_sedes != sedes:
+                # This is either the first sedes group on the line, or the sedes
+                # of the current group is different from that of the preceding
+                # group.
+                if prev_sedes is not None:
+                    # There is an already open sedes <span> (i.e., this is not
+                    # the first sedes <span> of the line). Close it.
+                    print_end_tag("span", end="")
+                # Output the tokens (words and otherwise) that are between the
+                # previous group and this group. These tokens belong to neither
+                # sedes <span>. Convert whitespace to newlines for HTML
+                # readability.
+                print(esc(normalize(re.sub(r"\s+", "\n", "".join(token.text for token in tokens_between(prev_group_end_index, this_group_start_index))))), end="")
+                if sedes is not None:
+                    # Begin a new sedes <span> for this group.
+                    print_start_tag("span", (
+                        ("class", f"sedes s{sedes.replace('.', '_')}"),
+                    ), end="")
             else:
-                print(f"warning: no expectancy score for book {loc.book_n} line {loc.line_n} word {word_n}: {common.format_dist_cond_vars_spec(dist_vars, cond_vars)} {(dist_key, cond_key)}", file=sys.stderr)
-                word_attrs["class"] += " error"
-            if shape is not None:
-                word_attrs["data-shape"] = normalize(shape)
-                title_attr.append(f"shape={normalize(shape)}")
-            if title_attr:
-                word_attrs["title"] = " ".join(title_attr)
+                # Output the nonword tokens that are between the previous group
+                # and this group. These nonwords are inside of the sedes <span>
+                # that also contains both groups.
+                print(esc(normalize("".join(token.text for token in tokens_between(prev_group_end_index, this_group_start_index)))), end="")
 
-            # Span for a single word.
-            with html_element("span", word_attrs.items(), end=""):
-                print(esc(normalize(token.text)), end="")
+            # This conditional code runs in every iteration but the last. The
+            # last iteration is only to output training nonword tokens in the
+            # line, which has just happened up above.
+            if group is not None:
+                word = " ".join(line.tokens[tokens_word_index[i]].text for i in group)
+                word_n = assignment[group[0]][1]
+                sedes = assignment[group[0]][2]
+                shape = "".join(assignment[i][3] for i in group)
 
-        if word_entries:
-            print(f"warning: book {loc.book_n} line {loc.line_n} word {word_n} leftover scansion words {word_entries}", file=sys.stderr)
+                word_attrs = collections.OrderedDict()
+                title_attr = []
+                if line_id is not None:
+                    # We omit the per-word id for *all* words in a line that itself
+                    # does not have an id; i.e., we check whether line_id is set,
+                    # not whether the word id is in seen_ids. A None line_id means
+                    # we have already emitted a line with that number, and we do not
+                    # want to have ids on just the last few words of this line, when
+                    # this line has more words than the already emitted one.
+                    word_attrs["id"] = f"book-{loc.book_n}-line-{loc.line_n}-word-{word_n}"
+                word_attrs["class"] = "word"
+                word_attrs["data-wordno"] = str(word_n)
+                # Join the lemmata of every word in the group with spaces, as
+                # tei2csv does. Use the word itself as lemma if lemmatization
+                # fails.
+                lemma = " ".join(entries[i].lemma if entries[i].lemma is not None else entries[i].word for i in group)
+                if lemma is not None:
+                    word_attrs["data-lemma"] = normalize(lemma);
+                    title_attr.append(f"lemma={normalize(lemma)}")
+                if sedes is not None:
+                    word_attrs["data-sedes"] = sedes;
+                    title_attr.append(f"sedes={sedes}")
 
-        if prev_sedes is not None:
-            # Close the last remaining open sedes span.
-            print_end_tag("span", end="")
-        print(esc(normalize("".join(token.text for token in buffered_nonwords))), end="")
-        buffered_nonwords.clear()
+                # These are the variables whose values we know how to produce and
+                # are usable in dist_vars and cond_vars lookups.
+                VAR_VALUES = {
+                    "work": work_identifier,
+                    "book_n": loc.book_n,
+                    "line_n": loc.line_n,
+                    "word_n": word_n,
+                    "word": word,
+                    "lemma": lemma,
+                    "sedes": sedes,
+                    "metrical_shape": shape,
+                }
+                dist_key = tuple(VAR_VALUES[var] for var in dist_vars)
+                cond_key = tuple(VAR_VALUES[var] for var in cond_vars)
+                expectancy_needed.add(cond_key)
+                expectancy_entry = expectancy.get(cond_key, {}).get(dist_key)
+                if expectancy_entry is not None:
+                    title_attr.append(f"x={expectancy_entry.x}")
+                    title_attr.append(f"Σx={sum_x[cond_key]}")
+                    word_attrs["class"] += " " + esc(z_css(expectancy_entry.z))
+                    if expectancy_entry.z is not None:
+                        z_fmt = f"{expectancy_entry.z:+.8}"
+                        title_attr.append(f"z={z_fmt.replace('-', '−')}")
+                    else:
+                        word_attrs["class"] += " undefined-expectancy"
+                else:
+                    print(f"warning: no expectancy score for book {loc.book_n} line {loc.line_n} word {word_n}: {common.format_dist_cond_vars_spec(dist_vars, cond_vars)} {(dist_key, cond_key)}", file=sys.stderr)
+                    word_attrs["class"] += " error"
+                if shape is not None:
+                    word_attrs["data-shape"] = normalize(shape)
+                    title_attr.append(f"shape={normalize(shape)}")
+                if title_attr:
+                    word_attrs["title"] = " ".join(title_attr)
+
+                # <span> for a single group.
+                with html_element("span", word_attrs.items(), end=""):
+                    for a, b in windows_2(group):
+                        i = None if a is None else tokens_word_index[a]
+                        j = None if b is None else tokens_word_index[b]
+                        if i is not None and j is not None:
+                            print(esc(normalize("".join(token.text for token in nonword_tokens_between(i, j)))), end="")
+                        if j is not None:
+                            token = line.tokens[j]
+                            w = assignment[b][0]
+                            if w.lower() != token.text.lower():
+                                print(f"warning: book {loc.book_n} line {loc.line_n} word {word_n} {token.text!r} does not match scansion word {w!r}", file=sys.stderr)
+                            print(esc(normalize(token.text)), end="")
 
         # End line.
         print_end_tag("span")
@@ -1079,7 +1139,7 @@ def main():
         expectancy = parse_expectancy(expectancy_file, dist_vars, cond_vars)
 
     with open(tei_filename) as tei_file:
-        process(tei_file, work_identifier, expectancy, dist_vars, cond_vars)
+        process(tei_file, work_identifier, expectancy, dist_vars, cond_vars, appositive.merge_word)
 
 if __name__ == "__main__":
     main()
