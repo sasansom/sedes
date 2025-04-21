@@ -725,13 +725,10 @@ summary, .word {
         word_entries = list(word_entries)
         for token in line.tokens:
             if token.type != tei.Token.Type.WORD:
-                if prev_sedes is None:
-                    print(esc(normalize(token.text)), end="")
-                else:
-                    # These nonwords may or may not belong to the currently open
-                    # sedes span--it depends on whether the sedes of the next
-                    # word is the same or not.
-                    buffered_nonwords.append(token)
+                # These nonwords may or may not belong to a currently open sedes
+                # span--it depends on whether the sedes of the next word is the
+                # same or not.
+                buffered_nonwords.append(token)
                 continue
 
             while True:
@@ -835,7 +832,7 @@ summary, .word {
         if prev_sedes is not None:
             # Close the last remaining open sedes span.
             print_end_tag("span", end="")
-        print(esc(normalize("".join(token.text for token in buffered_nonwords))), end="")
+        print(esc(normalize(re.sub(r"\s+", "\n", "".join(token.text for token in buffered_nonwords)))), end="")
         buffered_nonwords.clear()
 
         # End line.
