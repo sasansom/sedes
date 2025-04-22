@@ -68,9 +68,48 @@ class TestAssign(unittest.TestCase):
                 ("ἐπ’", "10", "⏑"),
                 ("ἀπήνῃ", "10.5", "⏑––"),
             )),
+            # Artificial example for zero-quantity word at end of line (sedes 13).
+            ("οἱ μὲν ἄρ’ ἐκτὸς ἄμαξαν ἐύτροχον ἡμιονείην ’δ", (
+                ("οἱ", "1", "–"),
+                ("μὲν", "2", "⏑"),
+                ("ἄρ’", "2.5", "⏑"),
+                ("ἐκτὸς", "3", "–⏑"),
+                ("ἄμαξαν", "4.5", "⏑–⏑"),
+                ("ἐύτροχον", "6.5", "⏑–⏑⏑"),
+                ("ἡμιονείην", "9", "–⏑⏑––"),
+                ("’δ", "13", ""),
+            )),
         ):
             scansion, = hexameter.scan.analyze_line_metrical(line)
             self.assertEqual(sedes.assign(scansion), expected, repr(line))
+
+        # Test cases that should raise exceptions.
+        for scansion in (
+            # Artificial example with non-zero-quantity word at end of line (sedes 13).
+            (
+                ('π', '', ''), ('α', '+', '+'), ('λλ', '', ''), ('ά', '?', '-'), ('δ', '', ''), ('ι', '?', '-'),
+                ('', '', '|'),
+                (' ', '', ''),
+                ('χ', '', ''), ('ω', '+', '+'), ('ο', '-', '-'), ('μ', '', ''), ('έ', '-', '-'),
+                ('', '', '|'),
+                ('ν', '', ''), ('ῃ', '+', '+'),
+                (' ', '', ''),
+                ('τρ', '', ''), ('ώ', '+', '+'),
+                ('', '', '|'),
+                ('ω', '+', '+'), ('ν', '', ''),
+                (' ', '', ''),
+                ('ὕ', '?', '-'), ('π', '', ''), ('ε', '-', '-'),
+                ('', '', '|'),
+                ('ρ', '', ''),
+                (' ', '', ''),
+                ('αἰ', '+', '+'), ('χμ', '', ''), ('η', '+', '+'),
+                ('', '', '|'),
+                ('τ', '', ''), ('ά', '?', '+'), ('ω', '+', '+'), ('ν', '', ''),
+                ('τρ', '', ''), ('ώ', '+', '+'), # This is the extra word.
+            ),
+        ):
+            with self.assertRaises(Exception):
+                sedes.assign(scansion)
 
 class TestPartition(unittest.TestCase):
     def test_partition_scansion_into_words(self):

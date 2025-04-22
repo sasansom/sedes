@@ -112,8 +112,14 @@ def assign(scansion):
             word_sedes = None
 
     assert sedes == 13.0, sedes
-    assert not words, words
     assert word_sedes is None, word_sedes
+
+    # If there are any words left over at this point, they must be
+    # zero-quantity, non-vocalic words (i.e., word_sedes == None). Let them have
+    # sedes 13.
+    for (w, s) in zip(words, shapes):
+        result.append((w, "{:g}".format(sedes), format_shape(s)))
+
     return tuple(result)
 
 def recover_known(known):
