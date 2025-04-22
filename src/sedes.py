@@ -21,7 +21,7 @@ def trim(s):
 # elements.
 def partition_scansion_into_words(scansion):
     current = []
-    scansion = scansion[:]
+    scansion = list(scansion)
     while scansion:
         element = scansion.pop(0)
         c, mid, value = element
@@ -40,7 +40,7 @@ def partition_scansion_into_words(scansion):
         if (len(parts) == 1 and trimmed != c) or len(parts) > 1:
             # There's a word break here. Yield the current word.
             if current:
-                yield current
+                yield tuple(current)
             current = []
             # If there's something after a space, push it into the scansion
             # queue to be re-handled in the next iteration as the beginning of
@@ -50,7 +50,7 @@ def partition_scansion_into_words(scansion):
                 if trimmed:
                     scansion.insert(0, (trimmed, mid, value))
     if current:
-        yield current
+        yield tuple(current)
 
 def format_shape(shape):
     """

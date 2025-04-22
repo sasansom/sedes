@@ -71,3 +71,45 @@ class TestAssign(unittest.TestCase):
         ):
             scansion, = hexameter.scan.analyze_line_metrical(line)
             self.assertEqual(sedes.assign(scansion), expected, repr(line))
+
+class TestPartition(unittest.TestCase):
+    def test_partition_scansion_into_words(self):
+        for scansion, expected in (
+            (
+                (),
+                ()
+            ),
+            # Should strip foot markers.
+            (
+                (
+                    ('', '', '|'),
+                    ('α', '+', '+'),
+                    ('', '', '|'),
+                    ('α', '+', '+'),
+                    ('', '', '|'),
+                ),
+                (
+                    (('α', '+', '+'), ('α', '+', '+')),
+                )
+            ),
+            # Punctuation should bind left/right according to its relative positive with space.
+            (
+                (
+                    ('α', '+', '+'),
+                    ('’ ', '', ''),
+                    ('β', '+', '+'),
+                    (' ’', '', ''),
+                    ('γ', '+', '+'),
+                    ('’', '', ''),
+                    ('δ', '+', '+'),
+                    (' ’', '', ''),
+                ),
+                (
+                    (('α', '+', '+'), ('’', '', '')),
+                    (('β', '+', '+'),),
+                    (('’', '', ''), ('γ', '+', '+'), ('’', '', ''), ('δ', '+', '+')),
+                    (('’', '', ''),),
+                )
+            ),
+        ):
+            self.assertSequenceEqual(tuple(sedes.partition_scansion_into_words(scansion)), expected)
