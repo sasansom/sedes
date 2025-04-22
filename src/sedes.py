@@ -13,9 +13,6 @@ KNOWN_SCANSIONS = dict(
     for key, value in KNOWN_SCANSIONS.items()
 )
 
-def trim(s):
-    return re.sub("[^\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]*", "", s)
-
 # Yields sub-iterators for each contiguous group of scansion elements that
 # belong to the same word, throwing away all punctuation and non-letter
 # elements.
@@ -30,14 +27,16 @@ def partition_scansion_into_words(scansion):
             # This is just a foot marker, ignore it.
             continue
 
-        # If it's a space with punctuation, put the punctuation either at the
-        # end of this word or the beginning of the next, depending on what side
-        # of the space it's on.
-        parts = c.split(" ", 1)
-        trimmed = trim(parts[0])
-        if trimmed:
-            current.append((trimmed, mid, value))
-        if (len(parts) == 1 and trimmed != c) or len(parts) > 1:
+        # If it's any word character along with non-word characters, put the
+        # word character either at the end of the current word or the beginning
+        # of the next, depending on what side of the non-word characters it's
+        # on. Really, the only "word character" we expect here is \u2019,
+        # apostrophe, as an elision marker, and we want to attach it to one side
+        # of a word made of letters.
+        parts = re.split("[^\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", c, 1)
+        if parts[0]:
+            current.append((parts[0], mid, value))
+        if (len(parts) == 1 and parts[0] != c) or len(parts) > 1:
             # There's a word break here. Yield the current word.
             if current:
                 yield tuple(current)
@@ -45,10 +44,8 @@ def partition_scansion_into_words(scansion):
             # If there's something after a space, push it into the scansion
             # queue to be re-handled in the next iteration as the beginning of
             # the next word.
-            if len(parts) > 1:
-                trimmed = trim(parts[1])
-                if trimmed:
-                    scansion.insert(0, (trimmed, mid, value))
+            if len(parts) > 1 and parts[1]:
+                scansion.insert(0, (parts[1], mid, value))
     if current:
         yield tuple(current)
 
