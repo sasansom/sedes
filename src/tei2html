@@ -52,6 +52,11 @@ SHADE_SCALE_RANGE = (-2.0, 2.0)
 # light-on-dark rather than dark-on-light.
 LUMINANCE_INVERSION_THRESHOLD = 0.3
 
+MERGE_WORD_OPTIONS = {
+    "word": appositive.merge_word,
+    "appositive-group": appositive.merge_appositive_group,
+}
+
 def usage(file=sys.stdout):
     print(f"""\
 Usage: {sys.argv[0]} [OPTION...] IDENTIFIER FILENAME.xml EXPECTANCY.csv > FILENAME.html
@@ -1106,11 +1111,14 @@ CONTROLS["show-undefined-expectancy"].dispatchEvent(new Event("change"));
 def main():
     # Default grouping variables if not specified with --by.
     dist_cond_vars_spec = common.DEFAULT_DIST_COND_VARS_SPEC
+    # Default word grouping option if not specified with --word-unit.
+    merge_word = appositive.merge_word
 
     opts, args = getopt.gnu_getopt(sys.argv[1:], "hs:", (
         "by=",
         "help",
         "shade-mapping-adjust=",
+        "word-unit=",
     ))
     for o, a in opts:
         if o == "--by":
@@ -1120,6 +1128,13 @@ def main():
             sys.exit(0)
         elif o in ("-s", "--shade-mapping-adjust"):
             SHADE_MAPPING_ADJUST = float(a)
+        elif o == "--word-unit":
+            try:
+                merge_word = MERGE_WORD_OPTIONS[a]
+            except KeyError:
+                print(f"error: unknown --word-unit {a!r}", file=sys.stderr)
+                print("known units:", ", ".join(sorted(MERGE_WORD_OPTIONS.keys())), file=sys.stderr)
+                sys.exit(1)
 
     try:
         dist_vars, cond_vars = common.parse_dist_cond_vars_spec(dist_cond_vars_spec)
@@ -1139,7 +1154,7 @@ def main():
         expectancy = parse_expectancy(expectancy_file, dist_vars, cond_vars)
 
     with open(tei_filename) as tei_file:
-        process(tei_file, work_identifier, expectancy, dist_vars, cond_vars, appositive.merge_word)
+        process(tei_file, work_identifier, expectancy, dist_vars, cond_vars, merge_word)
 
 if __name__ == "__main__":
     main()

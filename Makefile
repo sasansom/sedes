@@ -42,7 +42,7 @@ $(WORKS_CSV): .EXTRA_PREREQS = src/tei2csv src/known.py src/lemma.py src/apposit
 corpus/%.csv: corpus/%.xml
 	src/tei2csv "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
 
-$(WORKS_HTML): .EXTRA_PREREQS = src/tei2html src/known.py src/lemma.py src/lemma-overrides.csv
+$(WORKS_HTML): .EXTRA_PREREQS = src/tei2html src/known.py src/lemma.py src/appositive.py src/lemma-overrides.csv src/exceptional-appositives.csv
 sedes-web/%.html: corpus/%.xml expectancy.all.csv
 	src/tei2html "$(WORK_IDENTIFIER_$*)" $^ > "$@"
 
