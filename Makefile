@@ -40,11 +40,11 @@ expectancy.hellenistic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/h
 
 $(WORKS_CSV): .EXTRA_PREREQS = src/tei2csv src/known.py src/lemma.py src/appositive.py src/lemma-overrides.csv src/exceptional-appositives.csv
 corpus/%.csv: corpus/%.xml
-	src/tei2csv "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
+	src/tei2csv --word-unit=appositive-group "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
 
 $(WORKS_HTML): .EXTRA_PREREQS = src/tei2html src/known.py src/lemma.py src/appositive.py src/lemma-overrides.csv src/exceptional-appositives.csv
 sedes-web/%.html: corpus/%.xml expectancy.all.csv
-	src/tei2html "$(WORK_IDENTIFIER_$*)" $^ > "$@"
+	src/tei2html --word-unit=appositive-group "$(WORK_IDENTIFIER_$*)" $^ > "$@"
 
 PYTHON = python3
 
