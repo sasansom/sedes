@@ -53,13 +53,13 @@ that processes a TEI-encoded XML document as downloaded from Perseus
 and produces a CSV file that annotates every word with
 its line number and sedes. For example:
 ```
-./src/tei2csv "Il." corpus/iliad.xml > corpus/iliad.csv
+src/tei2csv "Il." corpus/iliad.xml > corpus/iliad.csv
 ```
 
 The `expectancy` program annotates one or more CSV files
 as produced by `tei2csv` with statistics about expectancy for each word.
 ```
-./src/expectancy corpus/*.csv > expectancy.all.csv
+src/expectancy corpus/*.csv > expectancy.all.csv
 ```
 
 The `tei2html` program produces an HTML representation of
@@ -67,14 +67,14 @@ a TEI-encoded XML document, with visual highlighting of word expectancy.
 If you put the HTML file in the sedes-web directory,
 it will have access to locally installed web fonts for Greek.
 ```
-./src/tei2html "Il." corpus/iliad.xml expectancy.all.csv > sedes-web/iliad.html
+src/tei2html "Il." corpus/iliad.xml expectancy.all.csv > sedes-web/iliad.html
 ```
 
 The `join-expectancy` program takes a work-specific CSV file (as
 produced by `tei2csv`) and augments it with lemma/sedes expectancy
 numbers.
 ```
-./src/join-expectancy corpus/iliad.csv expectancy.all.csv > iliad-expectancy.csv
+src/join-expectancy corpus/iliad.csv expectancy.all.csv > iliad-expectancy.csv
 ```
 
 The "src/hexameter" subdirectory contains a Python module
