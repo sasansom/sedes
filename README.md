@@ -108,6 +108,78 @@ same commands as `make` would:
 ```
 
 
+## Word grouping
+
+One of the main functions of the programs is to divide lines into "word" units.
+By default, division into words is what you expect: separating on whitespace and punctuation.
+You can control the definition of "word" using the `--word-unit` option
+of the tei2csv and tei2html programs.
+
+You must use the same value of the `--word-unit` both
+when you invoke tei2csv to define the corpus
+and when you invoke tei2html to generate a visualization.
+
+No matter what value of the `--word-unit` option you use,
+the column name in CSV output is still `word`.
+
+### `--word-unit word`
+
+The default is `--word-unit word`, in which words are delimited
+straightforwardly by whitespace and punctuation.
+
+```
+src/tei2csv --word-unit word "Il." corpus/iliad.xml > corpus/iliad.csv
+src/tei2html --word-unit word "Il." corpus/iliad.xml expectancy.csv > iliad.html
+```
+
+The line *Il.* 1.4, ἡρώων, αὐτοὺς δὲ ἑλώρια τεῦχε κύνεσσιν,
+gets divided into 6 "words":
+
+| `work` | `book_n` | `line_n` | `word_n` | `word` | `lemma` | `sedes` | `metrical_shape` |
+|--------|---------:|---------:|---------:|--------|---------|---------|------------------|
+| Il. | 1 | 4 | 1 | ἡρώων | ἥρως | 1 | ––– |
+| Il. | 1 | 4 | 2 | αὐτοὺς | αὐτός | 4 | –– |
+| Il. | 1 | 4 | 3 | δὲ | δέ | 6 | ⏑ |
+| Il. | 1 | 4 | 4 | ἑλώρια | ἑλώριον | 6.5 | ⏑–⏑⏑ |
+| Il. | 1 | 4 | 5 | τεῦχε | τεύχω | 9 | –⏑ |
+| Il. | 1 | 4 | 6 | κύνεσσιν | κύων | 10.5 | ⏑–– |
+
+### `--word-unit appositive-group`
+
+The other option is `--word-unit appositive-group`.
+The line is split on whitespace and punctuation as before,
+but then consecutive words may be grouped together into a single word unit
+according to whether they are considered appositive.
+
+```
+src/tei2csv --word-unit appositive-group "Il." corpus/iliad.xml > corpus/iliad.csv
+src/tei2html --word-unit appositive-group "Il." corpus/iliad.xml expectancy.csv > iliad.html
+```
+
+With this option, *Il.* 1.4
+is divided into 5 groups,
+the adjacent words αὐτοὺς and δὲ
+having been grouped together.
+Notice also that the `lemma` column contains the lemmata of the words in the group
+separated by spaces,
+and the `metrical_shape` column has the concatentation of the constituent words.
+
+| `work` | `book_n` | `line_n` | `word_n` | `word` | `lemma` | `sedes` | `metrical_shape` |
+|--------|---------:|---------:|---------:|--------|---------|---------|------------------|
+| Il. | 1 | 4 | 1 | ἡρώων | ἥρως | 1 | ––– |
+| Il. | 1 | 4 | 2 | αὐτοὺς δὲ | αὐτός δέ | 4 | ––⏑ |
+| Il. | 1 | 4 | 4 | ἑλώρια | ἑλώριον | 6.5 | ⏑–⏑⏑ |
+| Il. | 1 | 4 | 5 | τεῦχε | τεύχω | 9 | –⏑ |
+| Il. | 1 | 4 | 6 | κύνεσσιν | κύων | 10.5 | ⏑–– |
+
+The definitions that control how words are joined into appositive groups
+are the tables
+`ALWAYS_PREPOSITIVE_WORDS` and `ALWAYS_POSTPOSITIVE_WORDS` in
+[src/appositive.py](/src/appositive.py),
+and the word-by-word override table in
+[src/exceptional-appositives.csv](/src/exceptional-appositives.csv).
+
+
 ## Controlling the variables used to calculate expectancy
 
 You can control what variables are used to group the input
