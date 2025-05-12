@@ -33,7 +33,7 @@ with open(os.path.join(os.path.dirname(__file__), "exceptional-appositives.csv")
 
 ALWAYS_PREPOSITIVE_WORDS = set(unicodedata.normalize("NFD", word) for word in (
     "ἀμ",
-    "ἀμφ᾽",
+    "ἀμφ’",
     "ἀμφί",
     "ἀμφὶ",
     "ἀντί",
@@ -79,6 +79,9 @@ ALWAYS_PREPOSITIVE_WORDS = set(unicodedata.normalize("NFD", word) for word in (
     "κατὰ",
     "μά",
     "μὰ",
+    "μετά",
+    "μετὰ",
+    "μετ’",
     "μήδ’",
     "μηδέ",
     "μηδὲ",
@@ -93,6 +96,16 @@ ALWAYS_PREPOSITIVE_WORDS = set(unicodedata.normalize("NFD", word) for word in (
     "οὐτ’",
     "οὔτε",
     "οὐχ",
+    "παρά",
+    "παρὰ",
+    "παρ’",
+    "περὶ",
+    "προς",
+    "προτὶ",
+    "ὑπὸ",
+    "ὑπό",
+    "ὑπ’",
+    "ὑφ’",
     "αἰ",
     "ἀλλ’",
     "ἀλλά",
@@ -207,7 +220,7 @@ ALWAYS_PREPOSITIVE_WORDS = set(unicodedata.normalize("NFD", word) for word in (
     "ἕνεκα",
     "ἕνεκ’",
     "ἕνεκεν",
-    "εἵνεκα",
+    "εἵνεκα"
 ))
 
 ALWAYS_POSTPOSITIVE_WORDS = set(unicodedata.normalize("NFD", word) for word in (
@@ -219,14 +232,17 @@ ALWAYS_POSTPOSITIVE_WORDS = set(unicodedata.normalize("NFD", word) for word in (
     "ἄρα",
     "γε",
     "γέ",
+    "γ’",
     "γάρ",
     "γὰρ",
     "δέ",
     "δὲ",
+    "δ’",
     "δή",
     "δὴ",
     "θην",
     "θήν",
+    "θ’",
     "κε",
     "κέ",
     "κεν",
@@ -244,6 +260,7 @@ ALWAYS_POSTPOSITIVE_WORDS = set(unicodedata.normalize("NFD", word) for word in (
     "ῥά",
     "τε",
     "τέ",
+    "τ’",
     "πῃ",
     "ποι",
     "ποθ’",
@@ -335,6 +352,13 @@ ALWAYS_POSTPOSITIVE_WORDS = set(unicodedata.normalize("NFD", word) for word in (
     "φασιν",
     "ἔνι",
     "εἵνεκα",
+    "μέτα",
+    "πάρα",
+    "πάρ’",
+    "πέρι",
+    "ὕπο",
+    "ὕπ’",
+    "ὕφ’"
 ))
 
 # Return a generator that yields ranges of indices of consecutive equal elements
