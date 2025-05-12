@@ -220,7 +220,7 @@ ALWAYS_PREPOSITIVE_WORDS = set(unicodedata.normalize("NFD", word) for word in (
     "ἕνεκα",
     "ἕνεκ’",
     "ἕνεκεν",
-    "εἵνεκα"
+    "εἵνεκα",
 ))
 
 ALWAYS_POSTPOSITIVE_WORDS = set(unicodedata.normalize("NFD", word) for word in (
@@ -358,7 +358,7 @@ ALWAYS_POSTPOSITIVE_WORDS = set(unicodedata.normalize("NFD", word) for word in (
     "πέρι",
     "ὕπο",
     "ὕπ’",
-    "ὕφ’"
+    "ὕφ’",
 ))
 
 # Return a generator that yields ranges of indices of consecutive equal elements
