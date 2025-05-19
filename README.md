@@ -162,7 +162,7 @@ the adjacent words αὐτοὺς and δὲ
 having been grouped together.
 Notice also that the `lemma` column contains the lemmata of the words in the group
 separated by spaces,
-and the `metrical_shape` column has the concatentation of the constituent words.
+and the `metrical_shape` column has the concatenation of the constituent words.
 
 | `work` | `book_n` | `line_n` | `word_n` | `word` | `lemma` | `sedes` | `metrical_shape` |
 |--------|---------:|---------:|---------:|--------|---------|---------|------------------|
