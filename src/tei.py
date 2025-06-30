@@ -121,6 +121,13 @@ def tokenize_text(text):
     if nonword:
         yield Token(Token.Type.NONWORD, nonword)
 
+def tokenize_betacode(beta):
+    """Decode text from beta code, then split into a sequence of WORD and
+    NONWORD tokens."""
+    if "?" in beta:
+        raise ValueError("\"?\" not allowed in beta code; see https://github.com/sasansom/sedes/issues/11")
+    return tokenize_text(betacode.decode(beta))
+
 def consolidate_tokens(tokens):
     """Consolidate runs of consecutive WORD and NONWORD tokens."""
 
@@ -164,15 +171,6 @@ class Line:
 
     def words(self):
         return (token.text for token in self.tokens if token.type == Token.Type.WORD)
-
-# Yield immediate child text nodes and elements, in order.
-def child_elements_and_text(elem):
-    if elem.text is not None:
-        yield elem.text
-    for child in elem:
-        yield child
-        if child.tail is not None:
-            yield child.tail
 
 class TEI:
     """TEI represents a TEI document read from a file stream."""
@@ -218,113 +216,116 @@ class TEI:
         def do_elem(root, env):
             nonlocal line_n, partial, next_partial
 
-            for elem in child_elements_and_text(root):
+            # Handle any text before the first child element.
+            if root.text is not None:
+                partial.extend(tokenize_betacode(root.text))
+
+            for elem in root:
                 # Make a copy of the environment to pass to recursive calls to
                 # do_elem. This allows them to know, for example, what book_n
                 # they're in, while enabling us to remember the environment
                 # before the call.
                 sub_env = env.copy()
 
-                if type(elem) == xml.etree.ElementTree.Comment:
-                    pass
-                elif type(elem) == xml.etree.ElementTree.Element:
-                    # Lines may be marked up as
-                    #   <l n="100">text text text</l>
-                    #   <lb n="100"/>text text text
-                    # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
-                    # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
-                    if elem.tag in ("l", "lb"):
-                        if elem.tag == "lb":
-                            # Output the previous line. l elements are flushed
-                            # at the end of the loop iteration, where the
-                            # element is closed.
-                            for x in flush(env):
-                                yield x
-
-                        partial.extend(next_partial)
-                        next_partial.clear()
-
-                        cur_loc = Locator(env.book_n, line_n)
-                        n = elem.get("n")
-                        if n is not None:
-                            # If the new line is marked with a number, check it
-                            # against the previous line.
-                            new_loc = Locator(env.book_n, n)
-                            if not cur_loc.may_precede(new_loc):
-                                warn("after line {!r}, expected {!r}, got {!r}".format(cur_loc, cur_loc.successor(), new_loc))
-                        else:
-                            # If no line number is provided, guess based on the
-                            # previous line number.
-                            new_loc = cur_loc.successor()
-                        assert env.book_n == new_loc.book_n
-                        line_n = new_loc.line_n
-
-                        if elem.tag == "l":
-                            sub_env.in_line = True
-                        elif elem.tag == "lb":
-                            env.in_line = True
-                    elif elem.tag == "div1":
-                        assert elem.get("type").lower() in ("book", "hymn", "poem"), elem.get("type")
-                        sub_env.book_n = elem.get("n")
-                        # Reset the line counter at the beginning of a new book.
-                        line_n = None
-
-                    if elem.tag in ("milestone", "head", "gap", "pb", "note", "speaker"):
-                        pass
-                    elif elem.tag in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name", "supplied"):
-                        for x in do_elem(elem, sub_env):
-                            yield x
-                    elif elem.tag == "q":
-                        # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
-                        # Quotation is tricky because it can appear in two forms
-                        # with essentially opposite nesting:
-                        #   <lb/><q>abcd abcd abcd
-                        #   <lb/>efgh efgh efgh efgh</q>
-                        #
-                        #   <q><l>abcd abcd abcd</l>
-                        #   <l>efgh efgh efgh</l></q>
-                        # The first case is easy: we just add open and close
-                        # quotation marks where the open and close q tags
-                        # appear. In the second case, the q element doesn't
-                        # actually belong to either line; we have to migrate the
-                        # open quotation mark to the beginning of the first
-                        # line, and the close quotation mark to the end of the
-                        # last line.
-                        if env.in_line:
-                            partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
-                            for x in do_elem(elem, sub_env):
-                                yield x
-                            partial.append(Token(Token.Type.CLOSE_QUOTE, "’"))
-                        else:
-                            # Put the open quotation mark in a queue to be
-                            # prepended to the next line that begins.
-                            next_partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
-                            # Append the close quotation mark to the final
-                            # yielded line.
-                            buf = None
-                            for x in do_elem(elem, sub_env):
-                                if buf is not None:
-                                    yield buf
-                                buf = x
-                            assert buf is not None, buf
-                            loc, line = buf
-                            line.tokens.append(Token(Token.Type.CLOSE_QUOTE, "’"))
-                            yield loc, line
-                    else:
-                        raise ValueError("don't understand element {!r}".format(elem.tag))
-
-                    if elem.tag == "l":
+                # Lines may be marked up as
+                #   <l n="100">text text text</l>
+                #   <lb n="100"/>text text text
+                # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
+                # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
+                if elem.tag in ("l", "lb"):
+                    if elem.tag == "lb":
+                        # Output the previous line. l elements are flushed
+                        # at the end of the loop iteration, where the
+                        # element is closed.
                         for x in flush(env):
                             yield x
-                    elif elem.tag == "div1":
-                        for x in flush(sub_env):
+
+                    partial.extend(next_partial)
+                    next_partial.clear()
+
+                    cur_loc = Locator(env.book_n, line_n)
+                    n = elem.get("n")
+                    if n is not None:
+                        # If the new line is marked with a number, check it
+                        # against the previous line.
+                        new_loc = Locator(env.book_n, n)
+                        if not cur_loc.may_precede(new_loc):
+                            warn("after line {!r}, expected {!r}, got {!r}".format(cur_loc, cur_loc.successor(), new_loc))
+                    else:
+                        # If no line number is provided, guess based on the
+                        # previous line number.
+                        new_loc = cur_loc.successor()
+                    assert env.book_n == new_loc.book_n
+                    line_n = new_loc.line_n
+
+                    if elem.tag == "l":
+                        sub_env.in_line = True
+                    elif elem.tag == "lb":
+                        env.in_line = True
+                elif elem.tag == "div1":
+                    assert elem.get("type").lower() in ("book", "hymn", "poem"), elem.get("type")
+                    sub_env.book_n = elem.get("n")
+                    # Reset the line counter at the beginning of a new book.
+                    line_n = None
+
+                if elem.tag in ("milestone", "head", "gap", "pb", "note", "speaker"):
+                    pass
+                elif elem.tag in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name", "supplied"):
+                    for x in do_elem(elem, sub_env):
+                        yield x
+                elif elem.tag == "q":
+                    # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
+                    # Quotation is tricky because it can appear in two forms
+                    # with essentially opposite nesting:
+                    #   <lb/><q>abcd abcd abcd
+                    #   <lb/>efgh efgh efgh efgh</q>
+                    #
+                    #   <q><l>abcd abcd abcd</l>
+                    #   <l>efgh efgh efgh</l></q>
+                    # The first case is easy: we just add open and close
+                    # quotation marks where the open and close q tags
+                    # appear. In the second case, the q element doesn't
+                    # actually belong to either line; we have to migrate the
+                    # open quotation mark to the beginning of the first
+                    # line, and the close quotation mark to the end of the
+                    # last line.
+                    if env.in_line:
+                        partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
+                        for x in do_elem(elem, sub_env):
                             yield x
-                        # At the end of a book, reset the line counter to be safe.
-                        line_n = None
+                        partial.append(Token(Token.Type.CLOSE_QUOTE, "’"))
+                    else:
+                        # Put the open quotation mark in a queue to be
+                        # prepended to the next line that begins.
+                        next_partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
+                        # Append the close quotation mark to the final
+                        # yielded line.
+                        buf = None
+                        for x in do_elem(elem, sub_env):
+                            if buf is not None:
+                                yield buf
+                            buf = x
+                        assert buf is not None, buf
+                        loc, line = buf
+                        line.tokens.append(Token(Token.Type.CLOSE_QUOTE, "’"))
+                        yield loc, line
                 else:
-                    if "?" in elem:
-                        raise ValueError("\"?\" not allowed in beta code; see https://github.com/sasansom/sedes/issues/11")
-                    partial.extend(tokenize_text(betacode.decode(elem)))
+                    raise ValueError("don't understand element {!r}".format(elem.tag))
+
+                if elem.tag == "l":
+                    for x in flush(env):
+                        yield x
+                elif elem.tag == "div1":
+                    for x in flush(sub_env):
+                        yield x
+                    # At the end of a book, reset the line counter to be safe.
+                    line_n = None
+
+                # Handle any text between this child element and the next child
+                # element, or between the end tag of this child element and the
+                # end tag of the parent element.
+                if elem.tail is not None:
+                    partial.extend(tokenize_betacode(elem.tail))
 
         for x in do_elem(self.tree.find(".//text/body"), Environment()):
             yield x
