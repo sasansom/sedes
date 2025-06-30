@@ -1,960 +1,1047 @@
-<?xml version="1.0" encoding="utf-8"?>
-<TEI.2>
-
-<teiHeader status="new" type="text">
-
+<?xml version="1.0" encoding="UTF-8"?><?xml-model href="http://www.stoa.org/epidoc/schema/latest/tei-epidoc.rng" schematypens="http://relaxng.org/ns/structure/1.0"?><TEI xmlns="http://www.tei-c.org/ns/1.0">
+<teiHeader>
 <fileDesc>
-
 <titleStmt>
-<title>Works and Days (Greek). Machine readable text</title>
+    <title xml:lang="grc">Ἔργα καὶ Ἡμέραι</title>
 <author>Hesiod</author>
 <sponsor>Perseus Project, Tufts University</sponsor>
-		<principal>Gregory Crane</principal>
-		<respStmt>
-		<resp>Prepared under the supervision of</resp>
-		<name>Lisa Cerrato</name>
-		<name>William Merrill</name>
-		<name>Elli Mylonas</name>
-		<name>David Smith</name>
-		</respStmt>
+<principal>Gregory Crane</principal>
+<respStmt>
+<resp>Prepared under the supervision of</resp>
+<name>Lisa Cerrato</name>
+<name>William Merrill</name>
+<name>Elli Mylonas</name>
+<name>David Smith</name>
+</respStmt>
 <funder n="org:AnnCPB">The Annenberg CPB/Project</funder>
 </titleStmt>
-
-<extent>About 58Kb</extent>
-
 <publicationStmt>
-		<publisher>Trustees of Tufts University</publisher>
-		<pubPlace>Medford, MA</pubPlace>
-		<authority>Perseus Project</authority>
-		<availability status="free">
-    <p>This text may be freely distributed, subject to the following
-    restrictions:</p>
-    <list>
-	<item>You credit Perseus, as follows, whenever you use the document:
-	    <quote>Text provided by Perseus Digital Library, with funding from The Annenberg CPB/Project. Original version available for viewing and download at http://www.perseus.tufts.edu/hopper/.</quote>
-	</item>
-	<item>You leave this availability statement intact.</item>
-	<item>You use it for non-commercial purposes only.</item>
-	<item>You offer Perseus any modifications you make.</item>
-    </list>
-</availability>
+<publisher>Trustees of Tufts University</publisher>
+<pubPlace>Medford, MA</pubPlace>
+<authority>Perseus Project</authority>
 </publicationStmt>
-<notesStmt><note anchored="yes" place="unspecified">Text keyboarded in the Philippines.  Basic SGML tagging by Scott Ettinger.</note></notesStmt>
-
-<sourceDesc default="NO">
-<biblStruct default="NO">
-	<monogr>
-		<author>Hesiod</author><title>The Homeric Hymns and Homerica with an English Translation by Hugh G. Evelyn-White. Works and Days.</title>
-	
-		<imprint><publisher>Cambridge, MA.,Harvard University Press; London, William Heinemann Ltd.</publisher><date>1914</date></imprint>
-	</monogr>
-</biblStruct>
+<sourceDesc>
+    <biblStruct>
+        <monogr>
+            <author>Hesiod</author>
+            <title>The Homeric Hymns and Homerica</title>
+            <editor role="translator">Hugh G. Evelyn-White</editor>
+            <imprint>
+                <pubPlace>London</pubPlace>
+                <publisher>William Heinemann Ltd.</publisher>
+                <pubPlace>New York</pubPlace>
+                <publisher>The Macmillan Co.</publisher>
+                <date>1914</date>
+            </imprint>
+        </monogr>
+        <series>
+            <title>Loeb Classical Library</title>
+        </series>
+        <ref target="https://archive.org/details/hesiodhomerichym00hesiuoft/hesiodhomerichym00hesiuoft/page/n55/mode/2up">Internet Archive</ref>
+    </biblStruct>
 </sourceDesc>
-
-
 </fileDesc>
-
-<encodingDesc>
-
-<refsDecl doctype="TEI.2">
-<state unit="card" />
-</refsDecl>
-</encodingDesc>
-
-<profileDesc>
-<langUsage default="NO">
-<language id="greek">Greek</language>
-<language id="en">English</language>
-</langUsage>
-</profileDesc>
-<revisionDesc>
-<change>
-<date>7/91</date><respStmt><name>Bill Merrill</name><resp>(n/a)</resp></respStmt><item>Check tagging.</item>
-</change>
-<change>
-<date>8/91</date><respStmt><name>EM</name><resp>(n/a)</resp></respStmt><item>Revise DTDs and recheck texts.</item>
-</change>
-<change>
-<date>10/91</date><respStmt><name>David Smith</name><resp>(n/a)</resp></respStmt><item>Fix typos from failed morphology.</item>
-</change>
-</revisionDesc>
-
+    <encodingDesc>
+        <refsDecl n="CTS">
+            <cRefPattern n="line" matchPattern="(\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:l[@n='$1'])">
+                <p>This pointer pattern extracts line</p>
+            </cRefPattern>
+        </refsDecl>
+        <refsDecl>
+            <refState unit="line"/>
+        </refsDecl>
+    </encodingDesc>
+    <profileDesc>
+        <langUsage>
+            <language ident="grc">Greek</language>
+            <language ident="eng">English</language>
+        </langUsage>
+    </profileDesc>
+    <revisionDesc>
+        <change who="Scott Ettinger" notAfter="1991-07">Basic SGML tagging.</change>
+        <change notAfter="1991-07">Text keyboarded in the Philippines.</change>
+        <change who="Bill Merrill" when="1991-07">Check tagging.</change>
+        <change who="Elli Mylonas" when="1991-08">Revise DTDs and recheck texts.</change>
+        <change who="David Smith" when="1991-10">Fix typos from failed morphology.</change>
+        <change when="2016-02-18" who="TDBuck">converted to CTS EpiDoc</change>
+    </revisionDesc>
 </teiHeader>
-<text><body>
-<div1 n="WD" type="Book" org="uniform" sample="complete">
-<sp><p><milestone n="1" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />*mou=sai *pieri/hqen a)oidh=|sin klei/ousai
-<lb />deu=te, *di/' e)nne/pete, sfe/teron pate/r' u(mnei/ousai:
-<lb />o(/nte dia\ brotoi\ a)/ndres o(mw=s a)/fatoi/ te fatoi/ te,
-<lb />r(htoi/ t' a)/rrhtoi/ te *dio\s mega/loio e(/khti.
-<lb rend="displayNum" n="5" />r(e/a me\n ga\r bria/ei, r(e/a de\ bria/onta xale/ptei,
-<lb />r(ei=a d' a)ri/zhlon minu/qei kai\ a)/dhlon a)e/cei,
-<lb />r(ei=a de/ t' i)qu/nei skolio\n kai\ a)gh/nora ka/rfei
-<lb />*zeu\s u(yibreme/ths, o(\s u(pe/rtata dw/mata nai/ei.
-<lb />klu=qi i)dw\n a)i/wn te, di/kh| d' i)/qune qe/mistas
-<lb rend="displayNum" n="10" />tu/nh: e)gw\ de/ ke, *pe/rsh, e)th/tuma muqhsai/mhn.</p></sp>
-<p>
-<milestone n="11" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />ou)k a)/ra mou=non e)/hn *)eri/dwn ge/nos, a)ll' e)pi\ gai=an
-<lb />ei)si\ du/w: th\n me/n ken e)paine/sseie noh/sas,
-<lb />h(\ d' e)pimwmhth/: dia\ d' a)/ndixa qumo\n e)/xousin.
-<lb />h(\ me\n ga\r po/lemo/n te kako\n kai\ dh=rin o)fe/llei,
-<lb rend="displayNum" n="15" />sxetli/h: ou)/tis th/n ge filei= broto/s, a)ll' u(p' a)na/gkhs
-<lb />a)qana/twn boulh=|sin *)/erin timw=si barei=an.
-<lb />th\n d' e(te/rhn prote/rhn me\n e)gei/nato *nu\c e)rebennh/,
-<lb />qh=ke de/ min *kroni/dhs u(yi/zugos, ai)qe/ri nai/wn,
-<lb />gai/hs e)n r(i/zh|si, kai\ a)ndra/si pollo\n a)mei/nw:
-<lb rend="displayNum" n="20" />h(/te kai\ a)pa/lamo/n per o(mw=s e)pi\ e)/rgon e)/geiren.
-<lb />ei)s e(/teron ga/r ti/s te i)dw\n e)/rgoio xati/zei
-<lb />plou/sion, o(\s speu/dei me\n a)rw/menai h)de\ futeu/ein
-<lb />oi)=ko/n t' eu)= qe/sqai: zhloi= de/ te gei/tona gei/twn
-<lb />ei)s a)/fenos speu/dont': a)gaqh\ d' *)/eris h(/de brotoi=sin.
-<lb rend="displayNum" n="25" />kai\ kerameu\s keramei= kote/ei kai\ te/ktoni te/ktwn,
-<lb />kai\ ptwxo\s ptwxw=| fqone/ei kai\ a)oido\s a)oidw=|.
-<lb /><milestone ed="P" unit="para" />w)= *pe/rsh, su\ de\ tau=ta tew=| e)nika/tqeo qumw=|,
-<lb />mhde/ s' *)/eris kako/xartos a)p' e)/rgou qumo\n e)ru/koi
-<lb />nei/ke' o)pipeu/ont' a)gorh=s e)pakouo\n e)o/nta.
-<lb rend="displayNum" n="30" />w)/rh ga/r t' o)li/gh pe/letai neike/wn t' a)gore/wn te,
-<lb />w(=|tini mh\ bi/os e)/ndon e)phetano\s kata/keitai
-<lb />w(rai=os, to\n gai=a fe/rei, *dhmh/teros a)kth/n.
-<lb />tou= ke koressa/menos nei/kea kai\ dh=rin o)fe/llois
-<lb />kth/mas' e)p' a)llotri/ois: soi\ d' ou)ke/ti deu/teron e)/stai
-<lb rend="displayNum" n="35" />w(=d' e)/rdein: a)ll' au)=qi diakrinw/meqa nei=kos
-<lb />i)qei/h|si di/kh|s, ai(/ t' e)k *dio/s ei)sin a)/ristai.
-<lb />h)/dh me\n ga\r klh=ron e)dassa/meq', a)lla\ ta\ polla\
-<lb />a(rpa/zwn e)fo/reis me/ga kudai/nwn basilh=as
-<lb />dwrofa/gous, oi(\ th/nde di/khn e)qe/lousi di/kassai.
-<lb rend="displayNum" n="40" />nh/pioi, ou)de\ i)/sasin o(/sw| ple/on h(/misu panto\s
-<lb />ou)d' o(/son e)n mala/xh| te kai\ a)sfode/lw| me/g' o)/neiar.
-<milestone n="42" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />kru/yantes ga\r e)/xousi qeoi\ bi/on a)nqrw/poisin:
-<lb />r(hidi/ws ga/r ken kai\ e)p' h)/mati e)rga/ssaio,
-<lb />w(/ste se kei)s e)niauto\n e)/xein kai\ a)ergo\n e)o/nta:
-<lb rend="displayNum" n="45" />ai)=ya/ ke phda/lion me\n u(pe\r kapnou= kataqei=o,
-<lb />e)/rga bow=n d' a)po/loito kai\ h(mio/nwn talaergw=n.
-<lb />a)lla\ *zeu\s e)/kruye xolwsa/menos fresi\n h(=|sin,
-<lb />o(/tti min e)capa/thse *promhqeu\s a)gkulomh/ths:
-<lb />tou)/nek' a)/r' a)nqrw/poisin e)mh/sato kh/dea lugra/.
-<lb rend="displayNum" n="50" />kru/ye de\ pu=r: to\ me\n au)=tis e)u\s pa/is *)iapetoi=o
-<lb />e)/kley' a)nqrw/poisi *dio\s pa/ra mhtio/entos
-<lb />e)n koi\+lw| na/rqhki laqw\n *di/a terpike/raunon.
-<lb />to\n de\ xolwsa/menos prose/fh nefelhgere/ta *zeus:
-</p>
-<sp><p>
-<lb /><milestone ed="P" unit="para" />*)iapetioni/dh, pa/ntwn pe/ri mh/dea ei)dw/s,
-<lb rend="displayNum" n="55" />xai/reis pu=r kle/yas kai\ e)ma\s fre/nas h)peropeu/sas,
-<lb />soi/ t' au)tw=| me/ga ph=ma kai\ a)ndra/sin e)ssome/noisin.
-<lb />toi=s d' e)gw\ a)nti\ puro\s dw/sw kako/n, w(=| ken a(/pantes
-<lb />te/rpwntai kata\ qumo\n e(o\n kako\n a)mfagapw=ntes.
-</p></sp>
-<p><milestone n="59" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />w(\s e)/fat': e)k d' e)ge/lasse path\r a)ndrw=n te qew=n te.
-<lb rend="displayNum" n="60" />*(/hfaiston d' e)ke/leuse perikluto\n o(/tti ta/xista
-<lb />gai=an u(/dei fu/rein, e)n d' a)nqrw/pou qe/men au)dh\n
-<lb />kai\ sqe/nos, a)qana/th|s de\ qeh=|s ei)s w)=pa e)i/skein
-<lb />parqenikh=s kalo\n ei)=dos e)ph/raton: au)ta\r *)aqh/nhn
-<lb />e)/rga didaskh=sai, poludai/dalon i(sto\n u(fai/nein:
-<lb rend="displayNum" n="65" />kai\ xa/rin a)mfixe/ai kefalh=| xruse/hn *)afrodi/thn
-<lb />kai\ po/qon a)rgale/on kai\ guiobo/rous meledw/nas:
-<lb />e)n de\ qe/men ku/neo/n te no/on kai\ e)pi/klopon h)=qos
-<lb />*(ermei/hn h)/nwge, dia/ktoron *)argei+fo/nthn.
-<lb /><milestone ed="P" unit="para" />w(\s e)/faq': oi(\ d' e)pi/qonto *dii\ *kroni/wni a)/nakti.
-<lb rend="displayNum" n="70" />au)ti/ka d' e)k gai/hs pla/ssen kluto\s *)amfiguh/eis
-<lb />parqe/nw| ai)doi/h| i)/kelon *kroni/dew dia\ boula/s:
-<lb />zw=se de\ kai\ ko/smhse qea\ glaukw=pis *)aqh/nh:
-<lb />a)mfi\ de/ oi( *xa/rite/s te qeai\ kai\ po/tnia *peiqw\
-<lb />o(/rmous xrusei/ous e)/qesan xroi/+: a)mfi\ de\ th/n ge
-<lb rend="displayNum" n="75" />*(=wrai kalli/komoi ste/fon a)/nqesin ei)arinoi=sin:
-<lb /><del status="unremarkable">pa/nta de/ oi( xroi\+ ko/smon e)fh/rmose *palla\s *)aqh/nh.</del>
-<lb />e)n d' a)/ra oi( sth/qessi dia/ktoros *)argei+fo/nths
-<lb />yeu/dea/ q' ai(muli/ous te lo/gous kai\ e)pi/klopon h)=qos
-<lb /><del status="unremarkable">teu=ce *dio\s boulh=|si baruktu/pou: e)n d' a)/ra fwnh\n</del>
-<lb rend="displayNum" n="80" />qh=ke qew=n kh=ruc, o)no/mhne de\ th/nde gunai=ka
-<lb />*pandw/rhn, o(/ti pa/ntes *)olu/mpia dw/mat' e)/xontes
-<lb />dw=ron e)dw/rhsan, ph=m' a)ndra/sin a)lfhsth=|sin.
-<milestone n="83" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />au)ta\r e)pei\ do/lon ai)pu\n a)mh/xanon e)cete/lessen,
-<lb />ei)s *)epimhqe/a pe/mpe path\r kluto\n *)argei+fo/nthn
-<lb rend="displayNum" n="85" />dw=ron a)/gonta, qew=n taxu\n a)/ggelon: ou)d' *)epimhqeu\s
-<lb />e)fra/saq', w(/s oi( e)/eipe *promhqeu\s mh/ pote dw=ron
-<lb />de/casqai pa\r *zhno\s *)olumpi/ou, a)ll' a)pope/mpein
-<lb />e)copi/sw, mh/ pou/ ti kako\n qnhtoi=si ge/nhtai.
-<lb />au)ta\r o(\ deca/menos, o(/te dh\ kako\n ei)=x', e)no/hsen.
-<lb rend="displayNum" n="90" />*pri\n me\n ga\r zw/eskon e)pi\ xqoni\ fu=l' a)nqrw/pwn
-<lb />no/sfin a)/ter te kakw=n kai\ a)/ter xalepoi=o po/noio
-<lb />nou/swn t' a)rgale/wn, ai(/ t' a)ndra/si *kh=ras e)/dwkan.
-<lb /><del status="unremarkable">ai)=ya ga\r e)n kako/thti brotoi\ kataghra/skousin.</del>
-<lb />a)lla\ gunh\ xei/ressi pi/qou me/ga pw=m' a)felou=sa
-<lb rend="displayNum" n="95" />e)ske/das': a)nqrw/poisi d' e)mh/sato kh/dea lugra/.
-<lb />mou/nh d' au)to/qi *)elpi\s e)n a)rrh/ktoisi do/moisin
-<lb />e)/ndon e)/mimne pi/qou u(po\ xei/lesin, ou)de\ qu/raze
-<lb />e)ce/pth: pro/sqen ga\r e)pe/llabe pw=ma pi/qoio
-<lb /><del status="unremarkable">ai)gio/xou boulh=|si *dio\s nefelhgere/tao.</del>
-<lb rend="displayNum" n="100" />a)/lla de\ muri/a lugra\ kat' a)nqrw/pous a)la/lhtai:
-<lb />plei/h me\n ga\r gai=a kakw=n, plei/h de\ qa/lassa:
-<lb />nou=soi d' a)nqrw/poisin e)f' h(me/rh|, ai(\ d' e)pi\ nukti\
-<lb />au)to/matoi foitw=si kaka\ qnhtoi=si fe/rousai
-<lb />sigh=|, e)pei\ fwnh\n e)cei/leto mhti/eta *zeu/s.
-<lb rend="displayNum" n="105" />ou(/tws ou)/ti ph e)/sti *dio\s no/on e)cale/asqai.
-<lb /><milestone ed="P" unit="para" />ei) d' e)qe/leis, e(/tero/n toi e)gw\ lo/gon e)kkorufw/sw
-<lb />eu)= kai\ e)pistame/nws: su\ d' e)ni\ fresi\ ba/lleo sh=|sin.
-<lb />w(s o(mo/qen gega/asi qeoi\ qnhtoi/ t' a)/nqrwpoi.
-<milestone n="109" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />xru/seon me\n prw/tista ge/nos mero/pwn a)nqrw/pwn
-<lb rend="displayNum" n="110" />a)qa/natoi poi/hsan *)olu/mpia dw/mat' e)/xontes.
-<lb />oi(\ me\n e)pi\ *kro/nou h)=san, o(/t' ou)ranw=| e)mbasi/leuen:
-<lb />w(/ste qeoi\ d' e)/zwon a)khde/a qumo\n e)/xontes
-<lb />no/sfin a)/ter te po/nwn kai\ o)izu/os: ou)de/ ti deilo\n
-<lb />gh=ras e)ph=n, ai)ei\ de\ po/das kai\ xei=ras o(moi=oi
-<lb rend="displayNum" n="115" />te/rpont' e)n qali/h|si kakw=n e)/ktosqen a(pa/ntwn:
-<lb />qnh=|skon d' w(/sq' u(/pnw| dedmhme/noi: e)sqla\ de\ pa/nta
-<lb />toi=sin e)/hn: karpo\n d' e)/fere zei/dwros a)/roura
-<lb />au)toma/th pollo/n te kai\ a)/fqonon: oi(\ d' e)qelhmoi\
-<lb />h(/suxoi e)/rg' e)ne/monto su\n e)sqloi=sin pole/essin.
-<lb rend="displayNum" n="120" />a)fneioi\ mh/loisi, fi/loi maka/ressi qeoi=sin.
-<lb /><milestone ed="P" unit="para" />au)ta\r e)pei\ dh\ tou=to ge/nos kata\ gai=' e)ka/luye,—
-<lb />toi\ me\n dai/mones a(gnoi\ e)pixqo/nioi kale/ontai
-<lb />e)sqloi/, a)leci/kakoi, fu/lakes qnhtw=n a)nqrw/pwn,
-<lb /><del status="unremarkable">oi(/ r(a fula/ssousi/n te di/kas kai\ sxe/tlia e)/rga
-<lb rend="displayNum" n="125" />h)e/ra e(ssa/menoi pa/nth foitw=ntes e)p' ai)=an,</del>
-<lb />ploutodo/tai: kai\ tou=to ge/ras basilh/ion e)/sxon—,
-<lb />deu/teron au)=te ge/nos polu\ xeiro/teron meto/pisqen
-<lb />a)rgu/reon poi/hsan *)olu/mpia dw/mat' e)/xontes,
-<lb />xruse/w| ou)/te fuh\n e)nali/gkion ou)/te no/hma.
-<lb rend="displayNum" n="130" />a)ll' e(kato\n me\n pai=s e)/tea para\ mhte/ri kednh=|
-<lb />e)tre/fet' a)ta/llwn, me/ga nh/pios, w(=| e)ni\ oi)/kw|.
-<lb />a)ll' o(/t' a)/r' h(bh/sai te kai\ h(/bhs me/tron i(/koito,
-<lb />pauri/dion zw/eskon e)pi\ xro/non, a)/lge' e)/xontes
-<lb />a)fradi/h|s: u(/brin ga\r a)ta/sqalon ou)k e)du/nanto
-<lb rend="displayNum" n="135" />a)llh/lwn a)pe/xein, ou)d' a)qana/tous qerapeu/ein
-<lb />h)/qelon ou)d' e)/rdein maka/rwn i(eroi=s e)pi\ bwmoi=s,
-<lb />h(\ qe/mis a)nqrw/pois kata\ h)/qea. tou\s me\n e)/peita
-<lb />*zeu\s *kroni/dhs e)/kruye xolou/menos, ou(/neka tima\s
-<lb />ou)k e)/didon maka/ressi qeoi=s, oi(\ *)/olumpon e)/xousin.
-<milestone n="140" ed="p" unit="card" />
-<lb rend="displayNum" n="140" /><milestone ed="P" unit="para" />au)ta\r e)pei\ kai\ tou=to ge/nos kata\ gai=' e)ka/luye,—
-<lb />toi\ me\n u(poxqo/nioi ma/kares qnhtoi=s kale/ontai,
-<lb />deu/teroi, a)ll' e)/mphs timh\ kai\ toi=sin o)phdei=—,
-<lb />*zeu\s de\ path\r tri/ton a)/llo ge/nos mero/pwn a)nqrw/pwn
-<lb />xa/lkeion poi/hs', ou)k a)rgure/w| ou)de\n o(moi=on,
-<lb rend="displayNum" n="145" />e)k melia=n, deino/n te kai\ o)/brimon: oi(=sin *)/arhos
-<lb />e)/rg' e)/melen stono/enta kai\ u(/bries: ou)de/ ti si=ton
-<lb />h)/sqion, a)ll' a)da/mantos e)/xon kratero/frona qumo/n,
-<lb />a)/plastoi: mega/lh de\ bi/h kai\ xei=res a)/aptoi
-<lb />e)c w)/mwn e)pe/fukon e)pi\ stibaroi=si me/lessin.
-<lb rend="displayNum" n="150" />w(=n d' h)=n xa/lkea me\n teu/xea, xa/lkeoi de/ te oi)=koi
-<lb />xalkw=| d' ei)rga/zonto: me/las d' ou)k e)/ske si/dhros.
-<lb />kai\ toi\ me\n xei/ressin u(/po sfete/rh|si dame/ntes
-<lb />bh=san e)s eu)rw/enta do/mon kruerou= *ai/dao
-<lb />nw/numnoi: qa/natos de\ kai\ e)kpa/glous per e)o/ntas
-<lb rend="displayNum" n="155" />ei(=le me/las, lampro\n d' e)/lipon fa/os h)eli/oio.
-<lb /><milestone ed="P" unit="para" />au)ta\r e)pei\ kai\ tou=to ge/nos kata\ gai=' e)ka/luyen,
-<lb />au)=tis e)/t' a)/llo te/tarton e)pi\ xqoni\ poulubotei/rh|
-<lb />*zeu\s *kroni/dhs poi/hse, dikaio/teron kai\ a)/reion,
-<lb />a)ndrw=n h(rw/wn qei=on ge/nos, oi(\ kale/ontai
-<lb rend="displayNum" n="160" />h(mi/qeoi, prote/rh geneh\ kat' a)pei/rona gai=an.
-<lb />kai\ tou\s me\n po/lemo/s te kako\s kai\ fu/lopis ai)nh/,
-<lb />tou\s me\n u(f' e(ptapu/lw| *qh/bh|, *kadmhi/di gai/h|,
-<lb />w)/lese marname/nous mh/lwn e(/nek' *oi)dipo/dao,
-<lb />tou\s de\ kai\ e)n nh/essin u(pe\r me/ga lai=tma qala/sshs
-<lb rend="displayNum" n="165" />e)s *troi/hn a)gagw\n *(ele/nhs e(/nek' h)uko/moio.
-<lb />e)/nq' h)/toi tou\s me\n qana/tou te/los a)mfeka/luye,
-<lb />toi=s de\ di/x' a)nqrw/pwn bi/oton kai\ h)/qe' o)pa/ssas
-<lb />*zeu\s *kroni/dhs kate/nasse path\r e)s pei/rata gai/hs.
-<lb rend="displayNum" n="170" />kai\ toi\ me\n nai/ousin a)khde/a qumo\n e)/xontes
-<lb />e)n maka/rwn nh/soisi par' *)wkeano\n baqudi/nhn,
-<lb />o)/lbioi h(/rwes, toi=sin melihde/a karpo\n
-<lb rend="displayNum" n="173" />tri\s e)/teos qa/llonta fe/rei zei/dwros a)/roura.
-<lb rend="displayNum" n="169" />thlou= a)p' a)qana/twn: toi=sin *kro/nos e)mbasileu/ei.
-<lb rend="displayNum" n="169a" /><del status="unremarkable">tou= ga\r desmo\</del>n e)/luse pa<del status="unremarkable">th\r a)ndrw=n te qew=n te.
-<lb rend="displayNum" n="169b" />toi=si d' o(mw=s n</del>ea/tois timh\ <del status="unremarkable">kai\ ku=dos o)phdei=.
-<lb rend="displayNum" n="169c" />*pe/mpton d' au)=tis e)/t' a)/</del>llo ge/nos qh=k' <del status="unremarkable">eu)ru/opa *zeu\s
-<lb rend="displayNum" n="169d" />a)ndrw=n, oi(\</del> gega/asin e)pi\ <del status="unremarkable">xqoni\ poulubotei/rh|.</del>
-<milestone n="174" ed="p" unit="card" /></p>
-<sp><p>
-<lb rend="displayNum" n="174" /><milestone ed="P" unit="para" />mhke/t' e)/peit' w)/fellon e)gw\ pe/mptoisi metei=nai
-<lb rend="displayNum" n="175" />a)ndra/sin, a)ll' h)\ pro/sqe qanei=n h)\ e)/peita gene/sqai.</p></sp>
-<p>
-<lb />nu=n ga\r dh\ ge/nos e)sti\ sidh/reon: ou)de/ pot' h)=mar
-<lb />pau/ontai kama/tou kai\ o)izu/os, ou)de/ ti nu/ktwr
-<lb />fqeiro/menoi. xalepa\s de\ qeoi\ dw/sousi meri/mnas:
-<lb />a)ll' e)/mphs kai\ toi=si memei/cetai e)sqla\ kakoi=sin.
-<lb rend="displayNum" n="180" />*zeu\s d' o)le/sei kai\ tou=to ge/nos mero/pwn a)nqrw/pwn,
-<lb />eu)=t' a)\n geino/menoi poliokro/tafoi tele/qwsin.
-<lb />ou)de\ path\r pai/dessin o(moi/ios ou)de/ ti pai=des,
-<lb />ou)de\ cei=nos ceinodo/kw| kai\ e(tai=ros e(tai/rw|,
-<lb />ou)de\ kasi/gnhtos fi/los e)/ssetai, w(s to\ pa/ros per.
-<lb rend="displayNum" n="185" />ai)=ya de\ ghra/skontas a)timh/sousi tokh=as:
-<lb />me/myontai d' a)/ra tou\s xalepoi=s ba/zontes e)/pessi
-<lb />sxe/tlioi ou)de\ qew=n o)/pin ei)do/tes: ou)de/ ken oi(/ ge
-<lb />ghra/ntessi tokeu=sin a)po\ qrepth/ria doi=en
-<lb />xeirodi/kai: e(/teros d' e(te/rou po/lin e)calapa/cei.
-<lb rend="displayNum" n="190" />ou)de/ tis eu)o/rkou xa/ris e)/ssetai ou)/te dikai/ou
-<lb />ou)/t' a)gaqou=, ma=llon de\ kakw=n r(ekth=ra kai\ u(/brin
-<lb />a)ne/res ai)nh/sousi: di/kh d' e)n xersi/, kai\ ai)dw\s
-<lb />ou)k e)/stai: bla/yei d' o( kako\s to\n a)rei/ona fw=ta
-<lb />mu/qoisin skolioi=s e)ne/pwn, e)pi\ d' o(/rkon o)mei=tai.
-<lb rend="displayNum" n="195" />zh=los d' a)nqrw/poisin o)izuroi=sin a(/pasi
-<lb />duske/lados kako/xartos o(marth/sei, stugerw/phs.
-<lb />kai\ to/te dh\ pro\s *)/olumpon a)po\ xqono\s eu)ruodei/hs
-<lb />leukoi=sin fa/ressi kaluyame/na xro/a kalo\n
-<lb />a)qana/twn meta\ fu=lon i)/ton prolipo/nt' a)nqrw/pous
-<lb rend="displayNum" n="200" />*ai)dw\s kai\ *ne/mesis: ta\ de\ lei/yetai a)/lgea lugra\
-<lb />qnhtoi=s a)nqrw/poisi: kakou= d' ou)k e)/ssetai a)lkh/.
-</p>
-<sp><p><milestone n="202" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />nu=n d' ai)=non basileu=sin e)re/w frone/ousi kai\ au)toi=s:</p></sp>
-<p>
-<lb />w(=d' i)/rhc prose/eipen a)hdo/na poikilo/deiron
-<lb />u(/yi ma/l' e)n nefe/essi fe/rwn o)nu/xessi memarpw/s:
-<lb rend="displayNum" n="205" />h(\ d' e)leo/n, gnamptoi=si peparme/nh a)mf' o)nu/xessi,
-<lb />mu/reto: th\n o(/g' e)pikrate/ws pro\s mu=qon e)/eipen:
-</p>
-<sp><p><lb /><milestone ed="P" unit="para" />daimoni/h, ti/ le/lhkas; e)/xei nu/ se pollo\n a)rei/wn:
-<lb />th=| d' ei)=s, h(=| s' a)\n e)gw/ per a)/gw kai\ a)oido\n e)ou=san:
-<lb />dei=pnon d', ai)/ k' e)qe/lw, poih/somai h)e\ meqh/sw.
-<lb rend="displayNum" n="210" />a)/frwn d', o(/s k' e)qe/lh| pro\s krei/ssonas a)ntiferi/zein:
-<lb />ni/khs te ste/retai pro/s t' ai)/sxesin a)/lgea pa/sxei.</p></sp>
-<p>
-<lb /><milestone ed="P" unit="para" />w(\s e)/fat' w)kupe/ths i)/rhc, tanusi/pteros o)/rnis.</p>
-<sp><p>
-<lb /><milestone ed="P" unit="para" />w)= *pe/rsh, su\ d' a)/koue di/khs, mhd' u(/brin o)/felle:</p></sp>
-<p>
-<lb />u(/bris ga/r te kakh\ deilw=| brotw=|: ou)de\ me\n e)sqlo\s
-<lb rend="displayNum" n="215" />r(hidi/ws fere/men du/natai, baru/qei de/ q' u(p' au)th=s
-<lb />e)gku/rsas a)/th|sin: o(do\s d' e(te/rhfi parelqei=n
-<lb />krei/sswn e)s ta\ di/kaia: *di/kh d' u(pe\r *(/ubrios i)/sxei
-<lb />e)s te/los e)celqou=sa: paqw\n de/ te nh/pios e)/gnw.
-<lb />au)ti/ka ga\r tre/xei *(/orkos a(/ma skolih=|si di/kh|sin.
-<lb rend="displayNum" n="220" />th=s de\ *di/khs r(o/qos e(lkome/nhs, h(=| k' a)/ndres a)/gwsi
-<lb />dwrofa/goi, skolih=|s de\ di/kh|s kri/nwsi qe/mistas.
-<lb />h(\ d' e(/petai klai/ousa po/lin kai\ h)/qea law=n,
-<lb />h)e/ra e(ssame/nh, kako\n a)nqrw/poisi fe/rousa,
-<lb />oi(/ te min e)cela/swsi kai\ ou)k i)qei=an e)/neiman.
-<lb rend="displayNum" n="225" />*oi(\ de\ di/kas cei/noisi kai\ e)ndh/moisi didou=sin
-<lb />i)qei/as kai\ mh/ ti parekbai/nousi dikai/ou,
-<lb />toi=si te/qhle po/lis, laoi\ d' a)nqeu=sin e)n au)th=|:
-<lb />ei)rh/nh d' a)na\ gh=n kourotro/fos, ou)de/ pot' au)toi=s
-<lb />a)rgale/on po/lemon tekmai/retai eu)ru/opa *zeu/s:
-<lb rend="displayNum" n="230" />ou)de/ pot' i)qudi/kh|si met' a)ndra/si limo\s o)phdei=
-<lb />ou)d' a)/th, qali/h|s de\ memhlo/ta e)/rga ne/montai.
-<lb />toi=si fe/rei me\n gai=a polu\n bi/on, ou)/resi de\ dru=s
-<lb />a)/krh me/n te fe/rei bala/nous, me/ssh de\ meli/ssas:
-<lb />ei)ropo/koi d' o)/ies malloi=s katabebri/qasin:
-<lb rend="displayNum" n="235" />ti/ktousin de\ gunai=kes e)oiko/ta te/kna goneu=sin:
-<lb />qa/llousin d' a)gaqoi=si diampere/s: ou)d' e)pi\ nhw=n
-<lb />ni/ssontai, karpo\n de\ fe/rei zei/dwros a)/roura.
-<milestone n="238" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />oi(=s d' u(/bris te me/mhle kakh\ kai\ sxe/tlia e)/rga,
-<lb />toi=s de\ di/khn *kroni/dhs tekmai/retai eu)ru/opa *zeu/s.
-<lb rend="displayNum" n="240" />polla/ki kai\ cu/mpasa po/lis kakou= a)ndro\s a)phu/ra,
-<lb />o(/s ken a)litrai/nh| kai\ a)ta/sqala mhxana/atai.
-<lb />toi=sin d' ou)rano/qen me/g' e)ph/gage ph=ma *kroni/wn
-<lb />limo\n o(mou= kai\ loimo/n: a)pofqinu/qousi de\ laoi/.
-<lb />ou)de\ gunai=kes ti/ktousin, minu/qousi de\ oi)=koi
-<lb rend="displayNum" n="245" />*zhno\s fradmosu/nh|sin *)olumpi/ou: a)/llote d' au)=te
-<lb />h)\ tw=n ge strato\n eu)ru\n a)pw/lesen h)\ o(/ ge tei=xos
-<lb />h)\ ne/as e)n po/ntw| *kroni/dhs a)poai/nutai au)tw=n.
-<lb /><milestone ed="P" unit="para" />w)= basilh=s, u(mei=s de\ katafra/zesqe kai\ au)toi\
-<lb />th/nde di/khn: e)ggu\s ga\r e)n a)nqrw/poisin e)o/ntes
-<lb rend="displayNum" n="250" />a)qa/natoi fra/zontai, o(/soi skolih=|si di/kh|sin
-<lb />a)llh/lous tri/bousi qew=n o)/pin ou)k a)le/gontes.
-<lb />tri\s ga\r mu/rioi/ ei)sin e)pi\ xqoni\ poulubotei/rh|
-<lb />a)qa/natoi *zhno\s fu/lakes qnhtw=n a)nqrw/pwn:
-<lb />oi(/ r(a fula/ssousi/n te di/kas kai\ sxe/tlia e)/rga
-<lb rend="displayNum" n="255" />h)e/ra e(ssa/menoi, pa/nth foitw=ntes e)p' ai)=an.
-<lb />h( de/ te parqe/nos e)sti\ *di/kh, *dio\s e)kgegaui=a,
-<lb />kudrh/ t' ai)doi/h te qew=n, oi(\ *)/olumpon e)/xousin.
-<lb />kai/ r(' o(po/t' a)/n ti/s min bla/pth| skoliw=s o)nota/zwn,
-<lb />au)ti/ka pa\r *dii\ patri\ kaqezome/nh *kroni/wni
-<lb rend="displayNum" n="260" />ghru/et' a)nqrw/pwn a)/dikon no/on, o)/fr' a)poti/sh|
-<lb />dh=mos a)tasqali/as basile/wn, oi(\ lugra\ noeu=ntes
-<lb />a)/llh| parkli/nwsi di/kas skoliw=s e)ne/pontes.
-<lb />tau=ta fulasso/menoi, basilh=s, i)qu/nete †di/kas
-<lb />dwrofa/goi, skolie/wn de\ dike/wn e)pi\ pa/gxu la/qesqe.
-<lb rend="displayNum" n="265" /><milestone ed="P" unit="para" />oi(= g' au)tw=| kaka\ teu/xei a)nh\r a)/llw| kaka\ teu/xwn,
-<lb />h( de\ kakh\ boulh\ tw=| bouleu/santi kaki/sth.
-<lb /><milestone ed="P" unit="para" />pa/nta i)dw\n *dio\s o)fqalmo\s kai\ pa/nta noh/sas
-<lb />kai/ nu ta/d', ai)/ k' e)qe/lh|s', e)pide/rketai, ou)de/ e( lh/qei,
-<lb />oi(/hn dh\ kai\ th/nde di/khn po/lis e)nto\s e)e/rgei.
-<lb rend="displayNum" n="270" />nu=n dh\ e)gw\ mh/t' au)to\s e)n a)nqrw/poisi di/kaios
-<lb />ei)/hn mh/t' e)mo\s ui(o/s: e)pei\ kako\n a)/ndra di/kaion
-<lb />e)/mmenai, ei) mei/zw ge di/khn a)dikw/teros e(/cei:
-<lb />a)lla\ ta/ g' ou)/ pw e)/olpa telei=n *di/a mhtio/enta.
-<milestone n="274" ed="p" unit="card" /></p>
-<sp><p>
-<lb /><milestone ed="P" unit="para" />w)= *pe/rsh, su\ de\ tau=ta meta\ fresi\ ba/lleo sh=|si,
-<lb rend="displayNum" n="275" />kai\ nu di/khs e)pa/koue, bi/hs d' e)pilh/qeo pa/mpan.</p></sp>
-<p>
-<lb />to/nde ga\r a)nqrw/poisi no/mon die/tace *kroni/wn
-<lb />i)xqu/si me\n kai\ qhrsi\ kai\ oi)wnoi=s petehnoi=s
-<lb />e)sqe/men a)llh/lous, e)pei\ ou) di/kh e)sti\ met' au)toi=s:
-<lb />a)nqrw/poisi d' e)/dwke di/khn, h(\ pollo\n a)ri/sth
-<lb rend="displayNum" n="280" />gi/gnetai: ei) ga/r ti/s k' e)qe/lh| ta\ di/kai' a)goreu=sai
-<lb />gignw/skwn, tw=| me/n t' o)/lbon didoi= eu)ru/opa *zeu/s:
-<lb />o(\s de/ ke marturi/h|si e(kw\n e)pi/orkon o)mo/ssas
-<lb />yeu/setai, e)n de\ di/khn bla/yas nh/keston a)asqh=|,
-<lb />tou= de/ t' a)maurote/rh geneh\ meto/pisqe le/leiptai:
-<lb rend="displayNum" n="285" />a)ndro\s d' eu)o/rkou geneh\ meto/pisqen a)mei/nwn.
-<lb /><milestone ed="P" unit="para" />soi\ d' e)gw\ e)sqla\ noe/wn e)re/w, me/ga nh/pie *pe/rsh.
-<lb />th\n me/n toi kako/thta kai\ i)lado\n e)/stin e(le/sqai
-<lb />r(hidi/ws: lei/h me\n o(do/s, ma/la d' e)ggu/qi nai/ei:
-<lb />th=s d' a)reth=s i(drw=ta qeoi\ propa/roiqen e)/qhkan
-<lb rend="displayNum" n="290" />a)qa/natoi: makro\s de\ kai\ o)/rqios oi)=mos e)s au)th\n
-<lb />kai\ trhxu\s to\ prw=ton: e)ph\n d' ei)s a)/kron i(/khtai,
-<lb />r(hidi/h dh\ e)/peita pe/lei, xaleph/ per e)ou=sa.
-<lb /><milestone ed="P" unit="para" />ou(=tos me\n pana/ristos, o(\s au)to\s pa/nta noh/sh|
-<lb />frassa/menos, ta/ k' e)/peita kai\ e)s te/los h)=|sin a)mei/nw:
-<lb rend="displayNum" n="295" />e)sqlo\s d' au)= ka)kei=nos, o(\s eu)= ei)po/nti pi/qhtai:
-<lb />o(\s de/ ke mh/t' au)to\s noe/h| mh/t' a)/llou a)kou/wn
-<lb />e)n qumw=| ba/llhtai, o(\ d' au)=t' a)xrh/ios a)nh/r.
-<lb />a)lla\ su/ g' h(mete/rhs memnhme/nos ai)e\n e)fetmh=s
-<lb />e)rga/zeu, *pe/rsh, di=on ge/nos, o)/fra se limo\s
-<lb rend="displayNum" n="300" />e)xqai/rh|, file/h| de/ s' e)uste/fanos *dhmh/thr
-<lb />ai)doi/h, bio/tou de\ teh\n pimplh=|si kalih/n:
-<lb />limo\s ga/r toi pa/mpan a)ergw=| su/mforos a)ndri/.
-<lb />tw=| de\ qeoi\ nemesw=si kai\ a)ne/res, o(/s ken a)ergo\s
-<lb />zw/h|, khfh/nessi koqou/rois ei)/kelos o)rgh/n,
-<lb rend="displayNum" n="305" />oi(/ te melissa/wn ka/maton tru/xousin a)ergoi\
-<lb />e)/sqontes: soi\ d' e)/rga fi/l' e)/stw me/tria kosmei=n,
-<lb />w(/s ke/ toi w(rai/ou bio/tou plh/qwsi kaliai/.
-<lb />e)c e)/rgwn d' a)/ndres polu/mhloi/ t' a)fneioi/ te:
-<lb rend="displayNum" n="309" />kai\ e)rgazo/menoi polu\ fi/lteroi a)qana/toisin.
-<lb rend="displayNum" n="311" />e)/rgon d' ou)de\n o)/neidos, a)ergi/h de/ t' o)/neidos.
-<lb />ei) de/ ke e)rga/zh|, ta/xa se zhlw/sei a)ergo\s
-<lb />plouteu=nta: plou/tw| d' a)reth\ kai\ ku=dos o)phdei=.
-<lb />dai/moni d' oi(=os e)/hsqa, to\ e)rga/zesqai a)/meinon,
-<lb rend="displayNum" n="315" />ei)/ ken a)p' a)llotri/wn ktea/nwn a)esi/frona qumo\n
-<lb />ei)s e)/rgon tre/yas meleta=|s bi/ou, w(/s se keleu/w.
-<lb />ai)dw\s d' ou)k a)gaqh\ kexrhme/non a)/ndra komi/zei,
-<lb />ai)dw/s, h(/ t' a)/ndras me/ga si/netai h)d' o)ni/nhsin.
-<lb />ai)dw/s toi pro\s a)nolbi/h|, qa/rsos de\ pro\s o)/lbw|.
-<milestone n="320" ed="p" unit="card" />
-<lb rend="displayNum" n="320" /><milestone ed="P" unit="para" />xrh/mata d' ou)x a(rpakta/, qeo/sdota pollo\n a)mei/nw.
-<lb />ei) ga/r tis kai\ xersi\ bi/h| me/gan o)/lbon e(/lhtai,
-<lb />h)\ o(/ g' a)po\ glw/sshs lhi/ssetai, oi(=a/ te polla\
-<lb />gi/gnetai, eu)=t' a)\n dh\ ke/rdos no/on e)capath/sh|
-<lb />a)nqrw/pwn, ai)dw= de/ t' a)naidei/h katopa/zh|:
-<lb rend="displayNum" n="325" />r(ei=a de/ min maurou=si qeoi/, minu/qousi de\ oi)=kon
-<lb />a)ne/ri tw=|, pau=ron de/ t' e)pi\ xro/non o)/lbos o)phdei=.
-<lb />i)=son d' o(/s q' i(ke/thn o(/s te cei=non kako\n e)/rch|,
-<lb />o(/s te kasignh/toio e(ou= a)na\ de/mnia bai/nh|
-<lb />kruptadi/hs eu)nh=s a)lo/xou, parakai/ria r(e/zwn,
-<lb rend="displayNum" n="330" />o(/s te/ teu a)fradi/h|s a)litai/netai o)rfana\ te/kna,
-<lb />o(/s te gonh=a ge/ronta kakw=| e)pi\ gh/raos ou)dw=|
-<lb />neikei/h| xalepoi=si kaqapto/menos e)pe/essin:
-<lb />tw=| d' h)= toi *zeu\s au)to\s a)gai/etai, e)s de\ teleuth\n
-<lb />e)/rgwn a)nt' a)di/kwn xaleph\n e)pe/qhken a)moibh/n.
-<lb rend="displayNum" n="335" />a)lla\ su\ tw=n me\n pa/mpan e)/erg' a)esi/frona qumo/n.
-<lb />ka\d du/namin d' e)/rdein i(e/r' a)qana/toisi qeoi=sin
-<lb />a(gnw=s kai\ kaqarw=s, e)pi\ d' a)glaa\ mhri/a kai/ein:
-<lb />a)/llote de\ spondh=|si qu/essi/ te i(la/skesqai,
-<lb />h)me\n o(/t' eu)na/zh| kai\ o(/t' a)\n fa/os i(ero\n e)/lqh|,
-<lb rend="displayNum" n="340" />w(/s ke/ toi i(/laon kradi/hn kai\ qumo\n e)/xwsin,
-<lb />o)/fr' a)/llwn w)nh=| klh=ron, mh\ to\n teo\n a)/llos.
-<lb /><milestone ed="P" unit="para" />to\n file/ont' e)pi\ dai=ta kalei=n, to\n d' e)xqro\n e)a=sai:
-<lb />to\n de\ ma/lista kalei=n, o(/s tis se/qen e)ggu/qi nai/ei:
-<lb />ei) ga/r toi kai\ xrh=m' e)gxw/rion a)/llo ge/nhtai,
-<lb rend="displayNum" n="345" />gei/tones a)/zwstoi e)/kion, zw/santo de\ phoi/.
-<lb />ph=ma kako\s gei/twn, o(/sson t' a)gaqo\s me/g' o)/neiar.
-<lb />e)/mmore/ toi timh=s, o(/s t' e)/mmore gei/tonos e)sqlou=.
-<lb />ou)d' a)\n bou=s a)po/loit', ei) mh\ gei/twn kako\s ei)/h.
-<lb />eu)= me\n metrei=sqai para\ gei/tonos, eu)= d' a)podou=nai,
-<lb rend="displayNum" n="350" />au)tw=| tw=| me/trw|, kai\ lw/ion, ai)/ ke du/nhai,
-<lb />w(s a)\n xrhi/zwn kai\ e)s u(/steron a)/rkion eu(/rh|s.
-<lb /><milestone ed="P" unit="para" />mh\ kaka\ kerdai/nein: kaka\ ke/rdea i)=s' a)a/th|sin.
-<lb />to\n file/onta filei=n, kai\ tw=| prosio/nti prosei=nai.
-<lb />kai\ do/men, o(/s ken dw=|, kai\ mh\ do/men, o(/s ken mh\ dw=|.
-<lb rend="displayNum" n="355" />dw/th| me/n tis e)/dwken, a)dw/th| d' ou)/tis e)/dwken.
-<lb />dw\s a)gaqh/, a(/rpac de\ kakh/, qana/toio do/teira.
-<lb />o(\s me\n ga/r ken a)nh\r e)qe/lwn, o(/ ge, kei) me/ga doi/h,
-<lb />xai/rei tw=| dw/rw| kai\ te/rpetai o(\n kata\ qumo/n:
-<lb />o(\s de/ ken au)to\s e(/lhtai a)naidei/hfi piqh/sas,
-<lb rend="displayNum" n="360" />kai/ te smikro\n e)o/n, to/ g' e)pa/xnwsen fi/lon h)=tor.
-<lb rend="displayNum" n="363" />o(\s d' e)p' e)o/nti fe/rei, o(\ d' a)le/cetai ai)/qopa limo/n:
-<lb rend="displayNum" n="361" />ei) ga/r ken kai\ smikro\n e)pi\ smikrw=| kataqei=o
-<lb rend="displayNum" n="362" />kai\ qama\ tou=t' e)/rdois, ta/xa ken me/ga kai\ to\ ge/noito.
-<lb rend="displayNum" n="364" />ou)de\ to/ g' e)n oi)/kw| katakei/menon a)ne/ra kh/dei.
-<lb rend="displayNum" n="365" />oi)/koi be/lteron ei)=nai, e)pei\ blabero\n to\ qu/rhfin.
-<lb />e)sqlo\n me\n pareo/ntos e(le/sqai, ph=ma de\ qumw=|
-<lb />xrhi/zein a)peo/ntos, a(/ se fra/zesqai a)/nwga.
-<lb />a)rxome/nou de\ pi/qou kai\ lh/gontos kore/sasqai,
-<lb />messo/qi fei/desqai: deilh\ d' e)ni\ puqme/ni feidw/.
-<milestone n="370" ed="p" unit="card" />
-<lb rend="displayNum" n="370" /><milestone ed="P" unit="para" />misqo\s d' a)ndri\ fi/lw| ei)rhme/nos a)/rkios e)/stw.
-<lb />kai/ te kasignh/tw| gela/sas e)pi\ ma/rtura qe/sqai.
-<lb />pi/steis ga/r toi o(mw=s kai\ a)pisti/ai w)/lesan a)/ndras.
-<lb /><milestone ed="P" unit="para" />mh\ de\ gunh/ se no/on pugosto/los e)capata/tw
-<lb />ai(mu/la kwti/llousa, teh\n difw=sa kalih/n.
-<lb rend="displayNum" n="375" />o(\s de\ gunaiki\ pe/poiqe, pe/poiq' o(/ ge fhlh/th|sin.
-<lb /><milestone ed="P" unit="para" />mounogenh\s de\ pa/is ei)/h patrw/ion oi)=kon
-<lb />ferbe/men w(\s ga\r plou=tos a)e/cetai e)n mega/roisin.
-<lb />ghraio\s de\ qa/nois e(/teron pai=d' e)gkatalei/pwn.
-<lb />r(ei=a de/ ken pleo/nessi po/roi *zeu\s a)/speton o)/lbon.
-<lb rend="displayNum" n="380" />plei/wn me\n pleo/nwn mele/th, mei/zwn d' e)piqh/kh.
-<lb /><milestone ed="P" unit="para" />soi\ d' ei) plou/tou qumo\s e)e/ldetai e)n fresi\n h(=|sin,
-<lb />w(=d' e)/rdein, kai\ e)/rgon e)p' e)/rgw| e)rga/zesqai.
-<lb /><milestone ed="P" unit="para" />plhia/dwn *)atlagene/wn e)pitellomena/wn
-<lb />a)/rxesq' a)mh/tou, a)ro/toio de\ dusomena/wn.
-<lb rend="displayNum" n="385" />ai(\ dh/ toi nu/ktas te kai\ h)/mata tessara/konta
-<lb />kekru/fatai, au)=tis de\ periplome/nou e)niautou=
-<lb />fai/nontai ta\ prw=ta xarassome/noio sidh/rou.
-<lb />ou(=to/s toi pedi/wn pe/letai no/mos, oi(/ te qala/sshs
-<lb />e)ggu/qi naieta/ous', oi(/ t' a)/gkea bhssh/enta,
-<lb rend="displayNum" n="390" />po/ntou kumai/nontos a)po/proqi, pi/ona xw=ron
-<lb />nai/ousin: gumno\n spei/rein, gumno\n de\ bowtei=n,
-<lb />gumno\n d' a)ma/ein, ei)/ x' w(/ria pa/nt' e)qe/lh|sqa
-<lb />e)/rga komi/zesqai *dhmh/teros: w(/s toi e(/kasta
-<lb />w(/ri' a)e/chtai, mh/ pws ta\ me/taze xati/zwn
-<lb rend="displayNum" n="395" />ptw/ssh|s a)llotri/ous oi)/kous kai\ mhde\n a)nu/ssh|s.
-<lb />w(s kai\ nu=n e)p' e)/m' h)=lqes: e)gw\ de/ toi ou)k e)pidw/sw
-<lb />ou)d' e)pimetrh/sw: e)rga/zeu, nh/pie *pe/rsh,
-<lb />e)/rga, ta/ t' a)nqrw/poisi qeoi\ dietekmh/ranto,
-<lb />mh/ pote su\n pai/dessi gunaiki/ te qumo\n a)xeu/wn
-<lb rend="displayNum" n="400" />zhteu/h|s bi/oton kata\ gei/tonas, oi(\ d' a)melw=sin.
-<lb />di\s me\n ga\r kai\ tri\s ta/xa teu/ceai: h)\n d' e)/ti luph=|s,
-<lb />xrh=ma me\n ou) prh/ceis, su\ d' e)tw/sia po/ll' a)goreu/seis:
-<lb />a)xrei=os d' e)/stai e)pe/wn nomo/s. a)lla/ s' a)/nwga
-<lb />fra/zesqai xreiw=n te lu/sin limou= t' a)lewrh/n.
-<milestone n="405" ed="p" unit="card" />
-<lb rend="displayNum" n="405" /><milestone ed="P" unit="para" />oi)=kon me\n prw/tista gunai=ka/ te bou=n t' a)roth=ra,
-<lb />kthth/n, ou) gameth/n, h(/tis kai\ bousi\n e(/poito,
-<lb />xrh/mata d' e)n oi)/kw| pa/nt' a)/rmena poih/sasqai,
-<lb />mh\ su\ me\n ai)th=|s a)/llon, o(\ d' a)rnh=tai, su\ de\ thta=|,
-<lb />h( d' w(/rh paramei/bhtai, minu/qh| de\ to\ e)/rgon.
-<lb rend="displayNum" n="410" />mhd' a)naba/llesqai e)/s t' au)/rion e)/s te e)/nhfin:
-<lb />ou) ga\r e)twsioergo\s a)nh\r pi/mplhsi kalih\n
-<lb />ou)d' a)naballo/menos: mele/th de\ to\ e)/rgon o)fe/llei:
-<lb />ai)ei\ d' a)mboliergo\s a)nh\r a)/th|si palai/ei.
-<lb /><milestone ed="P" unit="para" />h)=mos dh\ lh/gei me/nos o)ce/os h)eli/oio
-<lb rend="displayNum" n="415" />kau/matos i)dali/mou, metopwrino\n o)mbrh/santos
-<lb />*zhno\s e)risqene/os, meta\ de\ tre/petai bro/teos xrw\s
-<lb />pollo\n e)lafro/teros: dh\ ga\r to/te *sei/rios a)sth\r
-<lb />baio\n u(pe\r kefalh=s khritrefe/wn a)nqrw/pwn
-<lb />e)/rxetai h)ma/tios, plei=on de/ te nukto\s e)paurei=:
-<lb rend="displayNum" n="420" />th=mos a)dhktota/th pe/letai tmhqei=sa sidh/rw|
-<lb />u(/lh, fu/lla d' e)/raze xe/ei, pto/rqoio/ te lh/gei:
-<lb />th=mos a)/r' u(lotomei=n memnhme/nos w(/ria e)/rga.
-<lb />o)/lmon me\n tripo/dhn ta/mnein, u(/peron de\ tri/phxun,
-<lb />a)/cona d' e(ptapo/dhn: ma/la ga/r nu/ toi a)/rmenon ou(/tw:
-<lb rend="displayNum" n="425" />ei) de/ ken o)ktapo/dhn, a)po\ kai\ sfu=ra/n ke ta/moio.
-<lb />trispi/qamon d' a)/yin ta/mnein dekadw/rw| a)ma/ch|.
-<lb />po/ll' e)pikampu/la ka=la: fe/rein de\ gu/hn, o(/t' a)\n eu(/rh|s,
-<lb />e)s oi)=kon, kat' o)/ros dizh/menos h)\ kat' a)/rouran,
-<lb />pri/ninon: o(\s ga\r bousi\n a)rou=n o)xurw/tato/s e)stin,
-<lb rend="displayNum" n="430" />eu)=t' a)\n *)aqhnai/hs dmw=|os e)n e)lu/mati ph/cas
-<lb />go/mfoisin pela/sas prosarh/retai i(stoboh=i.
-<lb />doia\ de\ qe/sqai a)/rotra, ponhsa/menos kata\ oi)=kon,
-<lb />au)to/guon kai\ phkto/n, e)pei\ polu\ lw/ion ou(/tw:
-<lb />ei)/ x' e(/teron a)/cais, e(/tero/n k' e)pi\ bousi\ ba/loio.
-<lb rend="displayNum" n="435" />da/fnhs d' h)\ ptele/hs a)kiw/tatoi i(stoboh=es,
-<lb />druo\s e)/luma, gu/hs pri/nou: bo/e d' e)nnaeth/rw
-<lb />a)/rsene kekth=sqai, tw=n ga\r sqe/nos ou)k a)lapadno/n,
-<lb />h(/bhs me/tron e)/xonte: tw\ e)rga/zesqai a)ri/stw.
-<lb />ou)k a)\n tw/ g' e)ri/sante e)n au)/laki ka\m me\n a)/rotron
-<lb rend="displayNum" n="440" />a)/ceian, to\ de\ e)/rgon e)tw/sion au)=qi li/poien.
-<lb />toi=s d' a(/ma tessarakontaeth\s ai)zho\s e(/poito
-<lb />a)/rton deipnh/sas tetra/trufon, o)kta/blwmon,
-<lb />o(\s e)/rgou meletw=n i)qei=a/n k' au)/lak' e)lau/noi,
-<lb />mhke/ti paptai/nwn meq' o(mh/likas, a)ll' e)pi\ e)/rgw|
-<lb rend="displayNum" n="445" />qumo\n e)/xwn: tou= d' ou)/ti new/teros a)/llos a)mei/nwn
-<lb />spe/rmata da/ssasqai kai\ e)pispori/hn a)le/asqai.
-<lb />kouro/teros ga\r a)nh\r meq' o(mh/likas e)ptoi/htai.
-<milestone n="448" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />fra/zesqai d', eu)=t' a)\n gera/nou fwnh\n e)pakou/sh|s
-<lb />u(yo/qen e)k nefe/wn e)niau/sia keklhgui/hs:
-<lb rend="displayNum" n="450" />h(/t' a)ro/toio/ te sh=ma fe/rei kai\ xei/matos w(/rhn
-<lb />deiknu/ei o)mbrhrou=: kradi/hn d' e)/dak' a)ndro\s a)bou/tew:
-<lb />dh\ to/te xorta/zein e(/likas bo/as e)/ndon e)o/ntas:
-<lb />r(hi/dion ga\r e)/pos ei)pei=n: bo/e do\s kai\ a)/macan:
-<lb />r(hi/dion d' a)panh/nasqai: pa/ra e)/rga bo/essin.
-<lb rend="displayNum" n="455" />fhsi\ d' a)nh\r fre/nas a)fneio\s ph/casqai a)/macan,
-<lb />nh/pios, ou)de\ to\ oi)=d': e(kato\n de/ te dou/rat' a)ma/chs,
-<lb />tw=n pro/sqen mele/thn e)xe/men oi)kh/ia qe/sqai.
-<lb /><milestone ed="P" unit="para" />eu)=t' a)\n de\ prw/tist' a)/rotos qnhtoi=si fanei/h|,
-<lb />dh\ to/t' e)formhqh=nai o(mw=s dmw=e/s te kai\ au)to\s
-<lb rend="displayNum" n="460" />au)/hn kai\ dierh\n a)ro/wn a)ro/toio kaq' w(/rhn,
-<lb />prwi\ ma/la speu/dwn, i(/na toi plh/qwsin a)/rourai.
-<lb />h)=ri polei=n: qe/reos de\ newme/nh ou)/ s' a)path/sei.
-<lb />neio\n de\ spei/rein e)/ti koufi/zousan a)/rouran:
-<lb />neio\s a)lecia/rh pai/dwn eu)khlh/teira.
-<lb rend="displayNum" n="465" /><milestone ed="P" unit="para" />eu)/xesqai de\ *dii\ xqoni/w| *dhmh/teri/ q' a(gnh=|,
-<lb />e)ktele/a bri/qein *dhmh/teros i(ero\n a)kth/n,
-<lb />a)rxo/menos ta\ prw=t' a)ro/tou, o(/t' a)\n a)/kron e)xe/tlhs
-<lb />xeiri\ labw\n o(/rphka bow=n e)pi\ nw=ton i(/khai
-<lb />e)/ndruon e(lko/ntwn mesa/bwn. o( de\ tutqo\s o)/pisqe
-<lb rend="displayNum" n="470" />dmw=|os e)/xwn make/lhn po/non o)rni/qessi tiqei/h
-<lb />spe/rma katakru/ptwn: e)uqhmosu/nh ga\r a)ri/sth
-<lb />qnhtoi=s a)nqrw/pois, kakoqhmosu/nh de\ kaki/sth.
-<lb />w(=de/ ken a(drosu/nh| sta/xues neu/oien e)/raze,
-<lb />ei) te/los au)to\s o)/pisqen *)olu/mpios e)sqlo\n o)pa/zoi,
-<lb rend="displayNum" n="475" />e)k d' a)gge/wn e)la/seias a)ra/xnia: kai/ se e)/olpa
-<lb />ghqh/sein bio/tou ai)reu/menon e)/ndon e)o/ntos.
-<lb />eu)oxqe/wn d' i(/ceai polio\n e)/ar, ou)de\ pro\s a)/llous
-<lb />au)ga/seai: se/o d' a)/llos a)nh\r kexrhme/nos e)/stai.
-<milestone n="479" ed="p" unit="card" /></p>
-<sp><p>
-<lb /><milestone ed="P" unit="para" />ei) de/ ken h)eli/oio troph=|s a)ro/w|s xqo/na di=an,
-<lb rend="displayNum" n="480" />h(/menos a)mh/seis o)li/gon peri\ xeiro\s e)e/rgwn,
-<lb />a)nti/a desmeu/wn kekonime/nos, ou) ma/la xai/rwn,
-<lb />oi)/seis d' e)n formw=|: pau=roi de/ se qhh/sontai.</p></sp>
-<p>
-<lb />a)/llote d' a)lloi=os *zhno\s no/os ai)gio/xoio,
-<lb />a)rgale/os d' a)/ndressi kataqnhtoi=si noh=sai.
-<lb rend="displayNum" n="485" />ei) de/ ken o)/y' a)ro/sh|s, to/de ke/n toi fa/rmakon ei)/h:
-<lb />h)=mos ko/kkuc kokku/zei druo\s e)n peta/loisi
-<lb />to\ prw=ton, te/rpei de\ brotou\s e)p' a)pei/rona gai=an,
-<lb />th=mos *zeu\s u(/oi tri/tw| h)/mati mhd' a)polh/goi,
-<lb />mh/t' a)/r' u(perba/llwn boo\s o(plh\n mh/t' a)polei/pwn:
-<lb rend="displayNum" n="490" />ou(/tw k' o)yaro/ths prw|hro/th| i)sofari/zoi.
-<lb />e)n qumw=| d' eu)= pa/nta fula/sseo: mhde/ se lh/qoi
-<lb />mh/t' e)/ar gigno/menon polio\n mh/q' w(/rios o)/mbros.
-<lb /><milestone ed="P" unit="para" />pa\r d' i)/qi xa/lkeion qw=kon kai\ e)pale/a le/sxhn
-<lb />w(/rh| xeimeri/h|, o(po/te kru/os a)ne/ra e)/rgwn
-<lb rend="displayNum" n="495" />i)sxa/nei, e)/nqa k' a)/oknos a)nh\r me/ga oi)=kon o)fe/lloi,
-<lb />mh/ se kakou= xeimw=nos a)mhxani/h katama/ryh|
-<lb />su\n peni/h|, lepth=| de\ paxu\n po/da xeiri\ pie/zh|s.
-<lb />polla\ d' a)ergo\s a)nh/r, keneh\n e)pi\ e)lpi/da mi/mnwn,
-<lb />xrhi/zwn bio/toio, kaka\ prosele/cato qumw=|.
-<lb rend="displayNum" n="500" />e)lpi\s d' ou)k a)gaqh\ kexrhme/non a)/ndra komi/zei,
-<lb />h(/menon e)n le/sxh|, tw=| mh\ bi/os a)/rkios ei)/h.
-<lb /><milestone ed="P" unit="para" />dei/knue de\ dmw/essi qe/reus e)/ti me/ssou e)o/ntos:
-<lb />ou)k ai)ei\ qe/ros e)ssei=tai, poiei=sqe kalia/s.
-<milestone n="504" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />mh=na de\ *lhnaiw=na, ka/k' h)/mata, boudo/ra pa/nta,
-<lb rend="displayNum" n="505" />tou=ton a)leu/asqai, kai\ phga/das, ai(/t' e)pi\ gai=an
-<lb />pneu/santos *bore/ao dushlege/es tele/qousin,
-<lb />o(/ste dia\ *qrh/|khs i(ppotro/fou eu)re/i po/ntw|
-<lb />e)mpneu/sas w)/rine: me/muke de\ gai=a kai\ u(/lh:
-<lb />polla\s de\ dru=s u(yiko/mous e)la/tas te paxei/as
-<lb rend="displayNum" n="510" />ou)/reos e)n bh/ssh|s pilna=| xqoni\ poulubotei/rh|
-<lb />e)mpi/ptwn, kai\ pa=sa boa=| to/te nh/ritos u(/lh.
-<lb />qh=res de\ fri/ssous', ou)ra\s d' u(po\ me/ze' e)/qento,
-<lb />tw=n kai\ la/xnh| de/rma kata/skion: a)lla/ nu kai\ tw=n
-<lb />yuxro\s e)w\n dia/hsi dasuste/rnwn per e)o/ntwn.
-<lb rend="displayNum" n="515" />kai/ te dia\ r(inou= boo\s e)/rxetai, ou)de/ min i)/sxei:
-<lb />kai/ te di' ai)=ga a)/hsi tanu/trixa: pw/ea d' ou)/ ti,
-<lb />ou(/nek' e)phetanai\ tri/xes au)tw=n, ou) dia/hsin
-<lb />i)\s a)ne/mou *bore/ou: troxalo\n de\ ge/ronta ti/qhsin.
-<lb />kai\ dia\ parqenikh=s a(palo/xroos ou) dia/hsin,
-<lb rend="displayNum" n="520" />h(/te do/mwn e)/ntosqe fi/lh| para\ mhte/ri mi/mnei
-<lb />ou)/ pw e)/rga i)dui=a poluxru/sou *)afrodi/ths:
-<lb />eu)= te loessame/nh te/rena xro/a kai\ li/p' e)lai/w|
-<lb />xrisame/nh muxi/h katale/cetai e)/ndoqi oi)/kou
-<lb />h)/mati xeimeri/w|, o(/t' a)no/steos o(\n po/da te/ndei
-<lb rend="displayNum" n="525" />e)/n t' a)pu/rw| oi)/kw| kai\ h)/qesi leugale/oisin.
-<lb />ou)de/ oi( h)e/lios dei/knu nomo\n o(rmhqh=nai:
-<lb />a)ll' e)pi\ kuane/wn a)ndrw=n dh=mo/n te po/lin te
-<lb />strwfa=tai, bra/dion de\ *panellh/nessi faei/nei.
-<lb />kai\ to/te dh\ keraoi\ kai\ nh/keroi u(lhkoi=tai
-<lb rend="displayNum" n="530" />lugro\n mulio/wntes a)na\ dri/a bhssh/enta
-<lb />feu/gousin: kai\ pa=sin e)ni\ fresi\ tou=to me/mhlen,
-<lb />w(s ske/pa maio/menoi pukinou\s keuqmw=nas e)/xwsi
-<lb />kai\ gla/fu petrh=en: to/te dh\ tri/podi brotw=| i)=soi,
-<lb />ou(= t' e)pi\ nw=ta e)/age, ka/rh d' ei)s ou)=das o(ra=tai,
-<lb rend="displayNum" n="535" />tw=| i)/keloi foitw=sin, a)leuo/menoi ni/fa leukh/n.
-<milestone n="536" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />kai\ to/te e(/ssasqai e)/ruma xroo/s, w(/s se keleu/w,
-<lb />xlai=na/n te malakh\n kai\ termio/enta xitw=na:
-<lb />sth/moni d' e)n pau/rw| pollh\n kro/ka mhru/sasqai:
-<lb />th\n perie/ssasqai, i(/na toi tri/xes a)treme/wsi,
-<lb rend="displayNum" n="540" />mhd' o)rqai\ fri/sswsin a)eiro/menai kata\ sw=ma.
-<lb />a)mfi\ de\ possi\ pe/dila boo\s i)=fi ktame/noio
-<lb />a)/rmena dh/sasqai, pi/lois e)/ntosqe puka/ssas.
-<lb />prwtogo/nwn d' e)ri/fwn, o(po/t' a)\n kru/os w(/rion e)/lqh|,
-<lb />de/rmata surra/ptein neu/rw| boo/s, o)/fr' e)pi\ nw/tw|
-<lb rend="displayNum" n="545" />u(etou= a)mfiba/lh| a)le/hn: kefalh=fi d' u(/perqen
-<lb />pi=lon e)/xein a)skhto/n, i(/n' ou)/ata mh\ katadeu/h|:
-<lb />yuxrh\ ga/r t' h)w\s pe/letai *bore/ao peso/ntos
-<lb />h)w/ios d' e)pi\ gai=an a)p' ou)ranou= a)stero/entos
-<lb />a)h\r purofo/ros te/tatai maka/rwn e)pi\ e)/rgois:
-<lb rend="displayNum" n="550" />o(/ste a)rusa/menos potamw=n a)/po ai)enao/ntwn,
-<lb />u(you= u(pe\r gai/hs a)rqei\s a)ne/moio que/llh|
-<lb />a)/llote me/n q' u(/ei poti\ e(/speron, a)/llot' a)/hsi
-<lb />pukna\ *qrhiki/ou *bore/ou ne/fea klone/ontos.
-<lb />to\n fqa/menos e)/rgon tele/sas oi)=ko/nde ne/esqai,
-<lb rend="displayNum" n="555" />mh/ pote/ s' ou)rano/qen skoto/en ne/fos a)mfikalu/yh|,
-<lb />xrw=ta de\ mudale/on qh/h| kata/ q' ei(/mata deu/sh|.
-<lb />a)ll' u(paleu/asqai: mei\s ga\r xalepw/tatos ou(=tos,
-<lb />xeime/rios, xalepo\s proba/tois, xalepo\s d' a)nqrw/pois.
-<lb />th=mos tw)/misu bousi/n, e)p' a)ne/ri de\ ple/on ei)/h
-<lb rend="displayNum" n="560" />a(rmalih=s: makrai\ ga\r e)pi/rroqoi eu)fro/nai ei)si/n.
-<lb />tau=ta fulasso/menos tetelesme/non ei)s e)niauto\n
-<lb />i)sou=sqai nu/ktas te kai\ h)/mata, ei)so/ken au)=tis
-<lb />gh= pa/ntwn mh/thr karpo\n su/mmikton e)nei/kh|.
-<lb /><milestone ed="P" unit="para" />eu)=t' a)\n d' e(ch/konta meta\ tropa\s h)eli/oio
-<lb rend="displayNum" n="565" />xeime/ri' e)ktele/sh| *zeu\s h)/mata, dh/ r(a to/t' a)sth\r
-<lb />*)arktou=ros prolipw\n i(ero\n r(o/on *)wkeanoi=o
-<lb />prw=ton pamfai/nwn e)pite/lletai a)krokne/faios.
-<lb />to\n de\ me/t' o)rqogo/h *pandioni\s w)=rto xelidw\n
-<lb />e)s fa/os a)nqrw/pois, e)/aros ne/on i(stame/noio.
-<lb rend="displayNum" n="570" />th\n fqa/menos oi)/nas pertamne/men: w(\s ga\r a)/meinon.
-<milestone n="571" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />a)ll' o(po/t' a)\n fere/oikos a)po\ xqono\s a)\m futa\ bai/nh|
-<lb />*plhia/das feu/gwn, to/te dh\ ska/fos ou)ke/ti oi)ne/wn:
-<lb />a)ll' a(/rpas te xarasse/menai kai\ dmw=as e)gei/rein:
-<lb />feu/gein de\ skierou\s qw/kous kai\ e)p' h)o/a koi=ton
-<lb rend="displayNum" n="575" />w(/rh| e)n a)mh/tou, o(/te t' h)e/lios xro/a ka/rfei.
-<lb />thmou=tos speu/dein kai\ oi)/kade karpo\n a)ginei=n
-<lb />o)/rqrou a)nista/menos, i(/na toi bi/os a)/rkios ei)/h.
-<lb />h)w\s ga\r e)/rgoio tri/thn a)pomei/retai ai)=san,
-<lb />h)w/s toi profe/rei me\n o(dou=, profe/rei de\ kai\ e)/rgou,
-<lb rend="displayNum" n="580" />h)w/s, h(/te fanei=sa pole/as e)pe/bhse keleu/qou
-<lb />a)nqrw/pous polloi=si/ t' e)pi\ zuga\ bousi\ ti/qhsin.
-<lb /><milestone ed="P" unit="para" />h)=mos de\ sko/lumo/s t' a)nqei= kai\ h)xe/ta te/ttic
-<lb />dendre/w| e)fezo/menos ligurh\n kataxeu/et' a)oidh\n
-<lb />pukno\n u(po\ pteru/gwn, qe/reos kamatw/deos w(/rh|,
-<lb rend="displayNum" n="585" />th=mos pio/tatai/ t' ai)=ges kai\ oi)=nos a)/ristos,
-<lb />maxlo/tatai de\ gunai=kes, a)fauro/tatoi de/ toi a)/ndres
-<lb />ei)si/n, e)pei\ kefalh\n kai\ gou/nata *sei/rios a)/zei,
-<lb />au)ale/os de/ te xrw\s u(po\ kau/matos: a)lla\ to/t' h)/dh
-<lb />ei)/h petrai/h te skih\ kai\ bi/blinos oi)=nos,
-<lb rend="displayNum" n="590" />ma/za t' a)molgai/h ga/la t' ai)gw=n sbennumena/wn,
-<lb />kai\ boo\s u(lofa/goio kre/as mh/ pw tetokui/hs
-<lb />prwtogo/nwn t' e)ri/fwn: e)pi\ d' ai)/qopa pine/men oi)=non,
-<lb />e)n skih=| e(zo/menon, kekorhme/non h)=tor e)dwdh=s,
-<lb />a)nti/on a)krae/os *zefu/rou tre/yanta pro/swpa,
-<lb rend="displayNum" n="595" />krh/nhs t' ai)ena/ou kai\ a)porru/tou, h(/t' a)qo/lwtos,
-<lb />tri\s u(/datos proxe/ein, to\ de\ te/traton i(e/men oi)/nou.
-<lb /><milestone ed="P" unit="para" />dmwsi\ d' e)potru/nein *dhmh/teros i(ero\n a)kth\n
-<lb />dine/men, eu)=t' a)\n prw=ta fanh=| sqe/nos *)wari/wnos,
-<lb />xw/rw| e)n eu)ae/i kai\ e)utroxa/lw| e)n a)lwh=|.
-<lb rend="displayNum" n="600" />me/trw| d' eu)= komi/sasqai e)n a)/ggesin: au)ta\r e)ph\n dh\
-<lb />pa/nta bi/on kata/qhai e)pa/rmenon e)/ndoqi oi)/kou,
-<lb />qh=ta/ t' a)/oikon poiei=sqai kai\ a)/teknon e)/riqon
-<lb />di/zhsqai ke/lomai: xaleph\ d' u(po/portis e)/riqos:
-<lb />kai\ ku/na karxaro/donta komei=n, mh\ fei/deo si/tou,
-<lb rend="displayNum" n="605" />mh/ pote/ s' h(mero/koitos a)nh\r a)po\ xrh/maq' e(/lhtai.
-<lb />xo/rton d' e)skomi/sai kai\ surfeto/n, o)/fra toi ei)/h
-<lb />bousi\ kai\ h(mio/noisin e)phetano/n. au)ta\r e)/peita
-<lb />dmw=as a)nayu=cai fi/la gou/nata kai\ bo/e lu=sai.
-<milestone n="609" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />eu)=t' a)\n d' *)wari/wn kai\ *sei/rios e)s me/son e)/lqh|
-<lb rend="displayNum" n="610" />ou)rano/n, *)arktou=ron d' e)si/dh| r(ododa/ktulos *hw/s,
-<lb />w)= *pe/rsh, to/te pa/ntas a)podre/pen oi)/kade bo/trus:
-<lb />dei=cai d' h)eli/w| de/ka t' h)/mata kai\ de/ka nu/ktas,
-<lb />pe/nte de\ suskia/sai, e(/ktw| d' ei)s a)/gge' a)fu/ssai
-<lb />dw=ra *diwnu/sou polughqe/os. au)ta\r e)ph\n dh\
-<lb rend="displayNum" n="615" />*plhia/des q' *(ua/des te to/ te sqe/nos *)wari/wnos
-<lb />du/nwsin, to/t' e)/peit' a)ro/tou memnhme/nos ei)=nai
-<lb />w(rai/ou: pleiw\n de\ kata\ xqono\s a)/rmenos ei)=sin.
-<lb /><milestone ed="P" unit="para" />ei) de/ se nautili/hs duspemfe/lou i(/meros ai(rei=,
-<lb />eu)=t' a)\n *plhia/des sqe/nos o)/brimon *)wari/wnos
-<lb rend="displayNum" n="620" />feu/gousai pi/ptwsin e)s h)eroeide/a po/nton,
-<lb />dh\ to/te pantoi/wn a)ne/mwn qui/ousin a)h=tai:
-<lb />kai\ to/te mhke/ti nh=as e)/xein e)ni\ oi)/nopi po/ntw|,
-<lb />gh=n e)rga/zesqai memnhme/nos, w(/s se keleu/w.
-<lb />nh=a d' e)p' h)pei/rou e)ru/sai puka/sai te li/qoisi
-<lb rend="displayNum" n="625" />pa/ntoqen, o)/fr' i)/sxws' a)ne/mwn me/nos u(gro\n a)e/ntwn,
-<lb />xei/maron e)ceru/sas, i(/na mh\ pu/qh| *dio\s o)/mbros.
-<lb />o(/pla d' e)pa/rmena pa/nta tew=| e)gka/tqeo oi)/kw|
-<lb />eu)ko/smws stoli/sas nho\s ptera\ pontopo/roio:
-<lb />phda/lion d' e)uerge\s u(pe\r kapnou= krema/sasqai.
-<lb rend="displayNum" n="630" />au)to\s d' w(rai=on mi/mnein plo/on, ei)so/ken e)/lqh|:
-<lb />kai\ to/te nh=a qoh\n a(/lad' e(lke/men, e)n de/ te fo/rton
-<lb />a)/rmenon e)ntu/nasqai, i(/n' oi)/kade ke/rdos a)/rhai,
-<lb />w(/s per e)mo/s te path\r kai\ so/s, me/ga nh/pie *pe/rsh|,
-<lb />plwi/zesk' e)n nhusi/, bi/ou kexrhme/nos e)sqlou=:
-<lb rend="displayNum" n="635" />o(/s pote kai\ th=|d' h)=lqe, polu\n dia\ po/nton a)nu/ssas,
-<lb />*ku/mhn *ai)oli/da prolipw/n, e)n nhi\ melai/nh|:
-<lb />ou)k a)/fenos feu/gwn ou)de\ plou=to/n te kai\ o)/lbon,
-<lb />a)lla\ kakh\n peni/hn, th\n *zeu\s a)/ndressi di/dwsin:
-<lb />na/ssato d' a)/gx' *(elikw=nos o)izurh=| e)ni\ kw/mh|,
-<lb rend="displayNum" n="640" />*)/askrh|, xei=ma kakh=|, qe/rei a)rgale/h|, ou)de/ pot' e)sqlh=|.
-</p><sp><p><milestone n="641" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />tu/nh d', w)= *pe/rsh, e)/rgwn memnhme/nos ei)=nai
-<lb />w(rai/wn pa/ntwn, peri\ nautili/hs de\ ma/lista.
-<lb />nh=' o)li/ghn ai)nei=n, mega/lh| d' e)ni\ forti/a qe/sqai.</p></sp>
-<p>
-<lb />mei/zwn me\n fo/rtos, mei=zon d' e)pi\ ke/rdei+ ke/rdos
-<lb rend="displayNum" n="645" />e)/ssetai, ei)/ k' a)/nemoi/ ge kaka\s a)pe/xwsin a)h/tas.
-<lb /><milestone ed="P" unit="para" />eu)=t' a)\n e)p' e)mpori/hn tre/yas a)esi/frona qumo\n
-<lb />bou/lhai xre/a te profugei=n kai\ limo\n a)terpe/a,
-<lb />dei/cw dh/ toi me/tra polufloi/sboio qala/sshs,
-<lb />ou)/te ti nautili/hs sesofisme/nos ou)/te ti nhw=n.
-<lb rend="displayNum" n="650" />ou) ga/r pw/ pote nhi/ g' e)pe/plwn eu)re/a po/nton,
-<lb />ei) mh\ e)s *eu)/boian e)c *au)li/dos, h(=| pot' *)axaioi\
-<lb />mei/nantes xeimw=na polu\n su\n lao\n a)/geiran
-<lb />*(ella/dos e)c i(erh=s *troi/hn e)s kalligu/naika.
-<lb />e)/nqa d' e)gw\n e)p' a)/eqla dai/+fronos *)amfida/mantos
-<lb rend="displayNum" n="655" />*xalki/da t' ei)\s e)pe/rhsa: ta\ de\ propefradme/na polla\
-<lb />a)/eql' e)/qesan pai=des megalh/toros: e)/nqa me/ fhmi
-<lb />u(/mnw| nikh/santa fe/rein tri/pod' w)tw/enta.
-<lb />to\n me\n e)gw\ *mou/sh|s *(elikwnia/dess' a)ne/qhka,
-<lb />e)/nqa me to\ prw=ton ligurh=s e)pe/bhsan a)oidh=s.
-<lb rend="displayNum" n="660" />to/sson toi nhw=n ge pepei/rhmai polugo/mfwn:
-<lb />a)lla\ kai\ w(\s e)re/w *zhno\s no/on ai)gio/xoio:
-<lb />*mou=sai ga/r m' e)di/dacan a)qe/sfaton u(/mnon a)ei/dein.
-<lb /><milestone ed="P" unit="para" />h)/mata penth/konta meta\ tropa\s h)eli/oio,
-<lb />e)s te/los e)lqo/ntos qe/reos kamatw/deos w(/rhs,
-<lb rend="displayNum" n="665" />w(rai=os pe/letai qnhtoi=s plo/os: ou)/te ke nh=a
-<lb />kaua/cais ou)/t' a)/ndras a)pofqei/seie qa/lassa,
-<lb />ei) dh\ mh\ pro/frwn ge *poseida/wn e)nosi/xqwn
-<lb />h)\ *zeu\s a)qana/twn basileu\s e)qe/lh|sin o)le/ssai:
-<lb />e)n toi=s ga\r te/los e)sti\n o(mw=s a)gaqw=n te kakw=n te.
-<lb rend="displayNum" n="670" />th=mos d' eu)krine/es t' au)=rai kai\ po/ntos a)ph/mwn:
-<lb />eu)/khlos to/te nh=a qoh\n a)ne/moisi piqh/sas
-<lb />e(lke/men e)s po/nton fo/rton t' e)s pa/nta ti/qesqai,
-<lb />speu/dein d' o(/tti ta/xista pa/lin oi)=ko/nde ne/esqai:
-<lb />mhde\ me/nein oi)=no/n te ne/on kai\ o)pwrino\n o)/mbron
-<lb rend="displayNum" n="675" />kai\ xeimw=n' e)pio/nta *no/toio/ te deina\s a)h/tas,
-<lb />o(/st' w)/rine qa/lassan o(marth/sas *dio\s o)/mbrw|
-<lb />pollw=| o)pwrinw=|, xalepo\n de/ te po/nton e)/qhken.
-<milestone n="678" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />a)/llos d' ei)arino\s pe/letai plo/os a)nqrw/poisin:
-<lb />h)=mos dh\ to\ prw=ton, o(/son t' e)piba=sa korw/nh
-<lb rend="displayNum" n="680" />i)/xnos e)poi/hsen, to/sson pe/tal' a)ndri\ fanei/h|
-<lb />e)n kra/dh| a)krota/th|, to/te d' a)/mbato/s e)sti qa/lassa:
-<lb />ei)arino\s d' ou(=tos pe/letai plo/os. ou)/ min e)/gwge
-<lb />ai)/nhm': ou) ga\r e)mw=| qumw=| kexarisme/nos e)sti/n:
-<lb />a(rpakto/s: xalepw=s ke fu/gois kako/n: a)lla/ nu kai\ ta\
-<lb rend="displayNum" n="685" />a)/nqrwpoi r(e/zousin a)idrei/h|si no/oio:
-<lb />xrh/mata ga\r yuxh\ pe/letai deiloi=si brotoi=sin.
-<lb />deino\n d' e)sti\ qanei=n meta\ ku/masin. a)lla/ s' a)/nwga
-<lb />fra/zesqai ta/de pa/nta meta\ fresi/n, w(s a)goreu/w.
-<lb />mhd' e)n nhusi\n a(/panta bi/on koi/+lh|si ti/qesqai:
-<lb rend="displayNum" n="690" />a)lla\ ple/w lei/pein, ta\ de\ mei/ona forti/zesqai.
-<lb />deino\n ga\r po/ntou meta\ ku/masi ph/mati ku/rsai.
-<lb />deino\n d', ei)/ k' e)p' a)/macan u(pe/rbion a)/xqos a)ei/ras
-<lb />a)/cona. kaua/cais kai\ forti/a maurwqei/h.
-<lb />me/tra fula/ssesqai: kairo\s d' e)pi\ pa=sin a)/ristos.
-<lb rend="displayNum" n="695" /><milestone ed="P" unit="para" />w(rai=os de\ gunai=ka teo\n poti\ oi)=kon a)/gesqai,
-<lb />mh/te trihko/ntwn e)te/wn ma/la po/ll' a)polei/pwn
-<lb />mh/t' e)piqei\s ma/la polla/: ga/mos de/ toi w(/rios ou(=tos:
-<lb />h( de\ gunh\ te/tor' h(bw/oi, pe/mptw| de\ gamoi=to.
-<lb />parqenikh\n de\ gamei=n, w(/s k' h)/qea kedna\ dida/ch|s.
-<lb rend="displayNum" n="700" />th\n de\ ma/lista gamei=n, h(/ tis se/qen e)ggu/qi nai/ei,
-<lb />pa/nta ma/l' a)mfiidw/n, mh\ gei/tosi xa/rmata gh/mh|s.
-<lb />ou) me\n ga/r ti gunaiko\s a)nh\r lhi/zet' a)/meinon
-<lb />th=s a)gaqh=s, th=s d' au)=te kakh=s ou) r(i/gion a)/llo,
-<lb />deipnolo/xhs: h(/t' a)/ndra kai\ i)/fqimo/n per e)o/nta
-<lb rend="displayNum" n="705" />eu(/ei a)/ter daloi=o kai\ w)mw=| gh/rai+ dw=ken. 
-<milestone n="706" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />eu)= d' o)/pin a)qana/twn maka/rwn pefulagme/nos ei)=nai.
-<lb />mhde\ kasignh/tw| i)=son poiei=sqai e(tai=ron:
-<lb />ei) de/ ke poih/sh|s, mh/ min pro/teros kako\n e)/rch|s.
-<lb />mhde\ yeu/desqai glw/sshs xa/rin: ei) de\ se/ g' a)/rxh|
-<lb rend="displayNum" n="710" />h)/ ti e)/pos ei)pw\n a)poqu/mion h)e\ kai\ e)/rcas,
-<lb />di\s to/sa ti/nusqai memnhme/nos: ei) de\ se/ g' au)=tis
-<lb />h(gh=t' e)s filo/thta, di/khn d' e)qe/lh|si parasxei=n,
-<lb />de/casqai: deilo/s toi a)nh\r fi/lon a)/llote a)/llon
-<lb />poiei=tai, se\ de\ mh/ ti no/on katelegxe/tw ei)=dos.
-<lb rend="displayNum" n="715" /><milestone ed="P" unit="para" />mhde\ polu/ceinon mhd' a)/ceinon kale/esqai,
-<lb />mhde\ kakw=n e(/taron mhd' e)sqlw=n neikesth=ra.
-<lb /><milestone ed="P" unit="para" />mhde/ pot' ou)lome/nhn peni/hn qumofqo/ron a)ndri\
-<lb />te/tlaq' o)neidi/zein, maka/rwn do/sin ai)e\n e)o/ntwn.
-<lb />glw/sshs toi qhsauro\s e)n a)nqrw/poisin a)/ristos
-<lb rend="displayNum" n="720" />feidwlh=s, plei/sth de\ xa/ris kata\ me/tron i)ou/shs.
-<lb />ei) de\ kako\n ei)/pois, ta/xa k' au)to\s mei=zon a)kou/sais.
-<lb /><milestone ed="P" unit="para" />mhde\ polucei/nou daito\s duspe/mfelos ei)=nai
-<lb />e)k koinou=: plei/sth de\ xa/ris, dapa/nh t' o)ligi/sth.
-<lb /><milestone ed="P" unit="para" />mhde/ pot' e)c h)ou=s *dii\ leibe/men ai)/qopa oi)=non
-<lb rend="displayNum" n="725" />xersi\n a)ni/ptoisin mhd' a)/llois a)qana/toisin:
-<lb />ou) ga\r toi/ ge klu/ousin, a)poptu/ousi de/ t' a)ra/s.
-<lb /><milestone ed="P" unit="para" />mhd' a)/nt' h)eli/ou tetramme/nos o)rqo\s o)mixei=n:
-<lb />au)ta\r e)pei/ ke du/h|, memnhme/nos, e)/s t' a)nio/nta:
-<lb />mh/t' e)n o(dw=| mh/t' e)kto\s o(dou= proba/dhn ou)rh/sh|s
-<lb rend="displayNum" n="730" />mhd' a)pogumnwqei/s: maka/rwn toi nu/ktes e)/asin:
-<lb />e(zo/menos d' o(/ ge qei=os a)nh/r, pepnume/na ei)dw/s,
-<lb />h)\ o(/ ge pro\s toi=xon pela/sas e)uerke/os au)lh=s.
-<lb /><milestone ed="P" unit="para" />mhd' ai)doi=a gonh=| pepalagme/nos e)/ndoqi oi)/kou
-<lb />i(sti/h| e)mpelado\n parafaine/men, a)ll' a)le/asqai.
-<lb rend="displayNum" n="735" />mhd' a)po\ dusfh/moio ta/fou a)ponosth/santa
-<lb />spermai/nein geneh/n, a)ll' a)qana/twn a)po\ daito/s.
-<milestone n="737" ed="p" unit="card" />
-<lb /><milestone ed="P" unit="para" />mhde/ pot' ai)ena/wn potamw=n kalli/rroon u(/dwr
-<lb />possi\ pera=n, pri/n g' eu)/ch| i)dw\n e)s kala\ r(e/eqra,
-<lb />xei=ras niya/menos poluhra/tw| u(/dati leukw=|.
-<lb rend="displayNum" n="740" />o(\s potamo\n diabh=| kako/tht' i)de\ xei=ras a)/niptos,
-<lb />tw=| de\ qeoi\ nemesw=si kai\ a)/lgea dw=kan o)pi/ssw.
-<lb /><milestone ed="P" unit="para" />mhd' a)po\ pento/zoio qew=n e)n daiti\ qalei/h|
-<lb />au)=on a)po\ xlwrou= ta/mnein ai)/qwni sidh/rw|.
-<lb /><milestone ed="P" unit="para" />mhde/ pot' oi)noxo/hn tiqe/men krhth=ros u(/perqe
-<lb rend="displayNum" n="745" />pino/ntwn: o)loh\ ga\r e)p' au)tw=| moi=ra te/tuktai.
-<lb /><milestone ed="P" unit="para" />mhde\ do/mon poiw=n a)nepi/ceston katalei/pein,
-<lb />mh/ toi e)fezome/nh krw/ch| lake/ruza korw/nh.
-<lb /><milestone ed="P" unit="para" />mhd' a)po\ xutropo/dwn a)nepirre/ktwn a)nelo/nta
-<lb />e)/sqein mhde\ lo/esqai: e)pei\ kai\ toi=s e)/ni poinh/.
-<lb rend="displayNum" n="750" /><milestone ed="P" unit="para" />mhd' e)p' a)kinh/toisi kaqize/men, ou) ga\r a)/meinon,
-<lb />pai=da duwdekatai=on, o(/t' a)ne/r' a)nh/nora poiei=,
-<lb />mhde\ duwdeka/mhnon: i)/son kai\ tou=to te/tuktai.
-<lb />mhde\ gunaikei/w| loutrw=| xro/a faidru/nesqai
-<lb />a)ne/ra: leugale/h ga\r e)pi\ xro/non e)/st' e)pi\ kai\ tw=|
-<lb rend="displayNum" n="755" />poinh/. mhd' i(eroi=sin e)p' ai)qome/noisi kurh/sas
-<lb />mwmeu/ein a)i/dhla: qeo/s nu/ ti kai\ ta\ nemessa=|.
-<lb />mhde/ pot' e)n proxoh=|s potamw=n a(/lade proreo/ntwn
-<lb />mhd' e)pi\ krhna/wn ou)rei=n, ma/la d' e)cale/asqai:
-<lb />mhd' e)napoyu/xein: to\ ga\r ou)/ toi lw/io/n e)stin.
-<lb rend="displayNum" n="760" /><milestone ed="P" unit="para" />w(=d' e)/rdein: deinh\n de\ brotw=n u(paleu/eo fh/mhn.
-<lb />fh/mh ga/r te kakh\ pe/letai, kou/fh me\n a)ei=rai
-<lb />r(ei=a ma/l', a)rgale/h de\ fe/rein, xaleph\ d' a)poqe/sqai.
-<lb />fh/mh d' ou)/tis pa/mpan a)po/llutai, h(/n tina polloi\
-<lb />laoi\ fhmi/cwsi: qeo/s nu/ ti/s e)sti kai\ au)th/.
-<milestone n="765" ed="p" unit="card" />
-<lb rend="displayNum" n="765" />*)/hmata d' e)k *dio/qen pefulagme/nos eu)= kata\ moi=ran
-<lb />pefrade/men dmw/essi: trihka/da mhno\s a)ri/sthn
-<lb />e)/rga t' e)popteu/ein h)d' a(rmalih\n date/asqai.
-<lb rend="displayNum" n="769" /><milestone ed="P" unit="para" />ai(/de ga\r h(me/rai ei)si\ *dio\s pa/ra mhtio/entos,
-<lb rend="displayNum" n="768" />eu)=t' a)\n a)lhqei/hn laoi\ kri/nontes a)/gwsin.
-<lb rend="displayNum" n="770" />*prw=ton e)/nh tetra/s te kai\ e(bdo/mh i(ero\n h)=mar:
-<lb />th=| ga\r *)apo/llwna xrusa/ora gei/nato *lhtw/:
-<lb />o)gdoa/th d' e)na/th te, du/w ge me\n h)/mata mhno\s
-<lb />e)/cox' a)ecome/noio broth/sia e)/rga pe/nesqai:
-<lb />e(ndeka/th de\ duwdeka/th t', a)/mfw ge me\n e)sqlai/,
-<lb rend="displayNum" n="775" />h)me\n o)/is pei/kein h)d' eu)/frona karpo\n a)ma=sqai:
-<lb />h( de\ duwdeka/th th=s e(ndeka/ths me/g' a)mei/nwn:
-<lb />th=| ga/r toi nh=| nh/mat' a)ersipo/thtos a)ra/xnhs
-<lb />h)/matos e)k plei/ou, o(/te i)/dris swro\n a)ma=tai:
-<lb />th=| d' i(sto\n sth/saito gunh\ proba/loito/ te e)/rgon.
-<lb rend="displayNum" n="780" />*mhno\s d' i(stame/nou triskaideka/thn a)le/asqai
-<lb />spe/rmatos a)/rcasqai: futa\ d' e)nqre/yasqai a)ri/sth.
-<lb /><milestone ed="P" unit="para" />e(/kth d' h( me/ssh ma/l' a)su/mforo/s e)sti futoi=sin,
-<lb />a)ndrogo/nos d' a)gaqh/: kou/rh| d' ou) su/mforo/s e)stin,
-<lb />ou)/te gene/sqai prw=t' ou)/t' a)\r ga/mou a)ntibolh=sai.
-<lb rend="displayNum" n="785" />ou)de\ me\n h( prw/th e(/kth kou/rh| ge gene/sqai
-<lb />a)/rmenos, a)ll' e)ri/fous ta/mnein kai\ pw/ea mh/lwn
-<lb />shko/n t' a)mfibalei=n poimnh/ion h)/pion h)=mar:
-<lb />e)sqlh\ d' a)ndrogo/nos: file/oi d' o(/ ge ke/rtoma ba/zein
-<lb />yeu/dea/ q' ai(muli/ous te lo/gous krufi/ous t' o)arismou/s.
-<lb rend="displayNum" n="790" />mhno\s d' o)gdoa/th| ka/pron kai\ bou=n e)ri/mukon
-<lb />tamne/men, ou)rh=as de\ duwdeka/th| talaergou/s.
-<lb /><milestone ed="P" unit="para" />ei)ka/di d' e)n mega/lh|, ple/w| h)/mati, i(/stora fw=ta
-<lb />gei/nasqai: ma/la ga/r te no/on pepukasme/nos e)sti/n.
-<lb />e)sqlh\ d' a)ndrogo/nos deka/th, kou/rh| de/ te tetra\s
-<lb rend="displayNum" n="795" />me/ssh: th=| de/ te mh=la kai\ ei)li/podas e(/likas bou=s
-<lb />kai\ ku/na karxaro/donta kai\ ou)rh=as talaergou\s
-<lb />prhu/+nein e)pi\ xei=ra tiqei/s. pefu/laco de\ qumw=|
-<lb />tetra/d' a)leu/asqai fqi/nonto/s q' i(stame/nou te
-<lb />a)/lge' a(\ qumborei= ma/la ga\r tetelesme/non h)=mar.
-<milestone n="800" ed="p" unit="card" />
-<lb rend="displayNum" n="800" />*)en de\ teta/rth| mhno\s a)/gesqai oi)=kon a)/koitin
-<lb />oi)wnou\s kri/nas, oi(\ e)p' e)/rgmati tou/tw| a)/ristoi.
-<lb /><milestone ed="P" unit="para" />pe/mptas d' e)cale/asqai, e)pei\ xalepai/ te kai\ ai)nai/:
-<lb />e)n pe/mpth| ga/r fasin *)erinu/as a)mfipoleu/ein
-<lb />*(/orkon geino/menon, to\n *)/eris te/ke ph=m' e)pio/rkois.
-<lb rend="displayNum" n="805" />*me/ssh| d' e(bdoma/th| *dhmh/teros i(ero\n a)kth\n
-<lb />eu)= ma/l' o)pipeu/onta e)utroxa/lw| e)n a)lwh=|
-<lb />balle/men, u(loto/mon te tamei=n qalamh/ia dou=ra
-<lb />nh/ia/ te cu/la polla/, ta/ t' a)/rmena nhusi\ pe/lontai.
-<lb />tetra/di d' a)/rxesqai nh=as ph/gnusqai a)raia/s.
-<lb rend="displayNum" n="810" /><milestone ed="P" unit="para" />ei)na\s d' h( me/ssh e)pi\ dei/ela lw/ion h)=mar,
-<lb />prwti/sth d' ei)na\s panaph/mwn a)nqrw/poisin:
-<lb />e)sqlh\ me\n ga/r q' h(/ ge futeue/men h)de\ gene/sqai
-<lb />a)ne/ri t' h)de\ gunaiki/: kai\ ou)/pote pa/gkakon h)=mar.
-<lb /><milestone ed="P" unit="para" />pau=roi d' au)=te i)/sasi triseina/da mhno\s a)ri/sthn
-<lb rend="displayNum" n="815" />a)/rcasqai/ te pi/qou kai\ e)pi\ zugo\n au)xe/ni qei=nai
-<lb />bousi\ kai\ h(mio/noisi kai\ i(/ppois w)kupo/dessi,
-<lb />nh=a poluklh/ida qoh\n ei)s oi)/nopa po/nton
-<lb />ei)ru/menai: pau=roi de/ t' a)lhqe/a kiklh/|skousin.
-<lb /><milestone ed="P" unit="para" />tetra/di d' oi)=ge pi/qon: peri\ pa/ntwn i(ero\n h)=mar
-<lb rend="displayNum" n="820" />me/ssh: pau=roi d' au)=te met' ei)ka/da mhno\s a)ri/sthn
-<lb />h)ou=s gignome/nhs: e)pi\ dei/ela d' e)sti\ xerei/wn.
-<lb /><milestone ed="P" unit="para" />ai(/de me\n h(me/rai ei)sin e)pixqoni/ois me/g' o)/neiar,
-<lb />ai( d' a)/llai meta/doupoi, a)kh/rioi, ou)/ ti fe/rousai.
-<lb />a)/llos d' a)lloi/hn ai)nei=, pau=roi de\ i)/sasin.
-<lb rend="displayNum" n="825" />a)/llote mhtruih\ pe/lei h(me/rh, a)/llote mh/thr.
-<lb />ta/wn eu)dai/mwn te kai\ o)/lbios, o(\s ta/de pa/nta
-<lb />ei)dw\s e)rga/zhtai a)nai/tios a)qana/toisin,
-<lb />o)/rniqas kri/nwn kai\ u(perbasi/as a)leei/nwn.</p>
-</div1></body></text>
-</TEI.2>
+    <text>
+<body>
+    <div n="urn:cts:greekLit:tlg0020.tlg002.perseus-grc2" type="edition" xml:lang="grc">
+        
+<milestone n="1" ed="p" unit="card"/>
+
+<l n="1" style="speech">
+<milestone ed="P" unit="para"/>μοῦσαι Πιερίηθεν ἀοιδῇσιν κλείουσαι</l>
+    <l n="2" style="speech">δεῦτε, Δίʼ ἐννέπετε, σφέτερον πατέρʼ ὑμνείουσαι·</l>
+    <l n="3" style="speech">ὅντε διὰ βροτοὶ ἄνδρες ὁμῶς ἄφατοί τε φατοί τε,</l>
+    <l n="4" style="speech">ῥητοί τʼ ἄρρητοί τε Διὸς μεγάλοιο ἕκητι.</l>
+    <l n="5" style="speech">ῥέα μὲν γὰρ βριάει, ῥέα δὲ βριάοντα χαλέπτει,</l>
+    <l n="6" style="speech">ῥεῖα δʼ ἀρίζηλον μινύθει καὶ ἄδηλον ἀέξει,</l>
+    <l n="7" style="speech">ῥεῖα δέ τʼ ἰθύνει σκολιὸν καὶ ἀγήνορα κάρφει</l>
+    <l n="8" style="speech">Ζεὺς ὑψιβρεμέτης, ὃς ὑπέρτατα δώματα ναίει.</l>
+    <l n="9" style="speech">κλῦθι ἰδὼν ἀίων τε, δίκῃ δʼ ἴθυνε θέμιστας</l>
+    <l n="10" style="speech">τύνη· ἐγὼ δέ κε, Πέρση, ἐτήτυμα μυθησαίμην.</l>
+
+<milestone n="11" ed="p" unit="card"/>
+<l n="11">
+<milestone ed="P" unit="para"/>οὐκ ἄρα μοῦνον ἔην Ἐρίδων γένος, ἀλλʼ ἐπὶ γαῖαν</l>
+<l n="12">εἰσὶ δύω· τὴν μέν κεν ἐπαινέσσειε νοήσας,</l>
+<l n="13">ἣ δʼ ἐπιμωμητή· διὰ δʼ ἄνδιχα θυμὸν ἔχουσιν.</l>
+<l n="14">ἣ μὲν γὰρ πόλεμόν τε κακὸν καὶ δῆριν ὀφέλλει,</l>
+<l n="15">σχετλίη· οὔτις τήν γε φιλεῖ βροτός, ἀλλʼ ὑπʼ ἀνάγκης</l>
+<l n="16">ἀθανάτων βουλῇσιν Ἔριν τιμῶσι βαρεῖαν.</l>
+<l n="17">τὴν δʼ ἑτέρην προτέρην μὲν ἐγείνατο Νὺξ ἐρεβεννή,</l>
+<l n="18">θῆκε δέ μιν Κρονίδης ὑψίζυγος, αἰθέρι ναίων,</l>
+<l n="19">γαίης ἐν ῥίζῃσι, καὶ ἀνδράσι πολλὸν ἀμείνω·</l>
+<l n="20">ἥτε καὶ ἀπάλαμόν περ ὁμῶς ἐπὶ ἔργον ἔγειρεν.</l>
+<l n="21">εἰς ἕτερον γάρ τίς τε ἰδὼν ἔργοιο χατίζει</l>
+<l n="22">πλούσιον, ὃς σπεύδει μὲν ἀρώμεναι ἠδὲ φυτεύειν</l>
+<l n="23">οἶκόν τʼ εὖ θέσθαι· ζηλοῖ δέ τε γείτονα γείτων</l>
+<l n="24">εἰς ἄφενος σπεύδοντʼ· ἀγαθὴ δʼ Ἔρις ἥδε βροτοῖσιν.</l>
+<l n="25">καὶ κεραμεὺς κεραμεῖ κοτέει καὶ τέκτονι τέκτων,</l>
+<l n="26">καὶ πτωχὸς πτωχῷ φθονέει καὶ ἀοιδὸς ἀοιδῷ.</l>
+<l n="27">
+<milestone ed="P" unit="para"/>ὦ Πέρση, σὺ δὲ ταῦτα τεῷ ἐνικάτθεο θυμῷ,</l>
+<l n="28">μηδέ σʼ Ἔρις κακόχαρτος ἀπʼ ἔργου θυμὸν ἐρύκοι</l>
+<l n="29">νείκεʼ ὀπιπεύοντʼ ἀγορῆς ἐπακουὸν ἐόντα.</l>
+<l n="30">ὤρη γάρ τʼ ὀλίγη πέλεται νεικέων τʼ ἀγορέων τε,</l>
+<l n="31">ᾧτινι μὴ βίος ἔνδον ἐπηετανὸς κατάκειται</l>
+<l n="32">ὡραῖος, τὸν γαῖα φέρει, Δημήτερος ἀκτήν.</l>
+<l n="33">τοῦ κε κορεσσάμενος νείκεα καὶ δῆριν ὀφέλλοις</l>
+<l n="34">κτήμασʼ ἐπʼ ἀλλοτρίοις· σοὶ δʼ οὐκέτι δεύτερον ἔσται</l>
+<l n="35">ὧδʼ ἔρδειν· ἀλλʼ αὖθι διακρινώμεθα νεῖκος</l>
+<l n="36">ἰθείῃσι δίκῃς, αἵ τʼ ἐκ Διός εἰσιν ἄρισται.</l>
+<l n="37">ἤδη μὲν γὰρ κλῆρον ἐδασσάμεθʼ, ἀλλὰ τὰ πολλὰ</l>
+<l n="38">ἁρπάζων ἐφόρεις μέγα κυδαίνων βασιλῆας</l>
+<l n="39">δωροφάγους, οἳ τήνδε δίκην ἐθέλουσι δίκασσαι.</l>
+<l n="40">νήπιοι, οὐδὲ ἴσασιν ὅσῳ πλέον ἥμισυ παντὸς</l>
+<l n="41">οὐδʼ ὅσον ἐν μαλάχῃ τε καὶ ἀσφοδέλῳ μέγʼ ὄνειαρ.</l>
+<milestone n="42" ed="p" unit="card"/>
+<l n="42">
+<milestone ed="P" unit="para"/>κρύψαντες γὰρ ἔχουσι θεοὶ βίον ἀνθρώποισιν·</l>
+<l n="43">ῥηιδίως γάρ κεν καὶ ἐπʼ ἤματι ἐργάσσαιο,</l>
+<l n="44">ὥστε σε κεἰς ἐνιαυτὸν ἔχειν καὶ ἀεργὸν ἐόντα·</l>
+<l n="45">αἶψά κε πηδάλιον μὲν ὑπὲρ καπνοῦ καταθεῖο,</l>
+<l n="46">ἔργα βοῶν δʼ ἀπόλοιτο καὶ ἡμιόνων ταλαεργῶν.</l>
+<l n="47">ἀλλὰ Ζεὺς ἔκρυψε χολωσάμενος φρεσὶν ᾗσιν,</l>
+<l n="48">ὅττι μιν ἐξαπάτησε Προμηθεὺς ἀγκυλομήτης·</l>
+<l n="49">τοὔνεκʼ ἄρʼ ἀνθρώποισιν ἐμήσατο κήδεα λυγρά.</l>
+<l n="50">κρύψε δὲ πῦρ· τὸ μὲν αὖτις ἐὺς πάις Ἰαπετοῖο</l>
+<l n="51">ἔκλεψʼ ἀνθρώποισι Διὸς πάρα μητιόεντος</l>
+<l n="52">ἐν κοῒλῳ νάρθηκι λαθὼν Δία τερπικέραυνον.</l>
+<l n="53">τὸν δὲ χολωσάμενος προσέφη νεφεληγερέτα Ζευς·</l>
+
+    <l n="54" style="speech">
+<milestone ed="P" unit="para"/>Ἰαπετιονίδη, πάντων πέρι μήδεα εἰδώς,</l>
+    <l n="55" style="speech">χαίρεις πῦρ κλέψας καὶ ἐμὰς φρένας ἠπεροπεύσας,</l>
+    <l n="56" style="speech">σοί τʼ αὐτῷ μέγα πῆμα καὶ ἀνδράσιν ἐσσομένοισιν.</l>
+    <l n="57" style="speech">τοῖς δʼ ἐγὼ ἀντὶ πυρὸς δώσω κακόν, ᾧ κεν ἅπαντες</l>
+    <l n="58" style="speech">τέρπωνται κατὰ θυμὸν ἑὸν κακὸν ἀμφαγαπῶντες.</l>
+
+<milestone n="59" ed="p" unit="card"/>
+<l n="59">
+<milestone ed="P" unit="para"/>ὣς ἔφατʼ· ἐκ δʼ ἐγέλασσε πατὴρ ἀνδρῶν τε θεῶν τε.</l>
+<l n="60">Ἥφαιστον δʼ ἐκέλευσε περικλυτὸν ὅττι τάχιστα</l>
+<l n="61">γαῖαν ὕδει φύρειν, ἐν δʼ ἀνθρώπου θέμεν αὐδὴν</l>
+<l n="62">καὶ σθένος, ἀθανάτῃς δὲ θεῇς εἰς ὦπα ἐίσκειν</l>
+<l n="63">παρθενικῆς καλὸν εἶδος ἐπήρατον· αὐτὰρ Ἀθήνην</l>
+<l n="64">ἔργα διδασκῆσαι, πολυδαίδαλον ἱστὸν ὑφαίνειν·</l>
+<l n="65">καὶ χάριν ἀμφιχέαι κεφαλῇ χρυσέην Ἀφροδίτην</l>
+<l n="66">καὶ πόθον ἀργαλέον καὶ γυιοβόρους μελεδώνας·</l>
+<l n="67">ἐν δὲ θέμεν κύνεόν τε νόον καὶ ἐπίκλοπον ἦθος</l>
+<l n="68">Ἑρμείην ἤνωγε, διάκτορον Ἀργεϊφόντην.</l>
+<l n="69">
+<milestone ed="P" unit="para"/>ὣς ἔφαθʼ· οἳ δʼ ἐπίθοντο Διὶ Κρονίωνι ἄνακτι.</l>
+<l n="70">αὐτίκα δʼ ἐκ γαίης πλάσσεν κλυτὸς Ἀμφιγυήεις</l>
+<l n="71">παρθένῳ αἰδοίῃ ἴκελον Κρονίδεω διὰ βουλάς·</l>
+<l n="72">ζῶσε δὲ καὶ κόσμησε θεὰ γλαυκῶπις Ἀθήνη·</l>
+<l n="73">ἀμφὶ δέ οἱ Χάριτές τε θεαὶ καὶ πότνια Πειθὼ</l>
+<l n="74">ὅρμους χρυσείους ἔθεσαν χροΐ· ἀμφὶ δὲ τήν γε</l>
+<l n="75">Ὧραι καλλίκομοι στέφον ἄνθεσιν εἰαρινοῖσιν·</l>
+<l n="76">
+<del>πάντα δέ οἱ χροῒ κόσμον ἐφήρμοσε Παλλὰς Ἀθήνη.</del>
+</l>
+<l n="77">ἐν δʼ ἄρα οἱ στήθεσσι διάκτορος Ἀργεϊφόντης</l>
+<l n="78">ψεύδεά θʼ αἱμυλίους τε λόγους καὶ ἐπίκλοπον ἦθος</l>
+<l n="79">
+<del>τεῦξε Διὸς βουλῇσι βαρυκτύπου· ἐν δʼ ἄρα φωνὴν</del>
+</l>
+<l n="80">θῆκε θεῶν κῆρυξ, ὀνόμηνε δὲ τήνδε γυναῖκα</l>
+<l n="81">Πανδώρην, ὅτι πάντες Ὀλύμπια δώματʼ ἔχοντες</l>
+<l n="82">δῶρον ἐδώρησαν, πῆμʼ ἀνδράσιν ἀλφηστῇσιν.</l>
+<milestone n="83" ed="p" unit="card"/>
+<l n="83">
+<milestone ed="P" unit="para"/>αὐτὰρ ἐπεὶ δόλον αἰπὺν ἀμήχανον ἐξετέλεσσεν,</l>
+<l n="84">εἰς Ἐπιμηθέα πέμπε πατὴρ κλυτὸν Ἀργεϊφόντην</l>
+<l n="85">δῶρον ἄγοντα, θεῶν ταχὺν ἄγγελον· οὐδʼ Ἐπιμηθεὺς</l>
+<l n="86">ἐφράσαθʼ, ὥς οἱ ἔειπε Προμηθεὺς μή ποτε δῶρον</l>
+<l n="87">δέξασθαι πὰρ Ζηνὸς Ὀλυμπίου, ἀλλʼ ἀποπέμπειν</l>
+<l n="88">ἐξοπίσω, μή πού τι κακὸν θνητοῖσι γένηται.</l>
+<l n="89">αὐτὰρ ὃ δεξάμενος, ὅτε δὴ κακὸν εἶχʼ, ἐνόησεν.</l>
+<l n="90">Πρὶν μὲν γὰρ ζώεσκον ἐπὶ χθονὶ φῦλʼ ἀνθρώπων</l>
+<l n="91">νόσφιν ἄτερ τε κακῶν καὶ ἄτερ χαλεποῖο πόνοιο</l>
+<l n="92">νούσων τʼ ἀργαλέων, αἵ τʼ ἀνδράσι Κῆρας ἔδωκαν.</l>
+<l n="93">
+<del>αἶψα γὰρ ἐν κακότητι βροτοὶ καταγηράσκουσιν.</del>
+</l>
+<l n="94">ἀλλὰ γυνὴ χείρεσσι πίθου μέγα πῶμʼ ἀφελοῦσα</l>
+<l n="95">ἐσκέδασʼ· ἀνθρώποισι δʼ ἐμήσατο κήδεα λυγρά.</l>
+<l n="96">μούνη δʼ αὐτόθι Ἐλπὶς ἐν ἀρρήκτοισι δόμοισιν</l>
+<l n="97">ἔνδον ἔμιμνε πίθου ὑπὸ χείλεσιν, οὐδὲ θύραζε</l>
+<l n="98">ἐξέπτη· πρόσθεν γὰρ ἐπέλλαβε πῶμα πίθοιο</l>
+<l n="99">
+<del>αἰγιόχου βουλῇσι Διὸς νεφεληγερέταο.</del>
+</l>
+<l n="100">ἄλλα δὲ μυρία λυγρὰ κατʼ ἀνθρώπους ἀλάληται·</l>
+<l n="101">πλείη μὲν γὰρ γαῖα κακῶν, πλείη δὲ θάλασσα·</l>
+<l n="102">νοῦσοι δʼ ἀνθρώποισιν ἐφʼ ἡμέρῃ, αἳ δʼ ἐπὶ νυκτὶ</l>
+<l n="103">αὐτόματοι φοιτῶσι κακὰ θνητοῖσι φέρουσαι</l>
+<l n="104">σιγῇ, ἐπεὶ φωνὴν ἐξείλετο μητίετα Ζεύς.</l>
+<l n="105">οὕτως οὔτι πη ἔστι Διὸς νόον ἐξαλέασθαι.</l>
+<l n="106">
+<milestone ed="P" unit="para"/>εἰ δʼ ἐθέλεις, ἕτερόν τοι ἐγὼ λόγον ἐκκορυφώσω</l>
+<l n="107">εὖ καὶ ἐπισταμένως· σὺ δʼ ἐνὶ φρεσὶ βάλλεο σῇσιν.</l>
+<l n="108">ὡς ὁμόθεν γεγάασι θεοὶ θνητοί τʼ ἄνθρωποι.</l>
+<milestone n="109" ed="p" unit="card"/>
+<l n="109">
+<milestone ed="P" unit="para"/>χρύσεον μὲν πρώτιστα γένος μερόπων ἀνθρώπων</l>
+<l n="110">ἀθάνατοι ποίησαν Ὀλύμπια δώματʼ ἔχοντες.</l>
+<l n="111">οἳ μὲν ἐπὶ Κρόνου ἦσαν, ὅτʼ οὐρανῷ ἐμβασίλευεν·</l>
+<l n="112">ὥστε θεοὶ δʼ ἔζωον ἀκηδέα θυμὸν ἔχοντες</l>
+<l n="113">νόσφιν ἄτερ τε πόνων καὶ ὀιζύος· οὐδέ τι δειλὸν</l>
+<l n="114">γῆρας ἐπῆν, αἰεὶ δὲ πόδας καὶ χεῖρας ὁμοῖοι</l>
+<l n="115">τέρποντʼ ἐν θαλίῃσι κακῶν ἔκτοσθεν ἁπάντων·</l>
+<l n="116">θνῇσκον δʼ ὥσθʼ ὕπνῳ δεδμημένοι· ἐσθλὰ δὲ πάντα</l>
+<l n="117">τοῖσιν ἔην· καρπὸν δʼ ἔφερε ζείδωρος ἄρουρα</l>
+<l n="118">αὐτομάτη πολλόν τε καὶ ἄφθονον· οἳ δʼ ἐθελημοὶ</l>
+<l n="119">ἥσυχοι ἔργʼ ἐνέμοντο σὺν ἐσθλοῖσιν πολέεσσιν.</l>
+<l n="120">ἀφνειοὶ μήλοισι, φίλοι μακάρεσσι θεοῖσιν.</l>
+<l n="121">
+<milestone ed="P" unit="para"/>αὐτὰρ ἐπεὶ δὴ τοῦτο γένος κατὰ γαῖʼ ἐκάλυψε,—</l>
+<l n="122">τοὶ μὲν δαίμονες ἁγνοὶ ἐπιχθόνιοι καλέονται</l>
+<l n="123">ἐσθλοί, ἀλεξίκακοι, φύλακες θνητῶν ἀνθρώπων,</l>
+<l n="124">
+<del>οἵ ῥα φυλάσσουσίν τε δίκας καὶ σχέτλια ἔργα</del>
+</l>
+<l n="125">
+<del>ἠέρα ἑσσάμενοι πάντη φοιτῶντες ἐπʼ αἶαν,</del>
+</l>
+<l n="126">πλουτοδόται· καὶ τοῦτο γέρας βασιλήιον ἔσχον—,</l>
+<l n="127">δεύτερον αὖτε γένος πολὺ χειρότερον μετόπισθεν</l>
+<l n="128">ἀργύρεον ποίησαν Ὀλύμπια δώματʼ ἔχοντες,</l>
+<l n="129">χρυσέῳ οὔτε φυὴν ἐναλίγκιον οὔτε νόημα.</l>
+<l n="130">ἀλλʼ ἑκατὸν μὲν παῖς ἔτεα παρὰ μητέρι κεδνῇ</l>
+<l n="131">ἐτρέφετʼ ἀτάλλων, μέγα νήπιος, ᾧ ἐνὶ οἴκῳ.</l>
+<l n="132">ἀλλʼ ὅτʼ ἄρʼ ἡβήσαι τε καὶ ἥβης μέτρον ἵκοιτο,</l>
+<l n="133">παυρίδιον ζώεσκον ἐπὶ χρόνον, ἄλγεʼ ἔχοντες</l>
+<l n="134">ἀφραδίῃς· ὕβριν γὰρ ἀτάσθαλον οὐκ ἐδύναντο</l>
+<l n="135">ἀλλήλων ἀπέχειν, οὐδʼ ἀθανάτους θεραπεύειν</l>
+<l n="136">ἤθελον οὐδʼ ἔρδειν μακάρων ἱεροῖς ἐπὶ βωμοῖς,</l>
+<l n="137">ἣ θέμις ἀνθρώποις κατὰ ἤθεα. τοὺς μὲν ἔπειτα</l>
+<l n="138">Ζεὺς Κρονίδης ἔκρυψε χολούμενος, οὕνεκα τιμὰς</l>
+<l n="139">οὐκ ἔδιδον μακάρεσσι θεοῖς, οἳ Ὄλυμπον ἔχουσιν.</l>
+<milestone n="140" ed="p" unit="card"/>
+<l n="140">
+<milestone ed="P" unit="para"/>αὐτὰρ ἐπεὶ καὶ τοῦτο γένος κατὰ γαῖʼ ἐκάλυψε,—</l>
+<l n="141">τοὶ μὲν ὑποχθόνιοι μάκαρες θνητοῖς καλέονται,</l>
+<l n="142">δεύτεροι, ἀλλʼ ἔμπης τιμὴ καὶ τοῖσιν ὀπηδεῖ—,</l>
+<l n="143">Ζεὺς δὲ πατὴρ τρίτον ἄλλο γένος μερόπων ἀνθρώπων</l>
+<l n="144">χάλκειον ποίησʼ, οὐκ ἀργυρέῳ οὐδὲν ὁμοῖον,</l>
+<l n="145">ἐκ μελιᾶν, δεινόν τε καὶ ὄβριμον· οἷσιν Ἄρηος</l>
+<l n="146">ἔργʼ ἔμελεν στονόεντα καὶ ὕβριες· οὐδέ τι σῖτον</l>
+<l n="147">ἤσθιον, ἀλλʼ ἀδάμαντος ἔχον κρατερόφρονα θυμόν,</l>
+<l n="148">ἄπλαστοι· μεγάλη δὲ βίη καὶ χεῖρες ἄαπτοι</l>
+<l n="149">ἐξ ὤμων ἐπέφυκον ἐπὶ στιβαροῖσι μέλεσσιν.</l>
+<l n="150">ὧν δʼ ἦν χάλκεα μὲν τεύχεα, χάλκεοι δέ τε οἶκοι</l>
+<l n="151">χαλκῷ δʼ εἰργάζοντο· μέλας δʼ οὐκ ἔσκε σίδηρος.</l>
+<l n="152">καὶ τοὶ μὲν χείρεσσιν ὕπο σφετέρῃσι δαμέντες</l>
+<l n="153">βῆσαν ἐς εὐρώεντα δόμον κρυεροῦ Αίδαο</l>
+<l n="154">νώνυμνοι· θάνατος δὲ καὶ ἐκπάγλους περ ἐόντας</l>
+<l n="155">εἷλε μέλας, λαμπρὸν δʼ ἔλιπον φάος ἠελίοιο.</l>
+<l n="156">
+<milestone ed="P" unit="para"/>αὐτὰρ ἐπεὶ καὶ τοῦτο γένος κατὰ γαῖʼ ἐκάλυψεν,</l>
+<l n="157">αὖτις ἔτʼ ἄλλο τέταρτον ἐπὶ χθονὶ πουλυβοτείρῃ</l>
+<l n="158">Ζεὺς Κρονίδης ποίησε, δικαιότερον καὶ ἄρειον,</l>
+<l n="159">ἀνδρῶν ἡρώων θεῖον γένος, οἳ καλέονται</l>
+<l n="160">ἡμίθεοι, προτέρη γενεὴ κατʼ ἀπείρονα γαῖαν.</l>
+<l n="161">καὶ τοὺς μὲν πόλεμός τε κακὸς καὶ φύλοπις αἰνή,</l>
+<l n="162">τοὺς μὲν ὑφʼ ἑπταπύλῳ Θήβῃ, Καδμηίδι γαίῃ,</l>
+<l n="163">ὤλεσε μαρναμένους μήλων ἕνεκʼ Οἰδιπόδαο,</l>
+<l n="164">τοὺς δὲ καὶ ἐν νήεσσιν ὑπὲρ μέγα λαῖτμα θαλάσσης</l>
+<l n="165">ἐς Τροίην ἀγαγὼν Ἑλένης ἕνεκʼ ἠυκόμοιο.</l>
+<l n="166">ἔνθʼ ἤτοι τοὺς μὲν θανάτου τέλος ἀμφεκάλυψε,</l>
+<l n="167">τοῖς δὲ δίχʼ ἀνθρώπων βίοτον καὶ ἤθεʼ ὀπάσσας</l>
+<l n="168">Ζεὺς Κρονίδης κατένασσε πατὴρ ἐς πείρατα γαίης.</l>
+<l n="170">καὶ τοὶ μὲν ναίουσιν ἀκηδέα θυμὸν ἔχοντες</l>
+<l n="171">ἐν μακάρων νήσοισι παρʼ Ὠκεανὸν βαθυδίνην,</l>
+<l n="172">ὄλβιοι ἥρωες, τοῖσιν μελιηδέα καρπὸν</l>
+<l n="173">τρὶς ἔτεος θάλλοντα φέρει ζείδωρος ἄρουρα.</l>
+<l n="169">τηλοῦ ἀπʼ ἀθανάτων· τοῖσιν Κρόνος ἐμβασιλεύει.</l>
+<l n="169a">
+<del>τοῦ γὰρ δεσμὸ</del>ν ἔλυσε πα<del>τὴρ ἀνδρῶν τε θεῶν τε.</del>
+</l>
+<l n="169b">
+<del>τοῖσι δʼ ὁμῶς ν</del>εάτοις τιμὴ <del>καὶ κῦδος ὀπηδεῖ.</del>
+</l>
+<l n="169c">
+<del>Πέμπτον δʼ αὖτις ἔτʼ ἄ</del>λλο γένος θῆκʼ <del>εὐρύοπα Ζεὺς</del>
+</l>
+<l n="169d">
+<del>ἀνδρῶν, οἳ</del> γεγάασιν ἐπὶ <del>χθονὶ πουλυβοτείρῃ.</del>
+</l>
+<milestone n="174" ed="p" unit="card"/>
+
+    <l n="174" style="speech">
+<milestone ed="P" unit="para"/>μηκέτʼ ἔπειτʼ ὤφελλον ἐγὼ πέμπτοισι μετεῖναι</l>
+    <l n="175" style="speech">ἀνδράσιν, ἀλλʼ ἢ πρόσθε θανεῖν ἢ ἔπειτα γενέσθαι.</l>
+
+<l n="176">νῦν γὰρ δὴ γένος ἐστὶ σιδήρεον· οὐδέ ποτʼ ἦμαρ</l>
+<l n="177">παύονται καμάτου καὶ ὀιζύος, οὐδέ τι νύκτωρ</l>
+<l n="178">φθειρόμενοι. χαλεπὰς δὲ θεοὶ δώσουσι μερίμνας·</l>
+<l n="179">ἀλλʼ ἔμπης καὶ τοῖσι μεμείξεται ἐσθλὰ κακοῖσιν.</l>
+<l n="180">Ζεὺς δʼ ὀλέσει καὶ τοῦτο γένος μερόπων ἀνθρώπων,</l>
+<l n="181">εὖτʼ ἂν γεινόμενοι πολιοκρόταφοι τελέθωσιν.</l>
+<l n="182">οὐδὲ πατὴρ παίδεσσιν ὁμοίιος οὐδέ τι παῖδες,</l>
+<l n="183">οὐδὲ ξεῖνος ξεινοδόκῳ καὶ ἑταῖρος ἑταίρῳ,</l>
+<l n="184">οὐδὲ κασίγνητος φίλος ἔσσεται, ὡς τὸ πάρος περ.</l>
+<l n="185">αἶψα δὲ γηράσκοντας ἀτιμήσουσι τοκῆας·</l>
+<l n="186">μέμψονται δʼ ἄρα τοὺς χαλεποῖς βάζοντες ἔπεσσι</l>
+<l n="187">σχέτλιοι οὐδὲ θεῶν ὄπιν εἰδότες· οὐδέ κεν οἵ γε</l>
+<l n="188">γηράντεσσι τοκεῦσιν ἀπὸ θρεπτήρια δοῖεν</l>
+<l n="189">χειροδίκαι· ἕτερος δʼ ἑτέρου πόλιν ἐξαλαπάξει.</l>
+<l n="190">οὐδέ τις εὐόρκου χάρις ἔσσεται οὔτε δικαίου</l>
+<l n="191">οὔτʼ ἀγαθοῦ, μᾶλλον δὲ κακῶν ῥεκτῆρα καὶ ὕβριν</l>
+<l n="192">ἀνέρες αἰνήσουσι· δίκη δʼ ἐν χερσί, καὶ αἰδὼς</l>
+<l n="193">οὐκ ἔσται· βλάψει δʼ ὁ κακὸς τὸν ἀρείονα φῶτα</l>
+<l n="194">μύθοισιν σκολιοῖς ἐνέπων, ἐπὶ δʼ ὅρκον ὀμεῖται.</l>
+<l n="195">ζῆλος δʼ ἀνθρώποισιν ὀιζυροῖσιν ἅπασι</l>
+<l n="196">δυσκέλαδος κακόχαρτος ὁμαρτήσει, στυγερώπης.</l>
+<l n="197">καὶ τότε δὴ πρὸς Ὄλυμπον ἀπὸ χθονὸς εὐρυοδείης</l>
+<l n="198">λευκοῖσιν φάρεσσι καλυψαμένα χρόα καλὸν</l>
+<l n="199">ἀθανάτων μετὰ φῦλον ἴτον προλιπόντʼ ἀνθρώπους</l>
+<l n="200">Αἰδὼς καὶ Νέμεσις· τὰ δὲ λείψεται ἄλγεα λυγρὰ</l>
+<l n="201">θνητοῖς ἀνθρώποισι· κακοῦ δʼ οὐκ ἔσσεται ἀλκή.</l>
+
+<milestone n="202" ed="p" unit="card"/>
+    <l n="202"  style="speech">
+<milestone ed="P" unit="para"/>νῦν δʼ αἶνον βασιλεῦσιν ἐρέω φρονέουσι καὶ αὐτοῖς·</l>
+
+<l n="203">ὧδʼ ἴρηξ προσέειπεν ἀηδόνα ποικιλόδειρον</l>
+<l n="204">ὕψι μάλʼ ἐν νεφέεσσι φέρων ὀνύχεσσι μεμαρπώς·</l>
+<l n="205">ἣ δʼ ἐλεόν, γναμπτοῖσι πεπαρμένη ἀμφʼ ὀνύχεσσι,</l>
+<l n="206">μύρετο· τὴν ὅγʼ ἐπικρατέως πρὸς μῦθον ἔειπεν·</l>
+
+    <l n="207" style="speech">
+<milestone ed="P" unit="para"/>δαιμονίη, τί λέληκας; ἔχει νύ σε πολλὸν ἀρείων·</l>
+    <l n="208" style="speech">τῇ δʼ εἶς, ᾗ σʼ ἂν ἐγώ περ ἄγω καὶ ἀοιδὸν ἐοῦσαν·</l>
+    <l n="209" style="speech">δεῖπνον δʼ, αἴ κʼ ἐθέλω, ποιήσομαι ἠὲ μεθήσω.</l>
+    <l n="210" style="speech">ἄφρων δʼ, ὅς κʼ ἐθέλῃ πρὸς κρείσσονας ἀντιφερίζειν·</l>
+    <l n="211" style="speech">νίκης τε στέρεται πρός τʼ αἴσχεσιν ἄλγεα πάσχει.</l>
+
+<l n="212">
+<milestone ed="P" unit="para"/>ὣς ἔφατʼ ὠκυπέτης ἴρηξ, τανυσίπτερος ὄρνις.</l>
+
+    <l n="213"  style="speech">
+<milestone ed="P" unit="para"/>ὦ Πέρση, σὺ δʼ ἄκουε δίκης, μηδʼ ὕβριν ὄφελλε·</l>
+
+<l n="214">ὕβρις γάρ τε κακὴ δειλῷ βροτῷ· οὐδὲ μὲν ἐσθλὸς</l>
+<l n="215">ῥηιδίως φερέμεν δύναται, βαρύθει δέ θʼ ὑπʼ αὐτῆς</l>
+<l n="216">ἐγκύρσας ἄτῃσιν· ὁδὸς δʼ ἑτέρηφι παρελθεῖν</l>
+<l n="217">κρείσσων ἐς τὰ δίκαια· Δίκη δʼ ὑπὲρ Ὕβριος ἴσχει</l>
+<l n="218">ἐς τέλος ἐξελθοῦσα· παθὼν δέ τε νήπιος ἔγνω.</l>
+<l n="219">αὐτίκα γὰρ τρέχει Ὅρκος ἅμα σκολιῇσι δίκῃσιν.</l>
+<l n="220">τῆς δὲ Δίκης ῥόθος ἑλκομένης, ᾗ κʼ ἄνδρες ἄγωσι</l>
+<l n="221">δωροφάγοι, σκολιῇς δὲ δίκῃς κρίνωσι θέμιστας.</l>
+<l n="222">ἣ δʼ ἕπεται κλαίουσα πόλιν καὶ ἤθεα λαῶν,</l>
+<l n="223">ἠέρα ἑσσαμένη, κακὸν ἀνθρώποισι φέρουσα,</l>
+<l n="224">οἵ τε μιν ἐξελάσωσι καὶ οὐκ ἰθεῖαν ἔνειμαν.</l>
+<l n="225">Οἳ δὲ δίκας ξείνοισι καὶ ἐνδήμοισι διδοῦσιν</l>
+<l n="226">ἰθείας καὶ μή τι παρεκβαίνουσι δικαίου,</l>
+<l n="227">τοῖσι τέθηλε πόλις, λαοὶ δʼ ἀνθεῦσιν ἐν αὐτῇ·</l>
+<l n="228">εἰρήνη δʼ ἀνὰ γῆν κουροτρόφος, οὐδέ ποτʼ αὐτοῖς</l>
+<l n="229">ἀργαλέον πόλεμον τεκμαίρεται εὐρύοπα Ζεύς·</l>
+<l n="230">οὐδέ ποτʼ ἰθυδίκῃσι μετʼ ἀνδράσι λιμὸς ὀπηδεῖ</l>
+<l n="231">οὐδʼ ἄτη, θαλίῃς δὲ μεμηλότα ἔργα νέμονται.</l>
+<l n="232">τοῖσι φέρει μὲν γαῖα πολὺν βίον, οὔρεσι δὲ δρῦς</l>
+<l n="233">ἄκρη μέν τε φέρει βαλάνους, μέσση δὲ μελίσσας·</l>
+<l n="234">εἰροπόκοι δʼ ὄιες μαλλοῖς καταβεβρίθασιν·</l>
+<l n="235">τίκτουσιν δὲ γυναῖκες ἐοικότα τέκνα γονεῦσιν·</l>
+<l n="236">θάλλουσιν δʼ ἀγαθοῖσι διαμπερές· οὐδʼ ἐπὶ νηῶν</l>
+<l n="237">νίσσονται, καρπὸν δὲ φέρει ζείδωρος ἄρουρα.</l>
+<milestone n="238" ed="p" unit="card"/>
+<l n="238">
+<milestone ed="P" unit="para"/>οἷς δʼ ὕβρις τε μέμηλε κακὴ καὶ σχέτλια ἔργα,</l>
+<l n="239">τοῖς δὲ δίκην Κρονίδης τεκμαίρεται εὐρύοπα Ζεύς.</l>
+<l n="240">πολλάκι καὶ ξύμπασα πόλις κακοῦ ἀνδρὸς ἀπηύρα,</l>
+<l n="241">ὅς κεν ἀλιτραίνῃ καὶ ἀτάσθαλα μηχανάαται.</l>
+<l n="242">τοῖσιν δʼ οὐρανόθεν μέγʼ ἐπήγαγε πῆμα Κρονίων</l>
+<l n="243">λιμὸν ὁμοῦ καὶ λοιμόν· ἀποφθινύθουσι δὲ λαοί.</l>
+<l n="244">οὐδὲ γυναῖκες τίκτουσιν, μινύθουσι δὲ οἶκοι</l>
+<l n="245">Ζηνὸς φραδμοσύνῃσιν Ὀλυμπίου· ἄλλοτε δʼ αὖτε</l>
+<l n="246">ἢ τῶν γε στρατὸν εὐρὺν ἀπώλεσεν ἢ ὅ γε τεῖχος</l>
+<l n="247">ἢ νέας ἐν πόντῳ Κρονίδης ἀποαίνυται αὐτῶν.</l>
+<l n="248">
+<milestone ed="P" unit="para"/>ὦ βασιλῆς, ὑμεῖς δὲ καταφράζεσθε καὶ αὐτοὶ</l>
+<l n="249">τήνδε δίκην· ἐγγὺς γὰρ ἐν ἀνθρώποισιν ἐόντες</l>
+<l n="250">ἀθάνατοι φράζονται, ὅσοι σκολιῇσι δίκῃσιν</l>
+<l n="251">ἀλλήλους τρίβουσι θεῶν ὄπιν οὐκ ἀλέγοντες.</l>
+<l n="252">τρὶς γὰρ μύριοί εἰσιν ἐπὶ χθονὶ πουλυβοτείρῃ</l>
+<l n="253">ἀθάνατοι Ζηνὸς φύλακες θνητῶν ἀνθρώπων·</l>
+<l n="254">οἵ ῥα φυλάσσουσίν τε δίκας καὶ σχέτλια ἔργα</l>
+<l n="255">ἠέρα ἑσσάμενοι, πάντη φοιτῶντες ἐπʼ αἶαν.</l>
+<l n="256">ἡ δέ τε παρθένος ἐστὶ Δίκη, Διὸς ἐκγεγαυῖα,</l>
+<l n="257">κυδρή τʼ αἰδοίη τε θεῶν, οἳ Ὄλυμπον ἔχουσιν.</l>
+<l n="258">καί ῥʼ ὁπότʼ ἄν τίς μιν βλάπτῃ σκολιῶς ὀνοτάζων,</l>
+<l n="259">αὐτίκα πὰρ Διὶ πατρὶ καθεζομένη Κρονίωνι</l>
+<l n="260">γηρύετʼ ἀνθρώπων ἄδικον νόον, ὄφρʼ ἀποτίσῃ</l>
+<l n="261">δῆμος ἀτασθαλίας βασιλέων, οἳ λυγρὰ νοεῦντες</l>
+<l n="262">ἄλλῃ παρκλίνωσι δίκας σκολιῶς ἐνέποντες.</l>
+<l n="263">ταῦτα φυλασσόμενοι, βασιλῆς, ἰθύνετε †δίκας</l>
+<l n="264">δωροφάγοι, σκολιέων δὲ δικέων ἐπὶ πάγχυ λάθεσθε.</l>
+<l n="265">
+<milestone ed="P" unit="para"/>οἷ γʼ αὐτῷ κακὰ τεύχει ἀνὴρ ἄλλῳ κακὰ τεύχων,</l>
+<l n="266">ἡ δὲ κακὴ βουλὴ τῷ βουλεύσαντι κακίστη.</l>
+<l n="267">
+<milestone ed="P" unit="para"/>πάντα ἰδὼν Διὸς ὀφθαλμὸς καὶ πάντα νοήσας</l>
+<l n="268">καί νυ τάδʼ, αἴ κʼ ἐθέλῃσʼ, ἐπιδέρκεται, οὐδέ ἑ λήθει,</l>
+<l n="269">οἵην δὴ καὶ τήνδε δίκην πόλις ἐντὸς ἐέργει.</l>
+<l n="270">νῦν δὴ ἐγὼ μήτʼ αὐτὸς ἐν ἀνθρώποισι δίκαιος</l>
+<l n="271">εἴην μήτʼ ἐμὸς υἱός· ἐπεὶ κακὸν ἄνδρα δίκαιον</l>
+<l n="272">ἔμμεναι, εἰ μείζω γε δίκην ἀδικώτερος ἕξει·</l>
+<l n="273">ἀλλὰ τά γʼ οὔ πω ἔολπα τελεῖν Δία μητιόεντα.</l>
+<milestone n="274" ed="p" unit="card"/>
+
+    <l n="274" style="speech">
+<milestone ed="P" unit="para"/>ὦ Πέρση, σὺ δὲ ταῦτα μετὰ φρεσὶ βάλλεο σῇσι,</l>
+    <l n="275" style="speech">καὶ νυ δίκης ἐπάκουε, βίης δʼ ἐπιλήθεο πάμπαν.</l>
+
+<l n="276">τόνδε γὰρ ἀνθρώποισι νόμον διέταξε Κρονίων</l>
+<l n="277">ἰχθύσι μὲν καὶ θηρσὶ καὶ οἰωνοῖς πετεηνοῖς</l>
+<l n="278">ἐσθέμεν ἀλλήλους, ἐπεὶ οὐ δίκη ἐστὶ μετʼ αὐτοῖς·</l>
+<l n="279">ἀνθρώποισι δʼ ἔδωκε δίκην, ἣ πολλὸν ἀρίστη</l>
+<l n="280">γίγνεται· εἰ γάρ τίς κʼ ἐθέλῃ τὰ δίκαιʼ ἀγορεῦσαι</l>
+<l n="281">γιγνώσκων, τῷ μέν τʼ ὄλβον διδοῖ εὐρύοπα Ζεύς·</l>
+<l n="282">ὃς δέ κε μαρτυρίῃσι ἑκὼν ἐπίορκον ὀμόσσας</l>
+<l n="283">ψεύσεται, ἐν δὲ δίκην βλάψας νήκεστον ἀασθῇ,</l>
+<l n="284">τοῦ δέ τʼ ἀμαυροτέρη γενεὴ μετόπισθε λέλειπται·</l>
+<l n="285">ἀνδρὸς δʼ εὐόρκου γενεὴ μετόπισθεν ἀμείνων.</l>
+<l n="286">
+<milestone ed="P" unit="para"/>σοὶ δʼ ἐγὼ ἐσθλὰ νοέων ἐρέω, μέγα νήπιε Πέρση.</l>
+<l n="287">τὴν μέν τοι κακότητα καὶ ἰλαδὸν ἔστιν ἑλέσθαι</l>
+<l n="288">ῥηιδίως· λείη μὲν ὁδός, μάλα δʼ ἐγγύθι ναίει·</l>
+<l n="289">τῆς δʼ ἀρετῆς ἱδρῶτα θεοὶ προπάροιθεν ἔθηκαν</l>
+<l n="290">ἀθάνατοι· μακρὸς δὲ καὶ ὄρθιος οἶμος ἐς αὐτὴν</l>
+<l n="291">καὶ τρηχὺς τὸ πρῶτον· ἐπὴν δʼ εἰς ἄκρον ἵκηται,</l>
+<l n="292">ῥηιδίη δὴ ἔπειτα πέλει, χαλεπή περ ἐοῦσα.</l>
+<l n="293">
+<milestone ed="P" unit="para"/>οὗτος μὲν πανάριστος, ὃς αὐτὸς πάντα νοήσῃ</l>
+<l n="294">φρασσάμενος, τά κʼ ἔπειτα καὶ ἐς τέλος ᾖσιν ἀμείνω·</l>
+<l n="295">ἐσθλὸς δʼ αὖ κἀκεῖνος, ὃς εὖ εἰπόντι πίθηται·</l>
+<l n="296">ὃς δέ κε μήτʼ αὐτὸς νοέῃ μήτʼ ἄλλου ἀκούων</l>
+<l n="297">ἐν θυμῷ βάλληται, ὃ δʼ αὖτʼ ἀχρήιος ἀνήρ.</l>
+<l n="298">ἀλλὰ σύ γʼ ἡμετέρης μεμνημένος αἰὲν ἐφετμῆς</l>
+<l n="299">ἐργάζευ, Πέρση, δῖον γένος, ὄφρα σε λιμὸς</l>
+<l n="300">ἐχθαίρῃ, φιλέῃ δέ σʼ ἐυστέφανος Δημήτηρ</l>
+<l n="301">αἰδοίη, βιότου δὲ τεὴν πιμπλῇσι καλιήν·</l>
+<l n="302">λιμὸς γάρ τοι πάμπαν ἀεργῷ σύμφορος ἀνδρί.</l>
+<l n="303">τῷ δὲ θεοὶ νεμεσῶσι καὶ ἀνέρες, ὅς κεν ἀεργὸς</l>
+<l n="304">ζώῃ, κηφήνεσσι κοθούροις εἴκελος ὀργήν,</l>
+<l n="305">οἵ τε μελισσάων κάματον τρύχουσιν ἀεργοὶ</l>
+<l n="306">ἔσθοντες· σοὶ δʼ ἔργα φίλʼ ἔστω μέτρια κοσμεῖν,</l>
+<l n="307">ὥς κέ τοι ὡραίου βιότου πλήθωσι καλιαί.</l>
+<l n="308">ἐξ ἔργων δʼ ἄνδρες πολύμηλοί τʼ ἀφνειοί τε·</l>
+<l n="309">καὶ ἐργαζόμενοι πολὺ φίλτεροι ἀθανάτοισιν.</l>
+<l n="311">ἔργον δʼ οὐδὲν ὄνειδος, ἀεργίη δέ τʼ ὄνειδος.</l>
+<l n="312">εἰ δέ κε ἐργάζῃ, τάχα σε ζηλώσει ἀεργὸς</l>
+<l n="313">πλουτεῦντα· πλούτῳ δʼ ἀρετὴ καὶ κῦδος ὀπηδεῖ.</l>
+<l n="314">δαίμονι δʼ οἷος ἔησθα, τὸ ἐργάζεσθαι ἄμεινον,</l>
+<l n="315">εἴ κεν ἀπʼ ἀλλοτρίων κτεάνων ἀεσίφρονα θυμὸν</l>
+<l n="316">εἰς ἔργον τρέψας μελετᾷς βίου, ὥς σε κελεύω.</l>
+<l n="317">αἰδὼς δʼ οὐκ ἀγαθὴ κεχρημένον ἄνδρα κομίζει,</l>
+<l n="318">αἰδώς, ἥ τʼ ἄνδρας μέγα σίνεται ἠδʼ ὀνίνησιν.</l>
+<l n="319">αἰδώς τοι πρὸς ἀνολβίῃ, θάρσος δὲ πρὸς ὄλβῳ.</l>
+<milestone n="320" ed="p" unit="card"/>
+<l n="320">
+<milestone ed="P" unit="para"/>χρήματα δʼ οὐχ ἁρπακτά, θεόσδοτα πολλὸν ἀμείνω.</l>
+<l n="321">εἰ γάρ τις καὶ χερσὶ βίῃ μέγαν ὄλβον ἕληται,</l>
+<l n="322">ἢ ὅ γʼ ἀπὸ γλώσσης ληίσσεται, οἷά τε πολλὰ</l>
+<l n="323">γίγνεται, εὖτʼ ἂν δὴ κέρδος νόον ἐξαπατήσῃ</l>
+<l n="324">ἀνθρώπων, αἰδῶ δέ τʼ ἀναιδείη κατοπάζῃ·</l>
+<l n="325">ῥεῖα δέ μιν μαυροῦσι θεοί, μινύθουσι δὲ οἶκον</l>
+<l n="326">ἀνέρι τῷ, παῦρον δέ τʼ ἐπὶ χρόνον ὄλβος ὀπηδεῖ.</l>
+<l n="327">ἶσον δʼ ὅς θʼ ἱκέτην ὅς τε ξεῖνον κακὸν ἔρξῃ,</l>
+<l n="328">ὅς τε κασιγνήτοιο ἑοῦ ἀνὰ δέμνια βαίνῃ</l>
+<l n="329">κρυπταδίης εὐνῆς ἀλόχου, παρακαίρια ῥέζων,</l>
+<l n="330">ὅς τέ τευ ἀφραδίῃς ἀλιταίνεται ὀρφανὰ τέκνα,</l>
+<l n="331">ὅς τε γονῆα γέροντα κακῷ ἐπὶ γήραος οὐδῷ</l>
+<l n="332">νεικείῃ χαλεποῖσι καθαπτόμενος ἐπέεσσιν·</l>
+<l n="333">τῷ δʼ ἦ τοι Ζεὺς αὐτὸς ἀγαίεται, ἐς δὲ τελευτὴν</l>
+<l n="334">ἔργων ἀντʼ ἀδίκων χαλεπὴν ἐπέθηκεν ἀμοιβήν.</l>
+<l n="335">ἀλλὰ σὺ τῶν μὲν πάμπαν ἔεργʼ ἀεσίφρονα θυμόν.</l>
+<l n="336">κὰδ δύναμιν δʼ ἔρδειν ἱέρʼ ἀθανάτοισι θεοῖσιν</l>
+<l n="337">ἁγνῶς καὶ καθαρῶς, ἐπὶ δʼ ἀγλαὰ μηρία καίειν·</l>
+<l n="338">ἄλλοτε δὲ σπονδῇσι θύεσσί τε ἱλάσκεσθαι,</l>
+<l n="339">ἠμὲν ὅτʼ εὐνάζῃ καὶ ὅτʼ ἂν φάος ἱερὸν ἔλθῃ,</l>
+<l n="340">ὥς κέ τοι ἵλαον κραδίην καὶ θυμὸν ἔχωσιν,</l>
+<l n="341">ὄφρʼ ἄλλων ὠνῇ κλῆρον, μὴ τὸν τεὸν ἄλλος.</l>
+<l n="342">
+<milestone ed="P" unit="para"/>τὸν φιλέοντʼ ἐπὶ δαῖτα καλεῖν, τὸν δʼ ἐχθρὸν ἐᾶσαι·</l>
+<l n="343">τὸν δὲ μάλιστα καλεῖν, ὅς τις σέθεν ἐγγύθι ναίει·</l>
+<l n="344">εἰ γάρ τοι καὶ χρῆμʼ ἐγχώριον ἄλλο γένηται,</l>
+<l n="345">γείτονες ἄζωστοι ἔκιον, ζώσαντο δὲ πηοί.</l>
+<l n="346">πῆμα κακὸς γείτων, ὅσσον τʼ ἀγαθὸς μέγʼ ὄνειαρ.</l>
+<l n="347">ἔμμορέ τοι τιμῆς, ὅς τʼ ἔμμορε γείτονος ἐσθλοῦ.</l>
+<l n="348">οὐδʼ ἂν βοῦς ἀπόλοιτʼ, εἰ μὴ γείτων κακὸς εἴη.</l>
+<l n="349">εὖ μὲν μετρεῖσθαι παρὰ γείτονος, εὖ δʼ ἀποδοῦναι,</l>
+<l n="350">αὐτῷ τῷ μέτρῳ, καὶ λώιον, αἴ κε δύνηαι,</l>
+<l n="351">ὡς ἂν χρηίζων καὶ ἐς ὕστερον ἄρκιον εὕρῃς.</l>
+<l n="352">
+<milestone ed="P" unit="para"/>μὴ κακὰ κερδαίνειν· κακὰ κέρδεα ἶσʼ ἀάτῃσιν.</l>
+<l n="353">τὸν φιλέοντα φιλεῖν, καὶ τῷ προσιόντι προσεῖναι.</l>
+<l n="354">καὶ δόμεν, ὅς κεν δῷ, καὶ μὴ δόμεν, ὅς κεν μὴ δῷ.</l>
+<l n="355">δώτῃ μέν τις ἔδωκεν, ἀδώτῃ δʼ οὔτις ἔδωκεν.</l>
+<l n="356">δὼς ἀγαθή, ἅρπαξ δὲ κακή, θανάτοιο δότειρα.</l>
+<l n="357">ὃς μὲν γάρ κεν ἀνὴρ ἐθέλων, ὅ γε, κεἰ μέγα δοίη,</l>
+<l n="358">χαίρει τῷ δώρῳ καὶ τέρπεται ὃν κατὰ θυμόν·</l>
+<l n="359">ὃς δέ κεν αὐτὸς ἕληται ἀναιδείηφι πιθήσας,</l>
+<l n="360">καί τε σμικρὸν ἐόν, τό γʼ ἐπάχνωσεν φίλον ἦτορ.</l>
+<l n="363">ὃς δʼ ἐπʼ ἐόντι φέρει, ὃ δʼ ἀλέξεται αἴθοπα λιμόν·</l>
+<l n="361">εἰ γάρ κεν καὶ σμικρὸν ἐπὶ σμικρῷ καταθεῖο</l>
+<l n="362">καὶ θαμὰ τοῦτʼ ἔρδοις, τάχα κεν μέγα καὶ τὸ γένοιτο.</l>
+<l n="364">οὐδὲ τό γʼ ἐν οἴκῳ κατακείμενον ἀνέρα κήδει.</l>
+<l n="365">οἴκοι βέλτερον εἶναι, ἐπεὶ βλαβερὸν τὸ θύρηφιν.</l>
+<l n="366">ἐσθλὸν μὲν παρεόντος ἑλέσθαι, πῆμα δὲ θυμῷ</l>
+<l n="367">χρηίζειν ἀπεόντος, ἅ σε φράζεσθαι ἄνωγα.</l>
+<l n="368">ἀρχομένου δὲ πίθου καὶ λήγοντος κορέσασθαι,</l>
+<l n="369">μεσσόθι φείδεσθαι· δειλὴ δʼ ἐνὶ πυθμένι φειδώ.</l>
+<milestone n="370" ed="p" unit="card"/>
+<l n="370">
+<milestone ed="P" unit="para"/>μισθὸς δʼ ἀνδρὶ φίλῳ εἰρημένος ἄρκιος ἔστω.</l>
+<l n="371">καί τε κασιγνήτῳ γελάσας ἐπὶ μάρτυρα θέσθαι.</l>
+<l n="372">πίστεις γάρ τοι ὁμῶς καὶ ἀπιστίαι ὤλεσαν ἄνδρας.</l>
+<l n="373">
+<milestone ed="P" unit="para"/>μὴ δὲ γυνή σε νόον πυγοστόλος ἐξαπατάτω</l>
+<l n="374">αἱμύλα κωτίλλουσα, τεὴν διφῶσα καλιήν.</l>
+<l n="375">ὃς δὲ γυναικὶ πέποιθε, πέποιθʼ ὅ γε φηλήτῃσιν.</l>
+<l n="376">
+<milestone ed="P" unit="para"/>μουνογενὴς δὲ πάις εἴη πατρώιον οἶκον</l>
+<l n="377">φερβέμεν ὣς γὰρ πλοῦτος ἀέξεται ἐν μεγάροισιν.</l>
+<l n="378">γηραιὸς δὲ θάνοις ἕτερον παῖδʼ ἐγκαταλείπων.</l>
+<l n="379">ῥεῖα δέ κεν πλεόνεσσι πόροι Ζεὺς ἄσπετον ὄλβον.</l>
+<l n="380">πλείων μὲν πλεόνων μελέτη, μείζων δʼ ἐπιθήκη.</l>
+<l n="381">
+<milestone ed="P" unit="para"/>σοὶ δʼ εἰ πλούτου θυμὸς ἐέλδεται ἐν φρεσὶν ᾗσιν,</l>
+<l n="382">ὧδʼ ἔρδειν, καὶ ἔργον ἐπʼ ἔργῳ ἐργάζεσθαι.</l>
+<l n="383">
+<milestone ed="P" unit="para"/>πληιάδων Ἀτλαγενέων ἐπιτελλομενάων</l>
+<l n="384">ἄρχεσθʼ ἀμήτου, ἀρότοιο δὲ δυσομενάων.</l>
+<l n="385">αἳ δή τοι νύκτας τε καὶ ἤματα τεσσαράκοντα</l>
+<l n="386">κεκρύφαται, αὖτις δὲ περιπλομένου ἐνιαυτοῦ</l>
+<l n="387">φαίνονται τὰ πρῶτα χαρασσομένοιο σιδήρου.</l>
+<l n="388">οὗτός τοι πεδίων πέλεται νόμος, οἵ τε θαλάσσης</l>
+<l n="389">ἐγγύθι ναιετάουσʼ, οἵ τʼ ἄγκεα βησσήεντα,</l>
+<l n="390">πόντου κυμαίνοντος ἀπόπροθι, πίονα χῶρον</l>
+<l n="391">ναίουσιν· γυμνὸν σπείρειν, γυμνὸν δὲ βοωτεῖν,</l>
+<l n="392">γυμνὸν δʼ ἀμάειν, εἴ χʼ ὥρια πάντʼ ἐθέλῃσθα</l>
+<l n="393">ἔργα κομίζεσθαι Δημήτερος· ὥς τοι ἕκαστα</l>
+<l n="394">ὥριʼ ἀέξηται, μή πως τὰ μέταζε χατίζων</l>
+<l n="395">πτώσσῃς ἀλλοτρίους οἴκους καὶ μηδὲν ἀνύσσῃς.</l>
+<l n="396">ὡς καὶ νῦν ἐπʼ ἔμʼ ἦλθες· ἐγὼ δέ τοι οὐκ ἐπιδώσω</l>
+<l n="397">οὐδʼ ἐπιμετρήσω· ἐργάζευ, νήπιε Πέρση,</l>
+<l n="398">ἔργα, τά τʼ ἀνθρώποισι θεοὶ διετεκμήραντο,</l>
+<l n="399">μή ποτε σὺν παίδεσσι γυναικί τε θυμὸν ἀχεύων</l>
+<l n="400">ζητεύῃς βίοτον κατὰ γείτονας, οἳ δʼ ἀμελῶσιν.</l>
+<l n="401">δὶς μὲν γὰρ καὶ τρὶς τάχα τεύξεαι· ἢν δʼ ἔτι λυπῇς,</l>
+<l n="402">χρῆμα μὲν οὐ πρήξεις, σὺ δʼ ἐτώσια πόλλʼ ἀγορεύσεις·</l>
+<l n="403">ἀχρεῖος δʼ ἔσται ἐπέων νομός. ἀλλά σʼ ἄνωγα</l>
+<l n="404">φράζεσθαι χρειῶν τε λύσιν λιμοῦ τʼ ἀλεωρήν.</l>
+<milestone n="405" ed="p" unit="card"/>
+<l n="405">
+<milestone ed="P" unit="para"/>οἶκον μὲν πρώτιστα γυναῖκά τε βοῦν τʼ ἀροτῆρα,</l>
+<l n="406">κτητήν, οὐ γαμετήν, ἥτις καὶ βουσὶν ἕποιτο,</l>
+<l n="407">χρήματα δʼ ἐν οἴκῳ πάντʼ ἄρμενα ποιήσασθαι,</l>
+<l n="408">μὴ σὺ μὲν αἰτῇς ἄλλον, ὃ δʼ ἀρνῆται, σὺ δὲ τητᾷ,</l>
+<l n="409">ἡ δʼ ὥρη παραμείβηται, μινύθῃ δὲ τὸ ἔργον.</l>
+<l n="410">μηδʼ ἀναβάλλεσθαι ἔς τʼ αὔριον ἔς τε ἔνηφιν·</l>
+<l n="411">οὐ γὰρ ἐτωσιοεργὸς ἀνὴρ πίμπλησι καλιὴν</l>
+<l n="412">οὐδʼ ἀναβαλλόμενος· μελέτη δὲ τὸ ἔργον ὀφέλλει·</l>
+<l n="413">αἰεὶ δʼ ἀμβολιεργὸς ἀνὴρ ἄτῃσι παλαίει.</l>
+<l n="414">
+<milestone ed="P" unit="para"/>ἦμος δὴ λήγει μένος ὀξέος ἠελίοιο</l>
+<l n="415">καύματος ἰδαλίμου, μετοπωρινὸν ὀμβρήσαντος</l>
+<l n="416">Ζηνὸς ἐρισθενέος, μετὰ δὲ τρέπεται βρότεος χρὼς</l>
+<l n="417">πολλὸν ἐλαφρότερος· δὴ γὰρ τότε Σείριος ἀστὴρ</l>
+<l n="418">βαιὸν ὑπὲρ κεφαλῆς κηριτρεφέων ἀνθρώπων</l>
+<l n="419">ἔρχεται ἠμάτιος, πλεῖον δέ τε νυκτὸς ἐπαυρεῖ·</l>
+<l n="420">τῆμος ἀδηκτοτάτη πέλεται τμηθεῖσα σιδήρῳ</l>
+<l n="421">ὕλη, φύλλα δʼ ἔραζε χέει, πτόρθοιό τε λήγει·</l>
+<l n="422">τῆμος ἄρʼ ὑλοτομεῖν μεμνημένος ὥρια ἔργα.</l>
+<l n="423">ὄλμον μὲν τριπόδην τάμνειν, ὕπερον δὲ τρίπηχυν,</l>
+<l n="424">ἄξονα δʼ ἑπταπόδην· μάλα γάρ νύ τοι ἄρμενον οὕτω·</l>
+<l n="425">εἰ δέ κεν ὀκταπόδην, ἀπὸ καὶ σφῦράν κε τάμοιο.</l>
+<l n="426">τρισπίθαμον δʼ ἄψιν τάμνειν δεκαδώρῳ ἀμάξῃ.</l>
+<l n="427">πόλλʼ ἐπικαμπύλα κᾶλα· φέρειν δὲ γύην, ὅτʼ ἂν εὕρῃς,</l>
+<l n="428">ἐς οἶκον, κατʼ ὄρος διζήμενος ἢ κατʼ ἄρουραν,</l>
+<l n="429">πρίνινον· ὃς γὰρ βουσὶν ἀροῦν ὀχυρώτατός ἐστιν,</l>
+<l n="430">εὖτʼ ἂν Ἀθηναίης δμῷος ἐν ἐλύματι πήξας</l>
+<l n="431">γόμφοισιν πελάσας προσαρήρεται ἱστοβοῆι.</l>
+<l n="432">δοιὰ δὲ θέσθαι ἄροτρα, πονησάμενος κατὰ οἶκον,</l>
+<l n="433">αὐτόγυον καὶ πηκτόν, ἐπεὶ πολὺ λώιον οὕτω·</l>
+<l n="434">εἴ χʼ ἕτερον ἄξαις, ἕτερόν κʼ ἐπὶ βουσὶ βάλοιο.</l>
+<l n="435">δάφνης δʼ ἢ πτελέης ἀκιώτατοι ἱστοβοῆες,</l>
+<l n="436">δρυὸς ἔλυμα, γύης πρίνου· βόε δʼ ἐνναετήρω</l>
+<l n="437">ἄρσενε κεκτῆσθαι, τῶν γὰρ σθένος οὐκ ἀλαπαδνόν,</l>
+<l n="438">ἥβης μέτρον ἔχοντε· τὼ ἐργάζεσθαι ἀρίστω.</l>
+<l n="439">οὐκ ἂν τώ γʼ ἐρίσαντε ἐν αὔλακι κὰμ μὲν ἄροτρον</l>
+<l n="440">ἄξειαν, τὸ δὲ ἔργον ἐτώσιον αὖθι λίποιεν.</l>
+<l n="441">τοῖς δʼ ἅμα τεσσαρακονταετὴς αἰζηὸς ἕποιτο</l>
+<l n="442">ἄρτον δειπνήσας τετράτρυφον, ὀκτάβλωμον,</l>
+<l n="443">ὃς ἔργου μελετῶν ἰθεῖάν κʼ αὔλακʼ ἐλαύνοι,</l>
+<l n="444">μηκέτι παπταίνων μεθʼ ὁμήλικας, ἀλλʼ ἐπὶ ἔργῳ</l>
+<l n="445">θυμὸν ἔχων· τοῦ δʼ οὔτι νεώτερος ἄλλος ἀμείνων</l>
+<l n="446">σπέρματα δάσσασθαι καὶ ἐπισπορίην ἀλέασθαι.</l>
+<l n="447">κουρότερος γὰρ ἀνὴρ μεθʼ ὁμήλικας ἐπτοίηται.</l>
+<milestone n="448" ed="p" unit="card"/>
+<l n="448">
+<milestone ed="P" unit="para"/>φράζεσθαι δʼ, εὖτʼ ἂν γεράνου φωνὴν ἐπακούσῃς</l>
+<l n="449">ὑψόθεν ἐκ νεφέων ἐνιαύσια κεκληγυίης·</l>
+<l n="450">ἥτʼ ἀρότοιό τε σῆμα φέρει καὶ χείματος ὥρην</l>
+<l n="451">δεικνύει ὀμβρηροῦ· κραδίην δʼ ἔδακʼ ἀνδρὸς ἀβούτεω·</l>
+<l n="452">δὴ τότε χορτάζειν ἕλικας βόας ἔνδον ἐόντας·</l>
+<l n="453">ῥηίδιον γὰρ ἔπος εἰπεῖν· βόε δὸς καὶ ἄμαξαν·</l>
+<l n="454">ῥηίδιον δʼ ἀπανήνασθαι· πάρα ἔργα βόεσσιν.</l>
+<l n="455">φησὶ δʼ ἀνὴρ φρένας ἀφνειὸς πήξασθαι ἄμαξαν,</l>
+<l n="456">νήπιος, οὐδὲ τὸ οἶδʼ· ἑκατὸν δέ τε δούρατʼ ἀμάξης,</l>
+<l n="457">τῶν πρόσθεν μελέτην ἐχέμεν οἰκήια θέσθαι.</l>
+<l n="458">
+<milestone ed="P" unit="para"/>εὖτʼ ἂν δὲ πρώτιστʼ ἄροτος θνητοῖσι φανείῃ,</l>
+<l n="459">δὴ τότʼ ἐφορμηθῆναι ὁμῶς δμῶές τε καὶ αὐτὸς</l>
+<l n="460">αὔην καὶ διερὴν ἀρόων ἀρότοιο καθʼ ὥρην,</l>
+<l n="461">πρωὶ μάλα σπεύδων, ἵνα τοι πλήθωσιν ἄρουραι.</l>
+<l n="462">ἦρι πολεῖν· θέρεος δὲ νεωμένη οὔ σʼ ἀπατήσει.</l>
+<l n="463">νειὸν δὲ σπείρειν ἔτι κουφίζουσαν ἄρουραν·</l>
+<l n="464">νειὸς ἀλεξιάρη παίδων εὐκηλήτειρα.</l>
+<l n="465">
+<milestone ed="P" unit="para"/>εὔχεσθαι δὲ Διὶ χθονίῳ Δημήτερί θʼ ἁγνῇ,</l>
+<l n="466">ἐκτελέα βρίθειν Δημήτερος ἱερὸν ἀκτήν,</l>
+<l n="467">ἀρχόμενος τὰ πρῶτʼ ἀρότου, ὅτʼ ἂν ἄκρον ἐχέτλης</l>
+<l n="468">χειρὶ λαβὼν ὅρπηκα βοῶν ἐπὶ νῶτον ἵκηαι</l>
+<l n="469">ἔνδρυον ἑλκόντων μεσάβων. ὁ δὲ τυτθὸς ὄπισθε</l>
+<l n="470">δμῷος ἔχων μακέλην πόνον ὀρνίθεσσι τιθείη</l>
+<l n="471">σπέρμα κατακρύπτων· ἐυθημοσύνη γὰρ ἀρίστη</l>
+<l n="472">θνητοῖς ἀνθρώποις, κακοθημοσύνη δὲ κακίστη.</l>
+<l n="473">ὧδέ κεν ἀδροσύνῃ στάχυες νεύοιεν ἔραζε,</l>
+<l n="474">εἰ τέλος αὐτὸς ὄπισθεν Ὀλύμπιος ἐσθλὸν ὀπάζοι,</l>
+<l n="475">ἐκ δʼ ἀγγέων ἐλάσειας ἀράχνια· καί σε ἔολπα</l>
+<l n="476">γηθήσειν βιότου αἰρεύμενον ἔνδον ἐόντος.</l>
+<l n="477">εὐοχθέων δʼ ἵξεαι πολιὸν ἔαρ, οὐδὲ πρὸς ἄλλους</l>
+<l n="478">αὐγάσεαι· σέο δʼ ἄλλος ἀνὴρ κεχρημένος ἔσται.</l>
+<milestone n="479" ed="p" unit="card"/>
+
+    <l n="479" style="speech">
+<milestone ed="P" unit="para"/>εἰ δέ κεν ἠελίοιο τροπῇς ἀρόῳς χθόνα δῖαν,</l>
+    <l n="480" style="speech">ἥμενος ἀμήσεις ὀλίγον περὶ χειρὸς ἐέργων,</l>
+    <l n="481" style="speech">ἀντία δεσμεύων κεκονιμένος, οὐ μάλα χαίρων,</l>
+    <l n="482" style="speech">οἴσεις δʼ ἐν φορμῷ· παῦροι δέ σε θηήσονται.</l>
+
+<l n="483">ἄλλοτε δʼ ἀλλοῖος Ζηνὸς νόος αἰγιόχοιο,</l>
+<l n="484">ἀργαλέος δʼ ἄνδρεσσι καταθνητοῖσι νοῆσαι.</l>
+<l n="485">εἰ δέ κεν ὄψʼ ἀρόσῃς, τόδε κέν τοι φάρμακον εἴη·</l>
+<l n="486">ἦμος κόκκυξ κοκκύζει δρυὸς ἐν πετάλοισι</l>
+<l n="487">τὸ πρῶτον, τέρπει δὲ βροτοὺς ἐπʼ ἀπείρονα γαῖαν,</l>
+<l n="488">τῆμος Ζεὺς ὕοι τρίτῳ ἤματι μηδʼ ἀπολήγοι,</l>
+<l n="489">μήτʼ ἄρʼ ὑπερβάλλων βοὸς ὁπλὴν μήτʼ ἀπολείπων·</l>
+<l n="490">οὕτω κʼ ὀψαρότης πρῳηρότῃ ἰσοφαρίζοι.</l>
+<l n="491">ἐν θυμῷ δʼ εὖ πάντα φυλάσσεο· μηδέ σε λήθοι</l>
+<l n="492">μήτʼ ἔαρ γιγνόμενον πολιὸν μήθʼ ὥριος ὄμβρος.</l>
+<l n="493">
+<milestone ed="P" unit="para"/>πὰρ δʼ ἴθι χάλκειον θῶκον καὶ ἐπαλέα λέσχην</l>
+<l n="494">ὥρῃ χειμερίῃ, ὁπότε κρύος ἀνέρα ἔργων</l>
+<l n="495">ἰσχάνει, ἔνθα κʼ ἄοκνος ἀνὴρ μέγα οἶκον ὀφέλλοι,</l>
+<l n="496">μή σε κακοῦ χειμῶνος ἀμηχανίη καταμάρψῃ</l>
+<l n="497">σὺν πενίῃ, λεπτῇ δὲ παχὺν πόδα χειρὶ πιέζῃς.</l>
+<l n="498">πολλὰ δʼ ἀεργὸς ἀνήρ, κενεὴν ἐπὶ ἐλπίδα μίμνων,</l>
+<l n="499">χρηίζων βιότοιο, κακὰ προσελέξατο θυμῷ.</l>
+<l n="500">ἐλπὶς δʼ οὐκ ἀγαθὴ κεχρημένον ἄνδρα κομίζει,</l>
+<l n="501">ἥμενον ἐν λέσχῃ, τῷ μὴ βίος ἄρκιος εἴη.</l>
+<l n="502">
+<milestone ed="P" unit="para"/>δείκνυε δὲ δμώεσσι θέρευς ἔτι μέσσου ἐόντος·</l>
+<l n="503">οὐκ αἰεὶ θέρος ἐσσεῖται, ποιεῖσθε καλιάς.</l>
+<milestone n="504" ed="p" unit="card"/>
+<l n="504">
+<milestone ed="P" unit="para"/>μῆνα δὲ Ληναιῶνα, κάκʼ ἤματα, βουδόρα πάντα,</l>
+<l n="505">τοῦτον ἀλεύασθαι, καὶ πηγάδας, αἵτʼ ἐπὶ γαῖαν</l>
+<l n="506">πνεύσαντος Βορέαο δυσηλεγέες τελέθουσιν,</l>
+<l n="507">ὅστε διὰ Θρῄκης ἱπποτρόφου εὐρέι πόντῳ</l>
+<l n="508">ἐμπνεύσας ὤρινε· μέμυκε δὲ γαῖα καὶ ὕλη·</l>
+<l n="509">πολλὰς δὲ δρῦς ὑψικόμους ἐλάτας τε παχείας</l>
+<l n="510">οὔρεος ἐν βήσσῃς πιλνᾷ χθονὶ πουλυβοτείρῃ</l>
+<l n="511">ἐμπίπτων, καὶ πᾶσα βοᾷ τότε νήριτος ὕλη.</l>
+<l n="512">θῆρες δὲ φρίσσουσʼ, οὐρὰς δʼ ὑπὸ μέζεʼ ἔθεντο,</l>
+<l n="513">τῶν καὶ λάχνῃ δέρμα κατάσκιον· ἀλλά νυ καὶ τῶν</l>
+<l n="514">ψυχρὸς ἐὼν διάησι δασυστέρνων περ ἐόντων.</l>
+<l n="515">καί τε διὰ ῥινοῦ βοὸς ἔρχεται, οὐδέ μιν ἴσχει·</l>
+<l n="516">καί τε διʼ αἶγα ἄησι τανύτριχα· πώεα δʼ οὔ τι,</l>
+<l n="517">οὕνεκʼ ἐπηεταναὶ τρίχες αὐτῶν, οὐ διάησιν</l>
+<l n="518">ἲς ἀνέμου Βορέου· τροχαλὸν δὲ γέροντα τίθησιν.</l>
+<l n="519">καὶ διὰ παρθενικῆς ἁπαλόχροος οὐ διάησιν,</l>
+<l n="520">ἥτε δόμων ἔντοσθε φίλῃ παρὰ μητέρι μίμνει</l>
+<l n="521">οὔ πω ἔργα ἰδυῖα πολυχρύσου Ἀφροδίτης·</l>
+<l n="522">εὖ τε λοεσσαμένη τέρενα χρόα καὶ λίπʼ ἐλαίῳ</l>
+<l n="523">χρισαμένη μυχίη καταλέξεται ἔνδοθι οἴκου</l>
+<l n="524">ἤματι χειμερίῳ, ὅτʼ ἀνόστεος ὃν πόδα τένδει</l>
+<l n="525">ἔν τʼ ἀπύρῳ οἴκῳ καὶ ἤθεσι λευγαλέοισιν.</l>
+<l n="526">οὐδέ οἱ ἠέλιος δείκνυ νομὸν ὁρμηθῆναι·</l>
+<l n="527">ἀλλʼ ἐπὶ κυανέων ἀνδρῶν δῆμόν τε πόλιν τε</l>
+<l n="528">στρωφᾶται, βράδιον δὲ Πανελλήνεσσι φαείνει.</l>
+<l n="529">καὶ τότε δὴ κεραοὶ καὶ νήκεροι ὑληκοῖται</l>
+<l n="530">λυγρὸν μυλιόωντες ἀνὰ δρία βησσήεντα</l>
+<l n="531">φεύγουσιν· καὶ πᾶσιν ἐνὶ φρεσὶ τοῦτο μέμηλεν,</l>
+<l n="532">ὡς σκέπα μαιόμενοι πυκινοὺς κευθμῶνας ἔχωσι</l>
+<l n="533">καὶ γλάφυ πετρῆεν· τότε δὴ τρίποδι βροτῷ ἶσοι,</l>
+<l n="534">οὗ τʼ ἐπὶ νῶτα ἔαγε, κάρη δʼ εἰς οὖδας ὁρᾶται,</l>
+<l n="535">τῷ ἴκελοι φοιτῶσιν, ἀλευόμενοι νίφα λευκήν.</l>
+<milestone n="536" ed="p" unit="card"/>
+<l n="536">
+<milestone ed="P" unit="para"/>καὶ τότε ἕσσασθαι ἔρυμα χροός, ὥς σε κελεύω,</l>
+<l n="537">χλαῖνάν τε μαλακὴν καὶ τερμιόεντα χιτῶνα·</l>
+<l n="538">στήμονι δʼ ἐν παύρῳ πολλὴν κρόκα μηρύσασθαι·</l>
+<l n="539">τὴν περιέσσασθαι, ἵνα τοι τρίχες ἀτρεμέωσι,</l>
+<l n="540">μηδʼ ὀρθαὶ φρίσσωσιν ἀειρόμεναι κατὰ σῶμα.</l>
+<l n="541">ἀμφὶ δὲ ποσσὶ πέδιλα βοὸς ἶφι κταμένοιο</l>
+<l n="542">ἄρμενα δήσασθαι, πίλοις ἔντοσθε πυκάσσας.</l>
+<l n="543">πρωτογόνων δʼ ἐρίφων, ὁπότʼ ἂν κρύος ὥριον ἔλθῃ,</l>
+<l n="544">δέρματα συρράπτειν νεύρῳ βοός, ὄφρʼ ἐπὶ νώτῳ</l>
+<l n="545">ὑετοῦ ἀμφιβάλῃ ἀλέην· κεφαλῆφι δʼ ὕπερθεν</l>
+<l n="546">πῖλον ἔχειν ἀσκητόν, ἵνʼ οὔατα μὴ καταδεύῃ·</l>
+<l n="547">ψυχρὴ γάρ τʼ ἠὼς πέλεται Βορέαο πεσόντος</l>
+<l n="548">ἠώιος δʼ ἐπὶ γαῖαν ἀπʼ οὐρανοῦ ἀστερόεντος</l>
+<l n="549">ἀὴρ πυροφόρος τέταται μακάρων ἐπὶ ἔργοις·</l>
+<l n="550">ὅστε ἀρυσάμενος ποταμῶν ἄπο αἰεναόντων,</l>
+<l n="551">ὑψοῦ ὑπὲρ γαίης ἀρθεὶς ἀνέμοιο θυέλλῃ</l>
+<l n="552">ἄλλοτε μέν θʼ ὕει ποτὶ ἕσπερον, ἄλλοτʼ ἄησι</l>
+<l n="553">πυκνὰ Θρηικίου Βορέου νέφεα κλονέοντος.</l>
+<l n="554">τὸν φθάμενος ἔργον τελέσας οἶκόνδε νέεσθαι,</l>
+<l n="555">μή ποτέ σʼ οὐρανόθεν σκοτόεν νέφος ἀμφικαλύψῃ,</l>
+<l n="556">χρῶτα δὲ μυδαλέον θήῃ κατά θʼ εἵματα δεύσῃ.</l>
+<l n="557">ἀλλʼ ὑπαλεύασθαι· μεὶς γὰρ χαλεπώτατος οὗτος,</l>
+<l n="558">χειμέριος, χαλεπὸς προβάτοις, χαλεπὸς δʼ ἀνθρώποις.</l>
+<l n="559">τῆμος τὤμισυ βουσίν, ἐπʼ ἀνέρι δὲ πλέον εἴη</l>
+<l n="560">ἁρμαλιῆς· μακραὶ γὰρ ἐπίρροθοι εὐφρόναι εἰσίν.</l>
+<l n="561">ταῦτα φυλασσόμενος τετελεσμένον εἰς ἐνιαυτὸν</l>
+<l n="562">ἰσοῦσθαι νύκτας τε καὶ ἤματα, εἰσόκεν αὖτις</l>
+<l n="563">γῆ πάντων μήτηρ καρπὸν σύμμικτον ἐνείκῃ.</l>
+<l n="564">
+<milestone ed="P" unit="para"/>εὖτʼ ἂν δʼ ἑξήκοντα μετὰ τροπὰς ἠελίοιο</l>
+<l n="565">χειμέριʼ ἐκτελέσῃ Ζεὺς ἤματα, δή ῥα τότʼ ἀστὴρ</l>
+<l n="566">Ἀρκτοῦρος προλιπὼν ἱερὸν ῥόον Ὠκεανοῖο</l>
+<l n="567">πρῶτον παμφαίνων ἐπιτέλλεται ἀκροκνέφαιος.</l>
+<l n="568">τὸν δὲ μέτʼ ὀρθογόη Πανδιονὶς ὦρτο χελιδὼν</l>
+<l n="569">ἐς φάος ἀνθρώποις, ἔαρος νέον ἱσταμένοιο.</l>
+<l n="570">τὴν φθάμενος οἴνας περταμνέμεν· ὣς γὰρ ἄμεινον.</l>
+<milestone n="571" ed="p" unit="card"/>
+<l n="571">
+<milestone ed="P" unit="para"/>ἀλλʼ ὁπότʼ ἂν φερέοικος ἀπὸ χθονὸς ἂμ φυτὰ βαίνῃ</l>
+<l n="572">Πληιάδας φεύγων, τότε δὴ σκάφος οὐκέτι οἰνέων·</l>
+<l n="573">ἀλλʼ ἅρπας τε χαρασσέμεναι καὶ δμῶας ἐγείρειν·</l>
+<l n="574">φεύγειν δὲ σκιεροὺς θώκους καὶ ἐπʼ ἠόα κοῖτον</l>
+<l n="575">ὥρῃ ἐν ἀμήτου, ὅτε τʼ ἠέλιος χρόα κάρφει.</l>
+<l n="576">τημοῦτος σπεύδειν καὶ οἴκαδε καρπὸν ἀγινεῖν</l>
+<l n="577">ὄρθρου ἀνιστάμενος, ἵνα τοι βίος ἄρκιος εἴη.</l>
+<l n="578">ἠὼς γὰρ ἔργοιο τρίτην ἀπομείρεται αἶσαν,</l>
+<l n="579">ἠώς τοι προφέρει μὲν ὁδοῦ, προφέρει δὲ καὶ ἔργου,</l>
+<l n="580">ἠώς, ἥτε φανεῖσα πολέας ἐπέβησε κελεύθου</l>
+<l n="581">ἀνθρώπους πολλοῖσί τʼ ἐπὶ ζυγὰ βουσὶ τίθησιν.</l>
+<l n="582">
+<milestone ed="P" unit="para"/>ἦμος δὲ σκόλυμός τʼ ἀνθεῖ καὶ ἠχέτα τέττιξ</l>
+<l n="583">δενδρέῳ ἐφεζόμενος λιγυρὴν καταχεύετʼ ἀοιδὴν</l>
+<l n="584">πυκνὸν ὑπὸ πτερύγων, θέρεος καματώδεος ὥρῃ,</l>
+<l n="585">τῆμος πιόταταί τʼ αἶγες καὶ οἶνος ἄριστος,</l>
+<l n="586">μαχλόταται δὲ γυναῖκες, ἀφαυρότατοι δέ τοι ἄνδρες</l>
+<l n="587">εἰσίν, ἐπεὶ κεφαλὴν καὶ γούνατα Σείριος ἄζει,</l>
+<l n="588">αὐαλέος δέ τε χρὼς ὑπὸ καύματος· ἀλλὰ τότʼ ἤδη</l>
+<l n="589">εἴη πετραίη τε σκιὴ καὶ βίβλινος οἶνος,</l>
+<l n="590">μάζα τʼ ἀμολγαίη γάλα τʼ αἰγῶν σβεννυμενάων,</l>
+<l n="591">καὶ βοὸς ὑλοφάγοιο κρέας μή πω τετοκυίης</l>
+<l n="592">πρωτογόνων τʼ ἐρίφων· ἐπὶ δʼ αἴθοπα πινέμεν οἶνον,</l>
+<l n="593">ἐν σκιῇ ἑζόμενον, κεκορημένον ἦτορ ἐδωδῆς,</l>
+<l n="594">ἀντίον ἀκραέος Ζεφύρου τρέψαντα πρόσωπα,</l>
+<l n="595">κρήνης τʼ αἰενάου καὶ ἀπορρύτου, ἥτʼ ἀθόλωτος,</l>
+<l n="596">τρὶς ὕδατος προχέειν, τὸ δὲ τέτρατον ἱέμεν οἴνου.</l>
+<l n="597">
+<milestone ed="P" unit="para"/>δμωσὶ δʼ ἐποτρύνειν Δημήτερος ἱερὸν ἀκτὴν</l>
+<l n="598">δινέμεν, εὖτʼ ἂν πρῶτα φανῇ σθένος Ὠαρίωνος,</l>
+<l n="599">χώρῳ ἐν εὐαέι καὶ ἐυτροχάλῳ ἐν ἀλωῇ.</l>
+<l n="600">μέτρῳ δʼ εὖ κομίσασθαι ἐν ἄγγεσιν· αὐτὰρ ἐπὴν δὴ</l>
+<l n="601">πάντα βίον κατάθηαι ἐπάρμενον ἔνδοθι οἴκου,</l>
+<l n="602">θῆτά τʼ ἄοικον ποιεῖσθαι καὶ ἄτεκνον ἔριθον</l>
+<l n="603">δίζησθαι κέλομαι· χαλεπὴ δʼ ὑπόπορτις ἔριθος·</l>
+<l n="604">καὶ κύνα καρχαρόδοντα κομεῖν, μὴ φείδεο σίτου,</l>
+<l n="605">μή ποτέ σʼ ἡμερόκοιτος ἀνὴρ ἀπὸ χρήμαθʼ ἕληται.</l>
+<l n="606">χόρτον δʼ ἐσκομίσαι καὶ συρφετόν, ὄφρα τοι εἴη</l>
+<l n="607">βουσὶ καὶ ἡμιόνοισιν ἐπηετανόν. αὐτὰρ ἔπειτα</l>
+<l n="608">δμῶας ἀναψῦξαι φίλα γούνατα καὶ βόε λῦσαι.</l>
+<milestone n="609" ed="p" unit="card"/>
+<l n="609">
+<milestone ed="P" unit="para"/>εὖτʼ ἂν δʼ Ὠαρίων καὶ Σείριος ἐς μέσον ἔλθῃ</l>
+<l n="610">οὐρανόν, Ἀρκτοῦρον δʼ ἐσίδῃ ῥοδοδάκτυλος Ηώς,</l>
+<l n="611">ὦ Πέρση, τότε πάντας ἀποδρέπεν οἴκαδε βότρυς·</l>
+<l n="612">δεῖξαι δʼ ἠελίῳ δέκα τʼ ἤματα καὶ δέκα νύκτας,</l>
+<l n="613">πέντε δὲ συσκιάσαι, ἕκτῳ δʼ εἰς ἄγγεʼ ἀφύσσαι</l>
+<l n="614">δῶρα Διωνύσου πολυγηθέος. αὐτὰρ ἐπὴν δὴ</l>
+<l n="615">Πληιάδες θʼ Ὑάδες τε τό τε σθένος Ὠαρίωνος</l>
+<l n="616">δύνωσιν, τότʼ ἔπειτʼ ἀρότου μεμνημένος εἶναι</l>
+<l n="617">ὡραίου· πλειὼν δὲ κατὰ χθονὸς ἄρμενος εἶσιν.</l>
+<l n="618">
+<milestone ed="P" unit="para"/>εἰ δέ σε ναυτιλίης δυσπεμφέλου ἵμερος αἱρεῖ,</l>
+<l n="619">εὖτʼ ἂν Πληιάδες σθένος ὄβριμον Ὠαρίωνος</l>
+<l n="620">φεύγουσαι πίπτωσιν ἐς ἠεροειδέα πόντον,</l>
+<l n="621">δὴ τότε παντοίων ἀνέμων θυίουσιν ἀῆται·</l>
+<l n="622">καὶ τότε μηκέτι νῆας ἔχειν ἐνὶ οἴνοπι πόντῳ,</l>
+<l n="623">γῆν ἐργάζεσθαι μεμνημένος, ὥς σε κελεύω.</l>
+<l n="624">νῆα δʼ ἐπʼ ἠπείρου ἐρύσαι πυκάσαι τε λίθοισι</l>
+<l n="625">πάντοθεν, ὄφρʼ ἴσχωσʼ ἀνέμων μένος ὑγρὸν ἀέντων,</l>
+<l n="626">χείμαρον ἐξερύσας, ἵνα μὴ πύθῃ Διὸς ὄμβρος.</l>
+<l n="627">ὅπλα δʼ ἐπάρμενα πάντα τεῷ ἐγκάτθεο οἴκῳ</l>
+<l n="628">εὐκόσμως στολίσας νηὸς πτερὰ ποντοπόροιο·</l>
+<l n="629">πηδάλιον δʼ ἐυεργὲς ὑπὲρ καπνοῦ κρεμάσασθαι.</l>
+<l n="630">αὐτὸς δʼ ὡραῖον μίμνειν πλόον, εἰσόκεν ἔλθῃ·</l>
+<l n="631">καὶ τότε νῆα θοὴν ἅλαδʼ ἑλκέμεν, ἐν δέ τε φόρτον</l>
+<l n="632">ἄρμενον ἐντύνασθαι, ἵνʼ οἴκαδε κέρδος ἄρηαι,</l>
+<l n="633">ὥς περ ἐμός τε πατὴρ καὶ σός, μέγα νήπιε Πέρσῃ,</l>
+<l n="634">πλωίζεσκʼ ἐν νηυσί, βίου κεχρημένος ἐσθλοῦ·</l>
+<l n="635">ὅς ποτε καὶ τῇδʼ ἦλθε, πολὺν διὰ πόντον ἀνύσσας,</l>
+<l n="636">Κύμην Αἰολίδα προλιπών, ἐν νηὶ μελαίνῃ·</l>
+<l n="637">οὐκ ἄφενος φεύγων οὐδὲ πλοῦτόν τε καὶ ὄλβον,</l>
+<l n="638">ἀλλὰ κακὴν πενίην, τὴν Ζεὺς ἄνδρεσσι δίδωσιν·</l>
+<l n="639">νάσσατο δʼ ἄγχʼ Ἑλικῶνος ὀιζυρῇ ἐνὶ κώμῃ,</l>
+<l n="640">Ἄσκρῃ, χεῖμα κακῇ, θέρει ἀργαλέῃ, οὐδέ ποτʼ ἐσθλῇ.</l>
+
+<milestone n="641" ed="p" unit="card"/>
+    <l n="641" style="speech">
+<milestone ed="P" unit="para"/>τύνη δʼ, ὦ Πέρση, ἔργων μεμνημένος εἶναι</l>
+    <l n="642" style="speech">ὡραίων πάντων, περὶ ναυτιλίης δὲ μάλιστα.</l>
+    <l n="643" style="speech">νῆʼ ὀλίγην αἰνεῖν, μεγάλῃ δʼ ἐνὶ φορτία θέσθαι.</l>
+
+<l n="644">μείζων μὲν φόρτος, μεῖζον δʼ ἐπὶ κέρδεϊ κέρδος</l>
+<l n="645">ἔσσεται, εἴ κʼ ἄνεμοί γε κακὰς ἀπέχωσιν ἀήτας.</l>
+<l n="646">
+<milestone ed="P" unit="para"/>εὖτʼ ἂν ἐπʼ ἐμπορίην τρέψας ἀεσίφρονα θυμὸν</l>
+<l n="647">βούληαι χρέα τε προφυγεῖν καὶ λιμὸν ἀτερπέα,</l>
+<l n="648">δείξω δή τοι μέτρα πολυφλοίσβοιο θαλάσσης,</l>
+<l n="649">οὔτε τι ναυτιλίης σεσοφισμένος οὔτε τι νηῶν.</l>
+<l n="650">οὐ γάρ πώ ποτε νηί γʼ ἐπέπλων εὐρέα πόντον,</l>
+<l n="651">εἰ μὴ ἐς Εὔβοιαν ἐξ Αὐλίδος, ᾗ ποτʼ Ἀχαιοὶ</l>
+<l n="652">μείναντες χειμῶνα πολὺν σὺν λαὸν ἄγειραν</l>
+<l n="653">Ἑλλάδος ἐξ ἱερῆς Τροίην ἐς καλλιγύναικα.</l>
+<l n="654">ἔνθα δʼ ἐγὼν ἐπʼ ἄεθλα δαΐφρονος Ἀμφιδάμαντος</l>
+<l n="655">Χαλκίδα τʼ εἲς ἐπέρησα· τὰ δὲ προπεφραδμένα πολλὰ</l>
+<l n="656">ἄεθλʼ ἔθεσαν παῖδες μεγαλήτορος· ἔνθα μέ φημι</l>
+<l n="657">ὕμνῳ νικήσαντα φέρειν τρίποδʼ ὠτώεντα.</l>
+<l n="658">τὸν μὲν ἐγὼ Μούσῃς Ἑλικωνιάδεσσʼ ἀνέθηκα,</l>
+<l n="659">ἔνθα με τὸ πρῶτον λιγυρῆς ἐπέβησαν ἀοιδῆς.</l>
+<l n="660">τόσσον τοι νηῶν γε πεπείρημαι πολυγόμφων·</l>
+<l n="661">ἀλλὰ καὶ ὣς ἐρέω Ζηνὸς νόον αἰγιόχοιο·</l>
+<l n="662">Μοῦσαι γάρ μʼ ἐδίδαξαν ἀθέσφατον ὕμνον ἀείδειν.</l>
+<l n="663">
+<milestone ed="P" unit="para"/>ἤματα πεντήκοντα μετὰ τροπὰς ἠελίοιο,</l>
+<l n="664">ἐς τέλος ἐλθόντος θέρεος καματώδεος ὥρης,</l>
+<l n="665">ὡραῖος πέλεται θνητοῖς πλόος· οὔτε κε νῆα</l>
+<l n="666">καυάξαις οὔτʼ ἄνδρας ἀποφθείσειε θάλασσα,</l>
+<l n="667">εἰ δὴ μὴ πρόφρων γε Ποσειδάων ἐνοσίχθων</l>
+<l n="668">ἢ Ζεὺς ἀθανάτων βασιλεὺς ἐθέλῃσιν ὀλέσσαι·</l>
+<l n="669">ἐν τοῖς γὰρ τέλος ἐστὶν ὁμῶς ἀγαθῶν τε κακῶν τε.</l>
+<l n="670">τῆμος δʼ εὐκρινέες τʼ αὖραι καὶ πόντος ἀπήμων·</l>
+<l n="671">εὔκηλος τότε νῆα θοὴν ἀνέμοισι πιθήσας</l>
+<l n="672">ἑλκέμεν ἐς πόντον φόρτον τʼ ἐς πάντα τίθεσθαι,</l>
+<l n="673">σπεύδειν δʼ ὅττι τάχιστα πάλιν οἶκόνδε νέεσθαι·</l>
+<l n="674">μηδὲ μένειν οἶνόν τε νέον καὶ ὀπωρινὸν ὄμβρον</l>
+<l n="675">καὶ χειμῶνʼ ἐπιόντα Νότοιό τε δεινὰς ἀήτας,</l>
+<l n="676">ὅστʼ ὤρινε θάλασσαν ὁμαρτήσας Διὸς ὄμβρῳ</l>
+<l n="677">πολλῷ ὀπωρινῷ, χαλεπὸν δέ τε πόντον ἔθηκεν.</l>
+<milestone n="678" ed="p" unit="card"/>
+<l n="678">
+<milestone ed="P" unit="para"/>ἄλλος δʼ εἰαρινὸς πέλεται πλόος ἀνθρώποισιν·</l>
+<l n="679">ἦμος δὴ τὸ πρῶτον, ὅσον τʼ ἐπιβᾶσα κορώνη</l>
+<l n="680">ἴχνος ἐποίησεν, τόσσον πέταλʼ ἀνδρὶ φανείῃ</l>
+<l n="681">ἐν κράδῃ ἀκροτάτῃ, τότε δʼ ἄμβατός ἐστι θάλασσα·</l>
+<l n="682">εἰαρινὸς δʼ οὗτος πέλεται πλόος. οὔ μιν ἔγωγε</l>
+<l n="683">αἴνημʼ· οὐ γὰρ ἐμῷ θυμῷ κεχαρισμένος ἐστίν·</l>
+<l n="684">ἁρπακτός· χαλεπῶς κε φύγοις κακόν· ἀλλά νυ καὶ τὰ</l>
+<l n="685">ἄνθρωποι ῥέζουσιν ἀιδρείῃσι νόοιο·</l>
+<l n="686">χρήματα γὰρ ψυχὴ πέλεται δειλοῖσι βροτοῖσιν.</l>
+<l n="687">δεινὸν δʼ ἐστὶ θανεῖν μετὰ κύμασιν. ἀλλά σʼ ἄνωγα</l>
+<l n="688">φράζεσθαι τάδε πάντα μετὰ φρεσίν, ὡς ἀγορεύω.</l>
+<l n="689">μηδʼ ἐν νηυσὶν ἅπαντα βίον κοΐλῃσι τίθεσθαι·</l>
+<l n="690">ἀλλὰ πλέω λείπειν, τὰ δὲ μείονα φορτίζεσθαι.</l>
+<l n="691">δεινὸν γὰρ πόντου μετὰ κύμασι πήματι κύρσαι.</l>
+<l n="692">δεινὸν δʼ, εἴ κʼ ἐπʼ ἄμαξαν ὑπέρβιον ἄχθος ἀείρας</l>
+<l n="693">ἄξονα. καυάξαις καὶ φορτία μαυρωθείη.</l>
+<l n="694">μέτρα φυλάσσεσθαι· καιρὸς δʼ ἐπὶ πᾶσιν ἄριστος.</l>
+<l n="695">
+<milestone ed="P" unit="para"/>ὡραῖος δὲ γυναῖκα τεὸν ποτὶ οἶκον ἄγεσθαι,</l>
+<l n="696">μήτε τριηκόντων ἐτέων μάλα πόλλʼ ἀπολείπων</l>
+<l n="697">μήτʼ ἐπιθεὶς μάλα πολλά· γάμος δέ τοι ὥριος οὗτος·</l>
+<l n="698">ἡ δὲ γυνὴ τέτορʼ ἡβώοι, πέμπτῳ δὲ γαμοῖτο.</l>
+<l n="699">παρθενικὴν δὲ γαμεῖν, ὥς κʼ ἤθεα κεδνὰ διδάξῃς.</l>
+<l n="700">τὴν δὲ μάλιστα γαμεῖν, ἥ τις σέθεν ἐγγύθι ναίει,</l>
+<l n="701">πάντα μάλʼ ἀμφιιδών, μὴ γείτοσι χάρματα γήμῃς.</l>
+<l n="702">οὐ μὲν γάρ τι γυναικὸς ἀνὴρ ληίζετʼ ἄμεινον</l>
+<l n="703">τῆς ἀγαθῆς, τῆς δʼ αὖτε κακῆς οὐ ῥίγιον ἄλλο,</l>
+<l n="704">δειπνολόχης· ἥτʼ ἄνδρα καὶ ἴφθιμόν περ ἐόντα</l>
+<l n="705">εὕει ἄτερ δαλοῖο καὶ ὠμῷ γήραϊ δῶκεν. </l>
+<milestone n="706" ed="p" unit="card"/>
+<l n="706">
+<milestone ed="P" unit="para"/>εὖ δʼ ὄπιν ἀθανάτων μακάρων πεφυλαγμένος εἶναι.</l>
+<l n="707">μηδὲ κασιγνήτῳ ἶσον ποιεῖσθαι ἑταῖρον·</l>
+<l n="708">εἰ δέ κε ποιήσῃς, μή μιν πρότερος κακὸν ἔρξῃς.</l>
+<l n="709">μηδὲ ψεύδεσθαι γλώσσης χάριν· εἰ δὲ σέ γʼ ἄρχῃ</l>
+<l n="710">ἤ τι ἔπος εἰπὼν ἀποθύμιον ἠὲ καὶ ἔρξας,</l>
+<l n="711">δὶς τόσα τίνυσθαι μεμνημένος· εἰ δὲ σέ γʼ αὖτις</l>
+<l n="712">ἡγῆτʼ ἐς φιλότητα, δίκην δʼ ἐθέλῃσι παρασχεῖν,</l>
+<l n="713">δέξασθαι· δειλός τοι ἀνὴρ φίλον ἄλλοτε ἄλλον</l>
+<l n="714">ποιεῖται, σὲ δὲ μή τι νόον κατελεγχέτω εἶδος.</l>
+<l n="715">
+<milestone ed="P" unit="para"/>μηδὲ πολύξεινον μηδʼ ἄξεινον καλέεσθαι,</l>
+<l n="716">μηδὲ κακῶν ἕταρον μηδʼ ἐσθλῶν νεικεστῆρα.</l>
+<l n="717">
+<milestone ed="P" unit="para"/>μηδέ ποτʼ οὐλομένην πενίην θυμοφθόρον ἀνδρὶ</l>
+<l n="718">τέτλαθʼ ὀνειδίζειν, μακάρων δόσιν αἰὲν ἐόντων.</l>
+<l n="719">γλώσσης τοι θησαυρὸς ἐν ἀνθρώποισιν ἄριστος</l>
+<l n="720">φειδωλῆς, πλείστη δὲ χάρις κατὰ μέτρον ἰούσης.</l>
+<l n="721">εἰ δὲ κακὸν εἴποις, τάχα κʼ αὐτὸς μεῖζον ἀκούσαις.</l>
+<l n="722">
+<milestone ed="P" unit="para"/>μηδὲ πολυξείνου δαιτὸς δυσπέμφελος εἶναι</l>
+<l n="723">ἐκ κοινοῦ· πλείστη δὲ χάρις, δαπάνη τʼ ὀλιγίστη.</l>
+<l n="724">
+<milestone ed="P" unit="para"/>μηδέ ποτʼ ἐξ ἠοῦς Διὶ λειβέμεν αἴθοπα οἶνον</l>
+<l n="725">χερσὶν ἀνίπτοισιν μηδʼ ἄλλοις ἀθανάτοισιν·</l>
+<l n="726">οὐ γὰρ τοί γε κλύουσιν, ἀποπτύουσι δέ τʼ ἀράς.</l>
+<l n="727">
+<milestone ed="P" unit="para"/>μηδʼ ἄντʼ ἠελίου τετραμμένος ὀρθὸς ὀμιχεῖν·</l>
+<l n="728">αὐτὰρ ἐπεί κε δύῃ, μεμνημένος, ἔς τʼ ἀνιόντα·</l>
+<l n="729">μήτʼ ἐν ὁδῷ μήτʼ ἐκτὸς ὁδοῦ προβάδην οὐρήσῃς</l>
+<l n="730">μηδʼ ἀπογυμνωθείς· μακάρων τοι νύκτες ἔασιν·</l>
+<l n="731">ἑζόμενος δʼ ὅ γε θεῖος ἀνήρ, πεπνυμένα εἰδώς,</l>
+<l n="732">ἢ ὅ γε πρὸς τοῖχον πελάσας ἐυερκέος αὐλῆς.</l>
+<l n="733">
+<milestone ed="P" unit="para"/>μηδʼ αἰδοῖα γονῇ πεπαλαγμένος ἔνδοθι οἴκου</l>
+<l n="734">ἱστίῃ ἐμπελαδὸν παραφαινέμεν, ἀλλʼ ἀλέασθαι.</l>
+<l n="735">μηδʼ ἀπὸ δυσφήμοιο τάφου ἀπονοστήσαντα</l>
+<l n="736">σπερμαίνειν γενεήν, ἀλλʼ ἀθανάτων ἀπὸ δαιτός.</l>
+<milestone n="737" ed="p" unit="card"/>
+<l n="737">
+<milestone ed="P" unit="para"/>μηδέ ποτʼ αἰενάων ποταμῶν καλλίρροον ὕδωρ</l>
+<l n="738">ποσσὶ περᾶν, πρίν γʼ εὔξῃ ἰδὼν ἐς καλὰ ῥέεθρα,</l>
+<l n="739">χεῖρας νιψάμενος πολυηράτῳ ὕδατι λευκῷ.</l>
+<l n="740">ὃς ποταμὸν διαβῇ κακότητʼ ἰδὲ χεῖρας ἄνιπτος,</l>
+<l n="741">τῷ δὲ θεοὶ νεμεσῶσι καὶ ἄλγεα δῶκαν ὀπίσσω.</l>
+<l n="742">
+<milestone ed="P" unit="para"/>μηδʼ ἀπὸ πεντόζοιο θεῶν ἐν δαιτὶ θαλείῃ</l>
+<l n="743">αὖον ἀπὸ χλωροῦ τάμνειν αἴθωνι σιδήρῳ.</l>
+<l n="744">
+<milestone ed="P" unit="para"/>μηδέ ποτʼ οἰνοχόην τιθέμεν κρητῆρος ὕπερθε</l>
+<l n="745">πινόντων· ὀλοὴ γὰρ ἐπʼ αὐτῷ μοῖρα τέτυκται.</l>
+<l n="746">
+<milestone ed="P" unit="para"/>μηδὲ δόμον ποιῶν ἀνεπίξεστον καταλείπειν,</l>
+<l n="747">μή τοι ἐφεζομένη κρώξῃ λακέρυζα κορώνη.</l>
+<l n="748">
+<milestone ed="P" unit="para"/>μηδʼ ἀπὸ χυτροπόδων ἀνεπιρρέκτων ἀνελόντα</l>
+<l n="749">ἔσθειν μηδὲ λόεσθαι· ἐπεὶ καὶ τοῖς ἔνι ποινή.</l>
+<l n="750">
+<milestone ed="P" unit="para"/>μηδʼ ἐπʼ ἀκινήτοισι καθιζέμεν, οὐ γὰρ ἄμεινον,</l>
+<l n="751">παῖδα δυωδεκαταῖον, ὅτʼ ἀνέρʼ ἀνήνορα ποιεῖ,</l>
+<l n="752">μηδὲ δυωδεκάμηνον· ἴσον καὶ τοῦτο τέτυκται.</l>
+<l n="753">μηδὲ γυναικείῳ λουτρῷ χρόα φαιδρύνεσθαι</l>
+<l n="754">ἀνέρα· λευγαλέη γὰρ ἐπὶ χρόνον ἔστʼ ἐπὶ καὶ τῷ</l>
+<l n="755">ποινή. μηδʼ ἱεροῖσιν ἐπʼ αἰθομένοισι κυρήσας</l>
+<l n="756">μωμεύειν ἀίδηλα· θεός νύ τι καὶ τὰ νεμεσσᾷ.</l>
+<l n="757">μηδέ ποτʼ ἐν προχοῇς ποταμῶν ἅλαδε προρεόντων</l>
+<l n="758">μηδʼ ἐπὶ κρηνάων οὐρεῖν, μάλα δʼ ἐξαλέασθαι·</l>
+<l n="759">μηδʼ ἐναποψύχειν· τὸ γὰρ οὔ τοι λώιόν ἐστιν.</l>
+<l n="760">
+<milestone ed="P" unit="para"/>ὧδʼ ἔρδειν· δεινὴν δὲ βροτῶν ὑπαλεύεο φήμην.</l>
+<l n="761">φήμη γάρ τε κακὴ πέλεται, κούφη μὲν ἀεῖραι</l>
+<l n="762">ῥεῖα μάλʼ, ἀργαλέη δὲ φέρειν, χαλεπὴ δʼ ἀποθέσθαι.</l>
+<l n="763">φήμη δʼ οὔτις πάμπαν ἀπόλλυται, ἥν τινα πολλοὶ</l>
+<l n="764">λαοὶ φημίξωσι· θεός νύ τίς ἐστι καὶ αὐτή.</l>
+<milestone n="765" ed="p" unit="card"/>
+<l n="765">Ἤματα δʼ ἐκ Διόθεν πεφυλαγμένος εὖ κατὰ μοῖραν</l>
+<l n="766">πεφραδέμεν δμώεσσι· τριηκάδα μηνὸς ἀρίστην</l>
+<l n="767">ἔργα τʼ ἐποπτεύειν ἠδʼ ἁρμαλιὴν δατέασθαι.</l>
+<l n="769">
+<milestone ed="P" unit="para"/>αἵδε γὰρ ἡμέραι εἰσὶ Διὸς πάρα μητιόεντος,</l>
+<l n="768">εὖτʼ ἂν ἀληθείην λαοὶ κρίνοντες ἄγωσιν.</l>
+<l n="770">Πρῶτον ἔνη τετράς τε καὶ ἑβδόμη ἱερὸν ἦμαρ·</l>
+<l n="771">τῇ γὰρ Ἀπόλλωνα χρυσάορα γείνατο Λητώ·</l>
+<l n="772">ὀγδοάτη δʼ ἐνάτη τε, δύω γε μὲν ἤματα μηνὸς</l>
+<l n="773">ἔξοχʼ ἀεξομένοιο βροτήσια ἔργα πένεσθαι·</l>
+<l n="774">ἑνδεκάτη δὲ δυωδεκάτη τʼ, ἄμφω γε μὲν ἐσθλαί,</l>
+<l n="775">ἠμὲν ὄις πείκειν ἠδʼ εὔφρονα καρπὸν ἀμᾶσθαι·</l>
+<l n="776">ἡ δὲ δυωδεκάτη τῆς ἑνδεκάτης μέγʼ ἀμείνων·</l>
+<l n="777">τῇ γάρ τοι νῇ νήματʼ ἀερσιπότητος ἀράχνης</l>
+<l n="778">ἤματος ἐκ πλείου, ὅτε ἴδρις σωρὸν ἀμᾶται·</l>
+<l n="779">τῇ δʼ ἱστὸν στήσαιτο γυνὴ προβάλοιτό τε ἔργον.</l>
+<l n="780">Μηνὸς δʼ ἱσταμένου τρισκαιδεκάτην ἀλέασθαι</l>
+<l n="781">σπέρματος ἄρξασθαι· φυτὰ δʼ ἐνθρέψασθαι ἀρίστη.</l>
+<l n="782">
+<milestone ed="P" unit="para"/>ἕκτη δʼ ἡ μέσση μάλʼ ἀσύμφορός ἐστι φυτοῖσιν,</l>
+<l n="783">ἀνδρογόνος δʼ ἀγαθή· κούρῃ δʼ οὐ σύμφορός ἐστιν,</l>
+<l n="784">οὔτε γενέσθαι πρῶτʼ οὔτʼ ἂρ γάμου ἀντιβολῆσαι.</l>
+<l n="785">οὐδὲ μὲν ἡ πρώτη ἕκτη κούρῃ γε γενέσθαι</l>
+<l n="786">ἄρμενος, ἀλλʼ ἐρίφους τάμνειν καὶ πώεα μήλων</l>
+<l n="787">σηκόν τʼ ἀμφιβαλεῖν ποιμνήιον ἤπιον ἦμαρ·</l>
+<l n="788">ἐσθλὴ δʼ ἀνδρογόνος· φιλέοι δʼ ὅ γε κέρτομα βάζειν</l>
+<l n="789">ψεύδεά θʼ αἱμυλίους τε λόγους κρυφίους τʼ ὀαρισμούς.</l>
+<l n="790">μηνὸς δʼ ὀγδοάτῃ κάπρον καὶ βοῦν ἐρίμυκον</l>
+<l n="791">ταμνέμεν, οὐρῆας δὲ δυωδεκάτῃ ταλαεργούς.</l>
+<l n="792">
+<milestone ed="P" unit="para"/>εἰκάδι δʼ ἐν μεγάλῃ, πλέῳ ἤματι, ἵστορα φῶτα</l>
+<l n="793">γείνασθαι· μάλα γάρ τε νόον πεπυκασμένος ἐστίν.</l>
+<l n="794">ἐσθλὴ δʼ ἀνδρογόνος δεκάτη, κούρῃ δέ τε τετρὰς</l>
+<l n="795">μέσση· τῇ δέ τε μῆλα καὶ εἰλίποδας ἕλικας βοῦς</l>
+<l n="796">καὶ κύνα καρχαρόδοντα καὶ οὐρῆας ταλαεργοὺς</l>
+<l n="797">πρηΰνειν ἐπὶ χεῖρα τιθείς. πεφύλαξο δὲ θυμῷ</l>
+<l n="798">τετράδʼ ἀλεύασθαι φθίνοντός θʼ ἱσταμένου τε</l>
+<l n="799">ἄλγεʼ ἃ θυμβορεῖ μάλα γὰρ τετελεσμένον ἦμαρ.</l>
+<milestone n="800" ed="p" unit="card"/>
+<l n="800">Ἐν δὲ τετάρτῃ μηνὸς ἄγεσθαι οἶκον ἄκοιτιν</l>
+<l n="801">οἰωνοὺς κρίνας, οἳ ἐπʼ ἔργματι τούτῳ ἄριστοι.</l>
+<l n="802">
+<milestone ed="P" unit="para"/>πέμπτας δʼ ἐξαλέασθαι, ἐπεὶ χαλεπαί τε καὶ αἰναί·</l>
+<l n="803">ἐν πέμπτῃ γάρ φασιν Ἐρινύας ἀμφιπολεύειν</l>
+<l n="804">Ὅρκον γεινόμενον, τὸν Ἔρις τέκε πῆμʼ ἐπιόρκοις.</l>
+<l n="805">Μέσσῃ δʼ ἑβδομάτῃ Δημήτερος ἱερὸν ἀκτὴν</l>
+<l n="806">εὖ μάλʼ ὀπιπεύοντα ἐυτροχάλῳ ἐν ἀλωῇ</l>
+<l n="807">βαλλέμεν, ὑλοτόμον τε ταμεῖν θαλαμήια δοῦρα</l>
+<l n="808">νήιά τε ξύλα πολλά, τά τʼ ἄρμενα νηυσὶ πέλονται.</l>
+<l n="809">τετράδι δʼ ἄρχεσθαι νῆας πήγνυσθαι ἀραιάς.</l>
+<l n="810">
+<milestone ed="P" unit="para"/>εἰνὰς δʼ ἡ μέσση ἐπὶ δείελα λώιον ἦμαρ,</l>
+<l n="811">πρωτίστη δʼ εἰνὰς παναπήμων ἀνθρώποισιν·</l>
+<l n="812">ἐσθλὴ μὲν γάρ θʼ ἥ γε φυτευέμεν ἠδὲ γενέσθαι</l>
+<l n="813">ἀνέρι τʼ ἠδὲ γυναικί· καὶ οὔποτε πάγκακον ἦμαρ.</l>
+<l n="814">
+<milestone ed="P" unit="para"/>παῦροι δʼ αὖτε ἴσασι τρισεινάδα μηνὸς ἀρίστην</l>
+<l n="815">ἄρξασθαί τε πίθου καὶ ἐπὶ ζυγὸν αὐχένι θεῖναι</l>
+<l n="816">βουσὶ καὶ ἡμιόνοισι καὶ ἵπποις ὠκυπόδεσσι,</l>
+<l n="817">νῆα πολυκλήιδα θοὴν εἰς οἴνοπα πόντον</l>
+<l n="818">εἰρύμεναι· παῦροι δέ τʼ ἀληθέα κικλῄσκουσιν.</l>
+<l n="819">
+<milestone ed="P" unit="para"/>τετράδι δʼ οἶγε πίθον· περὶ πάντων ἱερὸν ἦμαρ</l>
+<l n="820">μέσση· παῦροι δʼ αὖτε μετʼ εἰκάδα μηνὸς ἀρίστην</l>
+<l n="821">ἠοῦς γιγνομένης· ἐπὶ δείελα δʼ ἐστὶ χερείων.</l>
+<l n="822">
+<milestone ed="P" unit="para"/>αἵδε μὲν ἡμέραι εἰσιν ἐπιχθονίοις μέγʼ ὄνειαρ,</l>
+<l n="823">αἱ δʼ ἄλλαι μετάδουποι, ἀκήριοι, οὔ τι φέρουσαι.</l>
+<l n="824">ἄλλος δʼ ἀλλοίην αἰνεῖ, παῦροι δὲ ἴσασιν.</l>
+<l n="825">ἄλλοτε μητρυιὴ πέλει ἡμέρη, ἄλλοτε μήτηρ.</l>
+<l n="826">τάων εὐδαίμων τε καὶ ὄλβιος, ὃς τάδε πάντα</l>
+<l n="827">εἰδὼς ἐργάζηται ἀναίτιος ἀθανάτοισιν,</l>
+<l n="828">ὄρνιθας κρίνων καὶ ὑπερβασίας ἀλεείνων.</l>
+</div>
+</body>
+</text>
+</TEI>
