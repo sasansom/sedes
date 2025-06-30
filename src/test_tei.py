@@ -1,6 +1,7 @@
 import copy
 import io
 import unittest
+import xml.etree.ElementTree
 
 import tei
 
@@ -8,7 +9,7 @@ class TestParser(unittest.TestCase):
     # "Make `tei.TEI` parser raise an error when XML is not well-formed"
     # https://github.com/sasansom/sedes/issues/89
     def test_non_well_formed(self):
-        with self.assertRaises(ValueError): # TODO: replace with concrete error
+        with self.assertRaises(xml.etree.ElementTree.ParseError):
             # Unclosed <supplied> element.
             doc = tei.TEI(io.StringIO("""\
 <?xml version="1.0" encoding="utf-8"?>

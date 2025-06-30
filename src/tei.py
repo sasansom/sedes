@@ -2,11 +2,11 @@
 # XML files.
 # https://tei-c.org/release/doc/tei-p5-doc/en/html/index.html
 
-import bs4
 import copy
 import enum
 import re
 import sys
+import xml.etree.ElementTree
 
 import betacode
 
@@ -165,19 +165,28 @@ class Line:
     def words(self):
         return (token.text for token in self.tokens if token.type == Token.Type.WORD)
 
+# Yield immediate child text nodes and elements, in order.
+def child_elements_and_text(elem):
+    if elem.text is not None:
+        yield elem.text
+    for child in elem:
+        yield child
+        if child.tail is not None:
+            yield child.tail
+
 class TEI:
     """TEI represents a TEI document read from a file stream."""
 
     def __init__(self, f):
-        self.soup = bs4.BeautifulSoup(f, "xml")
+        self.tree = xml.etree.ElementTree.parse(f)
 
     @property
     def title(self):
-        return self.soup.teiHeader.fileDesc.titleStmt.title.get_text()
+        return "".join(self.tree.find("./teiHeader/fileDesc/titleStmt/title").itertext())
 
     @property
     def author(self):
-        return self.soup.teiHeader.fileDesc.titleStmt.author.get_text()
+        return "".join(self.tree.find("./teiHeader/fileDesc/titleStmt/author").itertext())
 
     def lines(self):
         """Return an iterator over (Locator, str) extracted from the text of the
@@ -209,23 +218,23 @@ class TEI:
         def do_elem(root, env):
             nonlocal line_n, partial, next_partial
 
-            for elem in root.children:
+            for elem in child_elements_and_text(root):
                 # Make a copy of the environment to pass to recursive calls to
                 # do_elem. This allows them to know, for example, what book_n
                 # they're in, while enabling us to remember the environment
                 # before the call.
                 sub_env = env.copy()
 
-                if type(elem) == bs4.element.Comment:
+                if type(elem) == xml.etree.ElementTree.Comment:
                     pass
-                elif type(elem) == bs4.element.Tag:
+                elif type(elem) == xml.etree.ElementTree.Element:
                     # Lines may be marked up as
                     #   <l n="100">text text text</l>
                     #   <lb n="100"/>text text text
                     # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
                     # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
-                    if elem.name in ("l", "lb"):
-                        if elem.name == "lb":
+                    if elem.tag in ("l", "lb"):
+                        if elem.tag == "lb":
                             # Output the previous line. l elements are flushed
                             # at the end of the loop iteration, where the
                             # element is closed.
@@ -250,22 +259,22 @@ class TEI:
                         assert env.book_n == new_loc.book_n
                         line_n = new_loc.line_n
 
-                        if elem.name == "l":
+                        if elem.tag == "l":
                             sub_env.in_line = True
-                        elif elem.name == "lb":
+                        elif elem.tag == "lb":
                             env.in_line = True
-                    elif elem.name == "div1":
+                    elif elem.tag == "div1":
                         assert elem.get("type").lower() in ("book", "hymn", "poem"), elem.get("type")
                         sub_env.book_n = elem.get("n")
                         # Reset the line counter at the beginning of a new book.
                         line_n = None
 
-                    if elem.name in ("milestone", "head", "gap", "pb", "note", "speaker"):
+                    if elem.tag in ("milestone", "head", "gap", "pb", "note", "speaker"):
                         pass
-                    elif elem.name in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name", "supplied"):
+                    elif elem.tag in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name", "supplied"):
                         for x in do_elem(elem, sub_env):
                             yield x
-                    elif elem.name == "q":
+                    elif elem.tag == "q":
                         # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
                         # Quotation is tricky because it can appear in two forms
                         # with essentially opposite nesting:
@@ -302,12 +311,12 @@ class TEI:
                             line.tokens.append(Token(Token.Type.CLOSE_QUOTE, "’"))
                             yield loc, line
                     else:
-                        raise ValueError("don't understand element {!r}".format(elem.name))
+                        raise ValueError("don't understand element {!r}".format(elem.tag))
 
-                    if elem.name == "l":
+                    if elem.tag == "l":
                         for x in flush(env):
                             yield x
-                    elif elem.name == "div1":
+                    elif elem.tag == "div1":
                         for x in flush(sub_env):
                             yield x
                         # At the end of a book, reset the line counter to be safe.
@@ -317,5 +326,5 @@ class TEI:
                         raise ValueError("\"?\" not allowed in beta code; see https://github.com/sasansom/sedes/issues/11")
                     partial.extend(tokenize_text(betacode.decode(elem)))
 
-        for x in do_elem(self.soup.find("text").body, Environment()):
+        for x in do_elem(self.tree.find(".//text/body"), Environment()):
             yield x
