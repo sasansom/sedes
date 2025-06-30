@@ -4,12 +4,10 @@
 
 set -e
 
-WORKS="aratus argonautica callimachushymns homerichymns iliad nonnusdionysiaca odyssey quintussmyrnaeus shield theocritus theogony worksanddays"
+WORKS="aratus argonautica iliad nonnusdionysiaca odyssey quintussmyrnaeus shield theocritus theogony worksanddays"
 
 src/tei2csv "Phaen." corpus/aratus.xml > corpus/aratus.csv
 src/tei2csv "Argon." corpus/argonautica.xml > corpus/argonautica.csv
-src/tei2csv "Callim.Hymn" corpus/callimachushymns.xml > corpus/callimachushymns.csv
-src/tei2csv "Hom.Hymn" corpus/homerichymns.xml > corpus/homerichymns.csv
 src/tei2csv "Il." corpus/iliad.xml > corpus/iliad.csv
 src/tei2csv "Dion." corpus/nonnusdionysiaca.xml > corpus/nonnusdionysiaca.csv
 src/tei2csv "Od." corpus/odyssey.xml > corpus/odyssey.csv
@@ -22,12 +20,10 @@ src/tei2csv "W.D." corpus/worksanddays.xml > corpus/worksanddays.csv
 WORKS_CSV="$(for work in $WORKS; do echo "corpus/$work.csv"; done)"
 
 src/expectancy $WORKS_CSV > expectancy.all.csv
-src/expectancy corpus/iliad.csv corpus/odyssey.csv corpus/homerichymns.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv > expectancy.hellenistic+archaic.csv
+src/expectancy corpus/iliad.csv corpus/odyssey.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/aratus.csv > expectancy.hellenistic+archaic.csv
 
 src/tei2html "Phaen." corpus/aratus.xml expectancy.all.csv > "sedes-web/aratus.html"
 src/tei2html "Argon." corpus/argonautica.xml expectancy.all.csv > "sedes-web/argonautica.html"
-src/tei2html "Callim.Hymn" corpus/callimachushymns.xml expectancy.all.csv > "sedes-web/callimachushymns.html"
-src/tei2html "Hom.Hymn" corpus/homerichymns.xml expectancy.all.csv > "sedes-web/homerichymns.html"
 src/tei2html "Il." corpus/iliad.xml expectancy.all.csv > "sedes-web/iliad.html"
 src/tei2html "Dion." corpus/nonnusdionysiaca.xml expectancy.all.csv > "sedes-web/nonnusdionysiaca.html"
 src/tei2html "Od." corpus/odyssey.xml expectancy.all.csv > "sedes-web/odyssey.html"
