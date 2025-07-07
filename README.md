@@ -26,7 +26,7 @@ in a virtual environment:
 python3 -m venv venv
 source venv/bin/activate
 pip3 install -U pip setuptools wheel
-pip3 install cltk bs4 lxml
+pip3 install cltk
 ```
 
 Next, [install the `grc_models_cltk` corpus](https://docs.cltk.org/en/latest/data.html):
