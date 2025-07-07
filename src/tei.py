@@ -8,6 +8,11 @@ import re
 import sys
 import xml.etree.ElementTree
 
+# The TEI XML namespace, contained in curly brackets as conventional for xml.etree.ElementTree.
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/USE.html#CFNS
+# https://docs.python.org/3/library/xml.etree.elementtree.html#parsing-xml-with-namespaces
+NS = "{http://www.tei-c.org/ns/1.0}"
+
 def warn(msg):
     print("warning: {}".format(msg), file=sys.stderr)
 
@@ -223,8 +228,8 @@ class TEI:
                 #   <lb n="100"/>text text text
                 # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
                 # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
-                if elem.tag in ("l", "lb"):
-                    if elem.tag == "lb":
+                if elem.tag in (f"{NS}l", f"{NS}lb"):
+                    if elem.tag == f"{NS}lb":
                         # Output the previous line. l elements are flushed
                         # at the end of the loop iteration, where the
                         # element is closed.
@@ -249,22 +254,26 @@ class TEI:
                     assert env.book_n == new_loc.book_n
                     line_n = new_loc.line_n
 
-                    if elem.tag == "l":
+                    if elem.tag == f"{NS}l":
                         sub_env.in_line = True
-                    elif elem.tag == "lb":
+                    elif elem.tag == f"{NS}lb":
                         env.in_line = True
-                elif elem.tag == "div1":
+                elif elem.tag == f"{NS}div1":
                     assert elem.get("type").lower() in ("book", "hymn", "poem"), elem.get("type")
                     sub_env.book_n = elem.get("n")
                     # Reset the line counter at the beginning of a new book.
                     line_n = None
 
-                if elem.tag in ("milestone", "head", "gap", "pb", "note", "speaker"):
+                if elem.tag in (f"{NS}milestone", f"{NS}head", f"{NS}gap", f"{NS}pb", f"{NS}note", f"{NS}speaker"):
                     pass
-                elif elem.tag in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name", "supplied"):
+                elif elem.tag in (
+                    f"{NS}div1", f"{NS}div2",
+                    f"{NS}l", f"{NS}lb", f"{NS}p", f"{NS}sp",
+                    f"{NS}add", f"{NS}del", f"{NS}name", f"{NS}supplied"
+                ):
                     for x in do_elem(elem, sub_env):
                         yield x
-                elif elem.tag == "q":
+                elif elem.tag == f"{NS}q":
                     # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
                     # Quotation is tricky because it can appear in two forms
                     # with essentially opposite nesting:
@@ -303,10 +312,10 @@ class TEI:
                 else:
                     raise ValueError("don't understand element {!r}".format(elem.tag))
 
-                if elem.tag == "l":
+                if elem.tag == f"{NS}l":
                     for x in flush(env):
                         yield x
-                elif elem.tag == "div1":
+                elif elem.tag == f"{NS}div1":
                     for x in flush(sub_env):
                         yield x
                     # At the end of a book, reset the line counter to be safe.
@@ -318,5 +327,5 @@ class TEI:
                 if elem.tail is not None:
                     partial.extend(tokenize_text(elem.tail))
 
-        for x in do_elem(self.tree.find(".//text/body"), Environment()):
+        for x in do_elem(self.tree.find(f".//{NS}text/{NS}body"), Environment()):
             yield x
