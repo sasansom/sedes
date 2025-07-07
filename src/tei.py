@@ -237,8 +237,7 @@ class TEI:
                         # Output the previous line. l elements are flushed
                         # at the end of the loop iteration, where the
                         # element is closed.
-                        for x in flush(env):
-                            yield x
+                        yield from flush(env)
 
                     partial.extend(next_partial)
                     next_partial.clear()
@@ -271,8 +270,7 @@ class TEI:
                 if elem.tag in ("milestone", "head", "gap", "pb", "note", "speaker"):
                     pass
                 elif elem.tag in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name", "supplied"):
-                    for x in do_elem(elem, sub_env):
-                        yield x
+                    yield from do_elem(elem, sub_env)
                 elif elem.tag == "q":
                     # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
                     # Quotation is tricky because it can appear in two forms
@@ -291,8 +289,7 @@ class TEI:
                     # last line.
                     if env.in_line:
                         partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
-                        for x in do_elem(elem, sub_env):
-                            yield x
+                        yield from do_elem(elem, sub_env)
                         partial.append(Token(Token.Type.CLOSE_QUOTE, "’"))
                     else:
                         # Put the open quotation mark in a queue to be
@@ -313,11 +310,9 @@ class TEI:
                     raise ValueError("don't understand element {!r}".format(elem.tag))
 
                 if elem.tag == "l":
-                    for x in flush(env):
-                        yield x
+                    yield from flush(env)
                 elif elem.tag == "div1":
-                    for x in flush(sub_env):
-                        yield x
+                    yield from flush(sub_env)
                     # At the end of a book, reset the line counter to be safe.
                     line_n = None
 
@@ -327,5 +322,4 @@ class TEI:
                 if elem.tail is not None:
                     partial.extend(tokenize_betacode(elem.tail))
 
-        for x in do_elem(self.tree.find(".//text/body"), Environment()):
-            yield x
+        yield from do_elem(self.tree.find(".//text/body"), Environment())
