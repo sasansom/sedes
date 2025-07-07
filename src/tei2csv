@@ -13,6 +13,7 @@ import csv
 import getopt
 import re
 import sys
+import unicodedata
 
 import appositive
 import lemma as lemma_mod
@@ -35,6 +36,9 @@ FILENAME.XML is a TEI XML document containing the text of the work.
                     known units: {', '.join(sorted(MERGE_WORD_OPTIONS.keys()))}
   -h, --help        show this help
 """, end="", file=file)
+
+def normalize(s):
+    return unicodedata.normalize("NFD", s)
 
 def assign_sedes_for_line(line):
     """From a line, return num_scansions and a sequence of (word, word_n, sedes, shape)
@@ -75,13 +79,13 @@ def process(f, work_identifier, merge_word):
                 "book_n": loc.book_n,
                 "line_n": loc.line_n,
                 "word_n": assignment[group[0]][1],
-                "word": " ".join(assignment[i][0] for i in group),
+                "word": normalize(" ".join(assignment[i][0] for i in group)),
                 "scanned": scanned,
                 "num_scansions": num_scansions,
                 "sedes": assignment[group[0]][2],
                 "metrical_shape": "".join(assignment[i][3] for i in group),
                 "lemma": " ".join(lemmata[i] for i in group),
-                "line_text": line.text(),
+                "line_text": normalize(line.text()),
             }
 
 def main():
