@@ -8,8 +8,6 @@ import re
 import sys
 import xml.etree.ElementTree
 
-import betacode
-
 def warn(msg):
     print("warning: {}".format(msg), file=sys.stderr)
 
@@ -121,13 +119,6 @@ def tokenize_text(text):
     if nonword:
         yield Token(Token.Type.NONWORD, nonword)
 
-def tokenize_betacode(beta):
-    """Decode text from beta code, then split into a sequence of WORD and
-    NONWORD tokens."""
-    if "?" in beta:
-        raise ValueError("\"?\" not allowed in beta code; see https://github.com/sasansom/sedes/issues/11")
-    return tokenize_text(betacode.decode(beta))
-
 def consolidate_tokens(tokens):
     """Consolidate runs of consecutive WORD and NONWORD tokens."""
 
@@ -218,7 +209,7 @@ class TEI:
 
             # Handle any text before the first child element.
             if root.text is not None:
-                partial.extend(tokenize_betacode(root.text))
+                partial.extend(tokenize_text(root.text))
 
             for elem in root:
                 # Make a copy of the environment to pass to recursive calls to
@@ -325,7 +316,7 @@ class TEI:
                 # element, or between the end tag of this child element and the
                 # end tag of the parent element.
                 if elem.tail is not None:
-                    partial.extend(tokenize_betacode(elem.tail))
+                    partial.extend(tokenize_text(elem.tail))
 
         for x in do_elem(self.tree.find(".//text/body"), Environment()):
             yield x
