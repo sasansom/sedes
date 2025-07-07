@@ -83,6 +83,9 @@ class Environment:
     def __init__(self):
         self.book_n = None
         self.in_line = False # Are we in a context that counts as being part of a line (i.e., not between l elements)?
+        # The depth of nesting of div elements.
+        # https://tei-c.org/release/doc/tei-p5-doc/en/html/DS.html#DSDIV
+        self.div_depth = 0
 
     def copy(self):
         return copy.copy(self)
@@ -258,16 +261,24 @@ class TEI:
                         sub_env.in_line = True
                     elif elem.tag == f"{NS}lb":
                         env.in_line = True
-                elif elem.tag == f"{NS}div1":
-                    assert elem.get("type").lower() in ("book", "hymn", "poem"), elem.get("type")
-                    sub_env.book_n = elem.get("n")
-                    # Reset the line counter at the beginning of a new book.
-                    line_n = None
+                elif elem.tag == f"{NS}div":
+                    # https://tei-c.org/release/doc/tei-p5-doc/en/html/DS.html#DSDIV1
+                    sub_env.div_depth += 1
+                    div_type = elem.get("type")
+                    div_subtype = elem.get("subtype")
+                    if env.div_depth == 0 and div_type in ("edition",):
+                        pass
+                    elif env.div_depth == 1 and div_type == "textpart" and div_subtype in ("book", "Book", "poem", "Poem"):
+                        sub_env.book_n = elem.get("n")
+                        # Reset the line counter at the beginning of a new book.
+                        line_n = None
+                    else:
+                        raise ValueError(f"unknown div type={div_type!r} subtype={div_subtype!r} at nesting level {env.div_depth}")
 
                 if elem.tag in (f"{NS}milestone", f"{NS}head", f"{NS}gap", f"{NS}pb", f"{NS}note", f"{NS}speaker"):
                     pass
                 elif elem.tag in (
-                    f"{NS}div1", f"{NS}div2",
+                    f"{NS}div",
                     f"{NS}l", f"{NS}lb", f"{NS}p", f"{NS}sp",
                     f"{NS}add", f"{NS}del", f"{NS}name", f"{NS}supplied"
                 ):
@@ -315,7 +326,7 @@ class TEI:
                 if elem.tag == f"{NS}l":
                     for x in flush(env):
                         yield x
-                elif elem.tag == f"{NS}div1":
+                elif elem.tag == f"{NS}div" and env.div_depth == 1:
                     for x in flush(sub_env):
                         yield x
                     # At the end of a book, reset the line counter to be safe.
