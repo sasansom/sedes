@@ -279,7 +279,7 @@ class TEI:
                     pass
                 elif elem.tag in (
                     f"{NS}div",
-                    f"{NS}l", f"{NS}lb", f"{NS}p", f"{NS}sp",
+                    f"{NS}l", f"{NS}lb", f"{NS}lg", f"{NS}p", f"{NS}sp",
                     f"{NS}add", f"{NS}del", f"{NS}name", f"{NS}supplied"
                 ):
                     for x in do_elem(elem, sub_env):
