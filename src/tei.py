@@ -278,6 +278,8 @@ class TEI:
                         # This is a continuation of the previous line. Ignore
                         # any explicit line number and reuse the previous one.
                         new_loc = cur_loc
+                        # Add a space token between parts of a split line.
+                        partial.append(Token(Token.Type.NONWORD, " "))
                     else:
                         raise ValueError(f"unhandled sequence of @part: {prev_part!r}, {part!r}")
                     assert env.book_n == new_loc.book_n
