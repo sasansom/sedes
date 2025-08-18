@@ -190,12 +190,19 @@ class TEI:
         TEI document."""
 
         # Internally this function works using recursion in the do_elem
-        # function. The current line number (line_n), and the partial contents
-        # of the current line (partial) are shared in common across all calls,
-        # in contrast to the Environment (env), which belongs to one call. The
+        # function. The current line number (line_n), the previous lines @part
+        # attribute (prev_part), and the partial contents of the current line
+        # (partial and next_partial) are shared in common across all calls, in
+        # contrast to the Environment (env), which belongs to one call. The
         # flush function is called at the end of a line to yield a line to the
         # caller.
         line_n = None
+        # prev_part is the @part attribute of the previous line. It is None when
+        # there is no previous line or the previous line had the attribute
+        # unset. Otherwise it may have the value "I", "M", or "F" for the
+        # initial, medial, or final part of a line.
+        # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.fragmentable.html#tei_att.part
+        prev_part = None
         partial = []
         # next_partial is a list of tokens to be prepended to the beginning of
         # the next line, when it starts.
@@ -213,10 +220,10 @@ class TEI:
                     yield Locator(env.book_n, line_n), Line(tokens)
 
         def do_elem(root, env):
-            nonlocal line_n, partial, next_partial
+            nonlocal line_n, prev_part, partial, next_partial
 
             # Handle any text before the first child element.
-            if root.text is not None:
+            if root.text is not None and env.in_line:
                 partial.extend(tokenize_text(root.text))
 
             for elem in root:
@@ -226,33 +233,56 @@ class TEI:
                 # before the call.
                 sub_env = env.copy()
 
-                # Lines may be marked up as
-                #   <l n="100">text text text</l>
-                #   <lb n="100"/>text text text
+                # Lines may be marked up in any of these ways:
+                #
+                #   <l n="100">first line</l>
+                #   <l n="101">next line</l>
+                #
+                #   <lb n="100"/>first line
+                #   <lb n="101"/>next line
+                #
+                #   <l n="100" part="I">start of first line</l>
+                #   <l n="100b" part="F">end of first line</l>
+                #
+                #   <l n="100" part="I">start of first line</l>
+                #   <l n="100b" part="M">middle of first line</l>
+                #   <l n="100c" part="F">end of first line</l>
+                #
                 # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
                 # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
+                # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.fragmentable.html#tei_att.part
                 if elem.tag in (f"{NS}l", f"{NS}lb"):
-                    # Output the previous line.
-                    for x in flush(env):
-                        yield x
-
                     partial.extend(next_partial)
                     next_partial.clear()
 
                     cur_loc = Locator(env.book_n, line_n)
-                    n = elem.get("n")
-                    if n is not None:
-                        # If the new line is marked with a number, check it
-                        # against the previous line.
-                        new_loc = Locator(env.book_n, n)
-                        if not cur_loc.may_precede(new_loc):
-                            warn("after line {!r}, expected {!r}, got {!r}".format(cur_loc, cur_loc.successor(), new_loc))
+                    part = elem.get("part")
+                    if (part is None) or ((prev_part is None or prev_part == "F") and part == "I"):
+                        # This is the beginning of a new line (the most common case).
+                        # Output the previous line.
+                        for x in flush(env):
+                            yield x
+                        # Infer a line number for the new line.
+                        n = elem.get("n")
+                        if n is not None:
+                            # If this line has an explicit number, check it
+                            # against the number of the previous line.
+                            new_loc = Locator(env.book_n, n)
+                            if not cur_loc.may_precede(new_loc):
+                                warn("after line {!r}, expected {!r}, got {!r}".format(cur_loc, cur_loc.successor(), new_loc))
+                        else:
+                            # If there's no explicit number is provided, guess
+                            # based on the previous line number.
+                            new_loc = cur_loc.successor()
+                    elif (prev_part == "I" and (part == "M" or part == "F")) or (prev_part == "M" and part == "F"):
+                        # This is a continuation of the previous line. Ignore
+                        # any explicit line number and reuse the previous one.
+                        new_loc = cur_loc
                     else:
-                        # If no line number is provided, guess based on the
-                        # previous line number.
-                        new_loc = cur_loc.successor()
+                        raise ValueError(f"unhandled sequence of @part: {prev_part!r}, {part!r}")
                     assert env.book_n == new_loc.book_n
                     line_n = new_loc.line_n
+                    prev_part = part
 
                     if elem.tag == f"{NS}l":
                         sub_env.in_line = True
@@ -346,11 +376,15 @@ class TEI:
                         yield x
                     # At the end of a book, reset the line counter to be safe.
                     line_n = None
+                    # Partial lines may not cross book boundaries.
+                    if not (prev_part is None or prev_part == "F"):
+                        raise ValueError(f"unfinished line at end of book: part={prev_part!r}")
+                    prev_part = None
 
                 # Handle any text between this child element and the next child
                 # element, or between the end tag of this child element and the
                 # end tag of the parent element.
-                if elem.tail is not None:
+                if elem.tail is not None and env.in_line:
                     partial.extend(tokenize_text(elem.tail))
 
         for x in do_elem(self.tree.find(f".//{NS}text/{NS}body"), Environment()):
