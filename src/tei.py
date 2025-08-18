@@ -232,12 +232,9 @@ class TEI:
                 # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
                 # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
                 if elem.tag in (f"{NS}l", f"{NS}lb"):
-                    if elem.tag == f"{NS}lb":
-                        # Output the previous line. l elements are flushed
-                        # at the end of the loop iteration, where the
-                        # element is closed.
-                        for x in flush(env):
-                            yield x
+                    # Output the previous line.
+                    for x in flush(env):
+                        yield x
 
                     partial.extend(next_partial)
                     next_partial.clear()
@@ -344,11 +341,7 @@ class TEI:
                         yield loc, line
                 else:
                     raise ValueError("don't understand element {!r}".format(elem.tag))
-
-                if elem.tag == f"{NS}l":
-                    for x in flush(env):
-                        yield x
-                elif elem.tag == f"{NS}div" and env.div_depth == 1:
+                if elem.tag == f"{NS}div" and env.div_depth == 1:
                     for x in flush(sub_env):
                         yield x
                     # At the end of a book, reset the line counter to be safe.
