@@ -133,7 +133,7 @@ def consolidate_tokens(tokens):
 
     cur = None
     for token in tokens:
-        if cur is not None and token.type == cur.type and token.type in (Token.Type.NONWORD, Token.Type.WORD):
+        if cur is not None and token.type is cur.type and token.type in (Token.Type.NONWORD, Token.Type.WORD):
             cur.text += token.text
         else:
             if cur is not None:
