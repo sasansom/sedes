@@ -49,7 +49,7 @@ source venv/bin/activate
 ## Programs
 
 The "src" subdirectory contains a `tei2csv` program
-that processes a TEI-encoded XML document as downloaded from Perseus
+that processes one or more TEI-encoded XML documents as downloaded from Perseus
 and produces a CSV file that annotates every word with
 its line number and sedes. For example:
 ```

@@ -4,10 +4,10 @@
 # standard output as CSV, one row per word.
 #
 # Usage:
-#   tei2csv IDENTIFIER FILENAME.xml > FILENAME.csv
+#   tei2csv IDENTIFIER FILENAME.xml... > FILENAME.csv
 # IDENTIFIER is a short text identifier for the work that will be copied to the
-# output; e.g., "Il.". FILENAME.xml is the name of the XML document containing
-# the text of the work.
+# output; e.g., "Il.". FILENAME.xml... is a list of names of XML documents
+# containing the text of the work.
 
 import csv
 import getopt
@@ -27,10 +27,10 @@ MERGE_WORD_OPTIONS = {
 
 def usage(file=sys.stdout):
     print(f"""\
-Usage: {sys.argv[0]} IDENTIFIER FILENAME.xml > FILENAME.csv
+Usage: {sys.argv[0]} IDENTIFIER FILENAME.xml... > FILENAME.csv
 
 IDENTIFIER is a short text identifier for the work; e.g., "Il.".
-FILENAME.XML is a TEI XML document containing the text of the work.
+FILENAME.XML... is a list of TEI XML documents containing the text of the work.
 
   --word-unit=UNIT  merge words according to the given unit (default "word")
                     known units: {', '.join(sorted(MERGE_WORD_OPTIONS.keys()))}
@@ -104,7 +104,7 @@ def main():
                 sys.exit(1)
 
     try:
-        work_identifier, input_filename = args
+        work_identifier, *input_filenames = args
     except ValueError:
         print("error: usage error", file=sys.stderr)
         print(file=sys.stderr)
@@ -129,9 +129,10 @@ def main():
         lineterminator="\n",
     )
     csv_w.writeheader()
-    with open(input_filename) as f:
-        for row in process(f, work_identifier, merge_word):
-            csv_w.writerow(row)
+    for input_filename in input_filenames:
+        with open(input_filename) as f:
+            for row in process(f, work_identifier, merge_word):
+                csv_w.writerow(row)
 
 if __name__ == "__main__":
     main()
