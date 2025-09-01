@@ -17,7 +17,7 @@ See support [here](https://sasansom.github.io/epic-rhythm/)
 for the _GRBS_ article, ["Epic Rhythm: Metrical Shapes in Greek Hexameter."](https://grbs.library.duke.edu/index.php/grbs/article/view/17015)
 
 See resources [here](https://github.com/sasansom/breaking-hermanns-bridge)
-for the _CQ_ article, ["Breaking Hermann's Bridge from Homer to Nonnus: Towards a Stylometry of Caesurae"](https://www.cambridge.org/core/journals/classical-quarterly/article/breaking-hermanns-bridge-from-homer-to-nonnus-towards-a-stylometry-of-caesurae/19F2C1C0219C4C843FE9FD9C2966423A?utm_campaign=shareaholic&utm_medium=copy_link&utm_source=bookmark)
+for the _CQ_ article, ["Breaking Hermann's Bridge from Homer to Nonnus: Towards a Stylometry of Caesurae"](https://www.cambridge.org/core/journals/classical-quarterly/article/breaking-hermanns-bridge-from-homer-to-nonnus-towards-a-stylometry-of-caesurae/19F2C1C0219C4C843FE9FD9C2966423A)
 
 ## Setup
 
