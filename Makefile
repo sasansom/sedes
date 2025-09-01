@@ -1,6 +1,7 @@
 WORKS = \
 	aratus \
 	argonautica \
+	callimachushymns \
  	iliad \
 	nonnusdionysiaca \
  	odyssey \
@@ -39,6 +40,13 @@ expectancy.hellenistic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/t
 $(WORKS_CSV): .EXTRA_PREREQS = src/tei2csv src/known.py src/lemma.py src/appositive.py src/lemma-overrides.csv src/exceptional-appositives.csv
 corpus/%.csv: corpus/%.xml
 	src/tei2csv "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
+corpus/callimachushymns.csv: \
+	corpus/callimachushymns-01.xml \
+	corpus/callimachushymns-02.xml \
+	corpus/callimachushymns-03.xml \
+	corpus/callimachushymns-04.xml \
+	corpus/callimachushymns-06.xml
+	src/tei2csv "$(WORK_IDENTIFIER_callimachushymns)" $^ > "$@"
 
 $(WORKS_HTML): .EXTRA_PREREQS = src/tei2html src/known.py src/lemma.py src/appositive.py src/lemma-overrides.csv src/exceptional-appositives.csv
 sedes-web/%.html: corpus/%.xml expectancy.all.csv
