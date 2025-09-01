@@ -3,6 +3,11 @@ https://github.com/sasansom/canonical-greekLit
 
 aratus.xml	f3eb3e93472a0c710c86c9fcec3ed084ccfb9793	data/tlg0653/tlg001/tlg0653.tlg001.perseus-grc2.xml
 argonautica.xml	0514c55b6d72d89a2416103e6b2e198e7b509d0c	data/tlg0001/tlg001/tlg0001.tlg001.perseus-grc2.xml
+callimachushymns-01.xml	5093c78843638cf2712d366efd4c78421b98bc7c	data/tlg0533/tlg015/tlg0533.tlg015.perseus-grc3.xml
+callimachushymns-02.xml	5093c78843638cf2712d366efd4c78421b98bc7c	data/tlg0533/tlg016/tlg0533.tlg016.perseus-grc3.xml
+callimachushymns-03.xml	5093c78843638cf2712d366efd4c78421b98bc7c	data/tlg0533/tlg017/tlg0533.tlg017.perseus-grc3.xml
+callimachushymns-04.xml	5093c78843638cf2712d366efd4c78421b98bc7c	data/tlg0533/tlg018/tlg0533.tlg018.perseus-grc3.xml
+callimachushymns-06.xml	5093c78843638cf2712d366efd4c78421b98bc7c	data/tlg0533/tlg020/tlg0533.tlg020.perseus-grc3.xml
 iliad.xml	f3eb3e93472a0c710c86c9fcec3ed084ccfb9793	data/tlg0012/tlg001/tlg0012.tlg001.perseus-grc2.xml
 nonnusdioysiaca.xml	f3eb3e93472a0c710c86c9fcec3ed084ccfb9793	data/tlg2045/tlg001/tlg2045.tlg001.perseus-grc2.xml
 odyssey.xml	f3eb3e93472a0c710c86c9fcec3ed084ccfb9793	data/tlg0012/tlg002/tlg0012.tlg002.perseus-grc2.xml
