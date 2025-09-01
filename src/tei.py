@@ -309,7 +309,7 @@ class TEI:
                 elif elem.tag in (
                     f"{NS}div",
                     f"{NS}l", f"{NS}lb", f"{NS}lg", f"{NS}p", f"{NS}sp",
-                    f"{NS}add", f"{NS}del", f"{NS}name", f"{NS}supplied"
+                    f"{NS}add", f"{NS}del", f"{NS}name", f"{NS}supplied", f"{NS}sic",
                 ):
                     for x in do_elem(elem, sub_env):
                         yield x
