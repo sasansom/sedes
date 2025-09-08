@@ -373,7 +373,9 @@ class TEI:
                         yield loc, line
                 else:
                     raise ValueError("don't understand element {!r}".format(elem.tag))
-                if elem.tag == f"{NS}div" and env.div_depth == 1:
+
+                if elem.tag == f"{NS}div":
+                    # Flush the last line of the div we have just processed.
                     for x in flush(sub_env):
                         yield x
                     # At the end of a book, reset the line counter to be safe.
