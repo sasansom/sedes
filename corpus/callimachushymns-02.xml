@@ -97,6 +97,7 @@
     <text>
         <body>
             <div type="edition" n="urn:cts:greekLit:tlg0533.tlg016.perseus-grc3" xml:lang="grc">
+                <div type="textpart" subtype="poem" xml:base="urn:cts:greekLit:tlg0533.tlg016.perseus-grc3" n="2">
 <l n="1" xml:base="urn:cts:greekLit:tlg0533.tlg016.perseus-grc3">οἷον ὁ τὠπόλλωνος ἐσείσατο δάφνινος ὅρπηξ,</l>
 <l n="2" xml:base="urn:cts:greekLit:tlg0533.tlg016.perseus-grc3">οἷα δʼ ὅλον τὸ μέλαθρον· ἑκάς, ἑκὰς ὅστις ἀλιτρός.</l>
 <l n="3" xml:base="urn:cts:greekLit:tlg0533.tlg016.perseus-grc3">καὶ δή που τὰ θύρετρα καλῷ ποδὶ Φοῖβος ἀράσσει·</l>
@@ -215,6 +216,7 @@
 <l n="111" xml:base="urn:cts:greekLit:tlg0533.tlg016.perseus-grc3"><q rend="merge">ἀλλʼ ἥτις καθαρή τε καὶ ἀχράαντος ἀνέρπει</q></l>
 <l n="112" xml:base="urn:cts:greekLit:tlg0533.tlg016.perseus-grc3"><q rend="merge">πίδακος ἐξ ἱερῆς ὀλίγη λιβὰς ἄκρον ἄωτον.</q></l>
 <l n="113" xml:base="urn:cts:greekLit:tlg0533.tlg016.perseus-grc3" rend="align(center)">χαῖρε ἄναξ· ὁ δὲ Μῶμος, ἵνʼ ὁ Φθόνος, <note xml:lang="eng"><foreign xml:lang="grc">φθόνος</foreign> *I (Vat. 1379), L (Mosquensis), schol. Gregor. Naz. <title>Catal. MSS. Clark</title>. p. 35; <foreign xml:lang="grc">φθόρος</foreign>.</note> ἔνθα νέοιτο.</l>
+                </div>
             </div>
         </body>
     </text>

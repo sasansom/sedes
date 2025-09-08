@@ -96,6 +96,7 @@
     <text>
         <body>
             <div type="edition" n="urn:cts:greekLit:tlg0533.tlg015.perseus-grc3" xml:lang="grc">
+                <div type="textpart" subtype="poem" xml:base="urn:cts:greekLit:tlg0533.tlg015.perseus-grc3" n="1">
                 <pb n="36"/>
 <l n="1" xml:base="urn:cts:greekLit:tlg0533.tlg015.perseus-grc3">Ζηνὸς ἔοι τί κεν ἄλλο παρὰ σπονδῇσιν ἀείδειν</l>
 <l n="2" xml:base="urn:cts:greekLit:tlg0533.tlg015.perseus-grc3">λώιον ἢ θεὸν αὐτόν, ἀεὶ μέγαν, αἰὲν ἄνακτα,</l>
@@ -199,6 +200,7 @@
 <l n="95" xml:base="urn:cts:greekLit:tlg0533.tlg015.perseus-grc3">οὔτʼ ἀρετῆς ἄτερ ὄλβος ἐπίσταται ἄνδρας ἀέξειν </l>
 <l n="96" xml:base="urn:cts:greekLit:tlg0533.tlg015.perseus-grc3">οὔτʼ ἀρετὴ ἀφένοιο· δίδου δʼ ἀρετήν τε καὶ ὄλβον.</l>
                 </div>
+           </div>
        </body>
     </text>
 </TEI>

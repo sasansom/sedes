@@ -95,6 +95,7 @@
 <text>
 <body>
 <div type="edition" n="urn:cts:greekLit:tlg0533.tlg018.perseus-grc3" xml:lang="grc">
+<div type="textpart" subtype="poem" xml:base="urn:cts:greekLit:tlg0533.tlg018.perseus-grc3" n="4">
 <l n="1" xml:base="urn:cts:greekLit:tlg0533.tlg018.perseus-grc3">τὴν ἱερήν, ὦ θυμέ, τίνα χρόνον ἢ πότʼ <note xml:lang="eng"><foreign xml:lang="grc">εἴ ποτ᾽</foreign> Reiske. But the text is quite right.</note> ἀείσεις</l>
 <l n="2" xml:base="urn:cts:greekLit:tlg0533.tlg018.perseus-grc3">δῆλον, Ἀπόλλωνος κουροτρόφον ; ἦ μὲν ἅπασαι</l>
 <l n="3" xml:base="urn:cts:greekLit:tlg0533.tlg018.perseus-grc3">Κυκλάδες, αἳ νήσων ἱερώταται εἰν ἁλὶ κεῖνται,</l>
@@ -434,6 +435,7 @@
 <l n="324" xml:base="urn:cts:greekLit:tlg0533.tlg018.perseus-grc3">παίγνια κουρίζοντι καὶ Ἀπόλλωνι γελαστύν.</l>
 <l n="325" xml:base="urn:cts:greekLit:tlg0533.tlg018.perseus-grc3">ἱστίη ὦ νήσων εὐέστιε, χαῖρε μὲν αὐτή, </l>
 <l n="326" xml:base="urn:cts:greekLit:tlg0533.tlg018.perseus-grc3">χαίροι δʼ Ἀπόλλων τε καὶ ἣν ἐλοχεύσατο <note xml:lang="eng"><foreign xml:lang="grc">ἣν ἐλοχεύσατο</foreign> MSS.; <foreign xml:lang="grc">ἣ ἐλ</foreign>. Stephanus; <foreign xml:lang="grc">ἥ σφ’ ἐλ</foreign>. Meineke; <foreign xml:lang="grc">ἣ ᾽νελ</foreign>. Schneider; <foreign xml:lang="grc">ἣν ἐλοχεύσαο</foreign> Wilamow.</note> Λητώ.</l>
+</div>
 </div>
 </body>
 </text>

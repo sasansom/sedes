@@ -95,6 +95,7 @@
 <text>
 <body>
 <div type="edition" n="urn:cts:greekLit:tlg0533.tlg020.perseus-grc3" xml:lang="grc">
+<div type="textpart" subtype="poem" xml:base="urn:cts:greekLit:tlg0533.tlg020.perseus-grc3" n="6">
 <l n="1" xml:base="urn:cts:greekLit:tlg0533.tlg020.perseus-grc3">τῶ καλάθω κατιόντος ἐπιφθέγξασθε, γυναῖκες,</l>
 <l n="2" xml:base="urn:cts:greekLit:tlg0533.tlg020.perseus-grc3"><q>Δάματερ μέγα χαῖρε πολυτρόφε πουλυμέδιμνε.</q></l>
 <l n="3" xml:base="urn:cts:greekLit:tlg0533.tlg020.perseus-grc3">τὸν κάλαθον κατιόντα χαμαὶ θασεῖσθε βέβαλοι, <note xml:lang="eng">Schol. Plato, <title>Symp.</title> 218 B <foreign xml:lang="grc">καὶ εἴ τις ἄλλος ἐστὶ βέβηλός τε καὶ ἄγροικος, πύλας παμμεγάλας τοῖς ὠσὶν ἐπίθεσθε] ἐντεῦθεν παρῴδησε Καλλίμαχος ἐν ὕμνῳ Δήμητρος καλάθου τὸ θύρας δ’ ἐπίθεσθε βέβηλοι</foreign>.</note></l>
@@ -237,6 +238,7 @@
 <l n="136" xml:base="urn:cts:greekLit:tlg0533.tlg020.perseus-grc3">φέρβε βόας, φέρε μᾶλα, φέρε στάχυν, οἶσε θερισμόν,</l>
 <l n="137" xml:base="urn:cts:greekLit:tlg0533.tlg020.perseus-grc3">φέρβε καὶ εἰράναν, ἵνʼ ὃς ἄροσε τῆνος ἀμάσῃ. <note xml:lang="eng"><foreign xml:lang="grc">ἀμάσῃ</foreign> Stephanus; <foreign xml:lang="grc">ἀμάσ(σ)ει</foreign> MSS., which may be right, cf. fr. Incert. 16.</note></l>
 <l n="138" xml:base="urn:cts:greekLit:tlg0533.tlg020.perseus-grc3">ἵλαθί μοι τρίλλιστε μέγα κρείοισα θεάων.</l>
+</div>
 </div>
 </body>
 </text>
