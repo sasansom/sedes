@@ -1,6 +1,7 @@
 WORKS = \
 	aratus \
 	argonautica \
+	homerichymns \
 	callimachushymns \
  	iliad \
 	nonnusdionysiaca \
@@ -34,12 +35,14 @@ all: $(EXPECTANCY_FILES) $(WORKS_HTML)
 $(EXPECTANCY_FILES): .EXTRA_PREREQS = src/expectancy
 expectancy.all.csv: $(WORKS_CSV)
 	src/expectancy $^ > "$@"
-expectancy.hellenistic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv
+expectancy.hellenistic+archaic.csv: corpus/iliad.csv corpus/odyssey.csv corpus/nonnusdionysiaca.csv corpus/theogony.csv corpus/worksanddays.csv corpus/shield.csv corpus/argonautica.csv corpus/theocritus.csv corpus/callimachushymns.csv corpus/aratus.csv
 	src/expectancy $^ > "$@"
 
 $(WORKS_CSV): .EXTRA_PREREQS = src/tei2csv src/known.py src/lemma.py src/appositive.py src/lemma-overrides.csv src/exceptional-appositives.csv
 corpus/%.csv: corpus/%.xml
 	src/tei2csv "$(WORK_IDENTIFIER_$*)" "$<" > "$@"
+corpus/homerichymns.csv: $(foreach n,01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33,corpus/homerichymns-$n.xml)
+	src/tei2csv "$(WORK_IDENTIFIER_homerichymns)" $^ > "$@"
 corpus/callimachushymns.csv: \
 	corpus/callimachushymns-01.xml \
 	corpus/callimachushymns-02.xml \
