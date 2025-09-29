@@ -7,6 +7,7 @@ import enum
 import re
 import sys
 import xml.etree.ElementTree
+import unicodedata
 
 # The TEI XML namespace, contained in curly brackets as conventional for xml.etree.ElementTree.
 # https://tei-c.org/release/doc/tei-p5-doc/en/html/USE.html#CFNS
@@ -113,6 +114,7 @@ class Token:
 def tokenize_text(text):
     """Split text into a sequence of WORD and NONWORD tokens."""
 
+    text = unicodedata.normalize("NFD", text)
     prev_end = 0
     for m in re.finditer("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", text):
         nonword = text[prev_end:m.start()]
