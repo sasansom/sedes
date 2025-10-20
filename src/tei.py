@@ -303,6 +303,13 @@ class TEI:
                         sub_env.book_n = elem.get("n")
                         # Reset the line counter at the beginning of a new book.
                         line_n = None
+                    elif env.div_depth >= 1 and div_type == "textpart" and div_subtype is None:
+                        # Hom.Hymn 3 uses <div type="textpart"> with no subtype
+                        # to separate the Delian and Pythian parts. Line
+                        # numbering should not restart.
+                        # https://github.com/PerseusDL/canonical-greekLit/blob/2f26022a1c47089e6469b44d78f14b94aedc447d/data/tlg0013/tlg003/tlg0013.tlg003.perseus-grc2.xml#L85
+                        # https://github.com/PerseusDL/canonical-greekLit/blob/2f26022a1c47089e6469b44d78f14b94aedc447d/data/tlg0013/tlg003/tlg0013.tlg003.perseus-grc2.xml#L85
+                        pass
                     else:
                         raise ValueError(f"unknown div type={div_type!r} subtype={div_subtype!r} at nesting level {env.div_depth}")
 
@@ -380,9 +387,7 @@ class TEI:
                     # Flush the last line of the div we have just processed.
                     for x in flush(sub_env):
                         yield x
-                    # At the end of a book, reset the line counter to be safe.
-                    line_n = None
-                    # Partial lines may not cross book boundaries.
+                    # Partial lines may not cross div boundaries.
                     if not (prev_part is None or prev_part == "F"):
                         raise ValueError(f"unfinished line at end of book: part={prev_part!r}")
                     prev_part = None
