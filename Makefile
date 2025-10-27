@@ -1,8 +1,8 @@
 WORKS = \
 	aratus \
 	argonautica \
-	homerichymns \
 	callimachushymns \
+	homerichymns \
  	iliad \
 	nonnusdionysiaca \
  	odyssey \
