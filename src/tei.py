@@ -115,6 +115,17 @@ def tokenize_text(text):
     """Split text into a sequence of WORD and NONWORD tokens."""
 
     text = unicodedata.normalize("NFD", text)
+
+    # Normalize quotation marks. Perseus texts often use U+02BC MODIFIER LETTER
+    # APOSTROPHE as an apostrophe, rather than U+2019 RIGHT SINGLE QUOTATION MARK:
+    # https://github.com/sasansom/sedes/issues/57#issuecomment-830509464
+    # The use of U+02BC for right-quote is by design. The presence of its
+    # left-quote counterpart U+02BD MODIFIER LETTER REVERSED COMMA, however, is
+    # an error: that only appears in contexts where text quotation marks should
+    # be replace with <q> elements, or in other erroneous contexts.
+    assert "\u02bd" not in text, text
+    text = text.replace("\u02bc", "\u2019")
+
     prev_end = 0
     for m in re.finditer("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", text):
         nonword = text[prev_end:m.start()]
