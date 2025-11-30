@@ -212,7 +212,7 @@ def decode(beta):
             elif c in BETA_DIACRITIC_MAP:
                 raise ValueError("unexpected diacritic {!r} {!r}".format(c, (beta[:i], beta[i:])))
             else:
-                # Not an Beta Code sequence, some other symbol or literal code
+                # Not a Beta Code sequence, some other symbol or literal code
                 # point.
                 prev_key = c
                 prev_basechar_index = len(output)
