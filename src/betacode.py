@@ -101,6 +101,9 @@ BETA_DIACRITIC_MAP = {
     "?": "\u0323", # COMBINING DOT BELOW
 }
 
+# Letters and apostrophe convert a preceding sigma into a medial sigma.
+MEDIAL_SIGMA = set(BETA_LETTER_MAP.keys()).union(set(("'",)))
+
 # https://github.com/sasansom/sedes/issues/45
 #
 # When we are attaching Unicode combining characters to a base character, we
@@ -252,10 +255,10 @@ def decode(beta):
             else:
                 state = STATE_EMIT
         if state == STATE_EMIT:
-            if prev_key == "s" and output[prev_basechar_index] == "ς" and key in BETA_LETTER_MAP:
+            if prev_key == "s" and output[prev_basechar_index] == "ς" and key in MEDIAL_SIGMA:
                 # Change previous character from final to medial sigma.
                 output[prev_basechar_index] = "σ"
-            if prev_key not in BETA_LETTER_MAP and key == "s":
+            if prev_key not in MEDIAL_SIGMA and key == "s":
                 # If previous character was not a letter, this sigma must be
                 # medial.
                 key = "s1"
