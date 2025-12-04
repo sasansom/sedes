@@ -62,7 +62,7 @@ class TestTrimTokens(unittest.TestCase):
             # WORDs shield inner NONWORDs
             ((NONWORD("<"), WORD("a"), NONWORD(" * "), WORD("b"), NONWORD(">")),
              (NONWORD("<"), WORD("a"), NONWORD(" * "), WORD("b"), NONWORD(">"))),
-            # whitespace-only NONWORDs are removed completely
+            # leading and trailing whitespace-only NONWORDs are removed completely
             ((NONWORD(""), NONWORD("   "), WORD("a"), NONWORD(""), NONWORD("   ")),
              (WORD("a"),)),
             ((NONWORD(""),),
@@ -70,6 +70,9 @@ class TestTrimTokens(unittest.TestCase):
             # left side is lstripped only, right side is rstripped only
             ((NONWORD(" < "), WORD("a"), NONWORD(" > ")),
              (NONWORD("< "), WORD("a"), NONWORD(" >"))),
+            # whitespace in tokens is normalized.
+            ((WORD("a"), NONWORD(" \n\t   "), WORD("b")),
+             (WORD("a"), NONWORD(" "), WORD("b"))),
             # WORDS and NONWORDS are consolidated
             ((NONWORD("<"), NONWORD("<"),
               WORD("a"), WORD("b"),

@@ -167,6 +167,12 @@ def trim_tokens(tokens):
         tokens[-1].text = tokens[-1].text.rstrip()
         if not tokens[-1].text:
             tokens.pop(-1)
+    # Sometimes the source TEI has two or more spaces between words, or newlines
+    # in the middle of an encoded line. Turn all those into a single space
+    # character.
+    for token in tokens:
+        if token.type is Token.Type.NONWORD:
+            token.text = re.sub(r'\s+', " ", token.text)
     return tokens
 
 class Line:
