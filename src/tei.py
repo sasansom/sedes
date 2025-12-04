@@ -145,7 +145,7 @@ def consolidate_tokens(tokens):
 
     cur = None
     for token in tokens:
-        if cur is not None and token.type == cur.type and token.type in (Token.Type.NONWORD, Token.Type.WORD):
+        if cur is not None and token.type is cur.type and token.type in (Token.Type.NONWORD, Token.Type.WORD):
             cur.text += token.text
         else:
             if cur is not None:
@@ -273,8 +273,7 @@ class TEI:
                     if (part is None) or ((prev_part is None or prev_part == "F") and part == "I"):
                         # This is the beginning of a new line (the most common case).
                         # Output the previous line.
-                        for x in flush(env):
-                            yield x
+                        yield from flush(env)
                         # Infer a line number for the new line.
                         n = elem.get("n")
                         if n is not None:
@@ -331,8 +330,7 @@ class TEI:
                     f"{NS}l", f"{NS}lb", f"{NS}lg", f"{NS}p", f"{NS}sp",
                     f"{NS}add", f"{NS}del", f"{NS}name", f"{NS}supplied", f"{NS}surplus", f"{NS}sic",
                 ):
-                    for x in do_elem(elem, sub_env):
-                        yield x
+                    yield from do_elem(elem, sub_env)
                 elif elem.tag == f"{NS}choice":
                     # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-choice.html
                     # We handle only the special case of choice containing
@@ -353,8 +351,7 @@ class TEI:
                     corr = children.get(f"{NS}corr")
                     if corr is None:
                         raise ValueError(f"no corr child of {elem.tag!r}")
-                    for x in do_elem(corr, sub_env):
-                        yield x
+                    yield from do_elem(corr, sub_env)
                 elif elem.tag == f"{NS}q":
                     # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
                     # Quotation is tricky because it can appear in two forms
@@ -373,8 +370,7 @@ class TEI:
                     # last line.
                     if env.in_line:
                         partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
-                        for x in do_elem(elem, sub_env):
-                            yield x
+                        yield from do_elem(elem, sub_env)
                         partial.append(Token(Token.Type.CLOSE_QUOTE, "’"))
                     else:
                         # Put the open quotation mark in a queue to be
@@ -396,8 +392,7 @@ class TEI:
 
                 if elem.tag == f"{NS}div":
                     # Flush the last line of the div we have just processed.
-                    for x in flush(sub_env):
-                        yield x
+                    yield from flush(sub_env)
                     # Partial lines may not cross div boundaries.
                     if not (prev_part is None or prev_part == "F"):
                         raise ValueError(f"unfinished line at end of book: part={prev_part!r}")
@@ -409,5 +404,4 @@ class TEI:
                 if elem.tail is not None and env.in_line:
                     partial.extend(tokenize_text(elem.tail))
 
-        for x in do_elem(self.tree.find(f".//{NS}text/{NS}body"), Environment()):
-            yield x
+        yield from do_elem(self.tree.find(f".//{NS}text/{NS}body"), Environment())
