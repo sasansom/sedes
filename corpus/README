@@ -1,8 +1,8 @@
 These TEI XML files come from a separate repository:
 https://github.com/sasansom/canonical-greekLit
 
-aratus.xml	f3eb3e93472a0c710c86c9fcec3ed084ccfb9793	data/tlg0653/tlg001/tlg0653.tlg001.perseus-grc2.xml
-argonautica.xml	0514c55b6d72d89a2416103e6b2e198e7b509d0c	data/tlg0001/tlg001/tlg0001.tlg001.perseus-grc2.xml
+aratus.xml	467c8056f48add3fdf3dc1a92d90a9cb19958ebf	data/tlg0653/tlg001/tlg0653.tlg001.perseus-grc2.xml
+argonautica.xml	467c8056f48add3fdf3dc1a92d90a9cb19958ebf	data/tlg0001/tlg001/tlg0001.tlg001.perseus-grc2.xml
 callimachushymns-01.xml	fc1d0671db97ab0e5b311b6815b5a1d22bf78e6f	data/tlg0533/tlg015/tlg0533.tlg015.perseus-grc3.xml
 callimachushymns-02.xml	fc1d0671db97ab0e5b311b6815b5a1d22bf78e6f	data/tlg0533/tlg016/tlg0533.tlg016.perseus-grc3.xml
 callimachushymns-03.xml	fc1d0671db97ab0e5b311b6815b5a1d22bf78e6f	data/tlg0533/tlg017/tlg0533.tlg017.perseus-grc3.xml
