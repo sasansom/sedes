@@ -28,7 +28,8 @@ def split_line_n(line_n):
     return int(number), extra
 
 class Locator:
-    """A combination of a book (div1) number and a line number."""
+    """A combination of a book number (attribute @n in <div type="textpart" subtype="book" n="...">)
+    and a line number (attribute @n in <l n="...">)."""
 
     def __init__(self, book_n=None, line_n=None):
         self.book_n = book_n
