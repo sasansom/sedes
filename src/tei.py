@@ -79,18 +79,308 @@ class Locator:
     def __repr__(self):
         return repr(str(self))
 
-class Environment:
-    """Environment represents the context of a call to TEI.do_elem."""
+# Extracting metrically isolated lines of text from a TEI document is tricky in
+# the general case, because the divisions in the XML structure of TEI do not
+# always correspond to the line divisions we want. The main difficulties have to
+# do with metrical lines divided across typographic lines, and with quotations.
+# (Which are both instances of overlapping hierarchies.)
+#
+# Lines may be delimited by l or lb elements. l *encloses* lines, while lb
+# ("line beginning") *separates* lines.
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
+# Perseus 6 mostly prefers l over lb, but we understand both.
+#
+#   <l n="1">first line</l>
+#   <l n="2">second line</l>
+#
+#   <lb n="1"/>first line
+#   <lb n="2"/>second line
+#
+# One line at the metrical level may be made up of multiple lines at the TEI
+# level. This is indicated by the @part attribute.
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.fragmentable.html#tei_att.part
+# An unset @part indicates a complete line. Otherwise, @part may be "I"
+# (initial), "M" (medial), or "F" (final). Allowable sequences of non-null @part
+# within a metrical line are ["I", "F"] and ["I", "M", "F"]. It is not possible
+# for a line to be divided into more than three parts using this scheme. @part
+# only works with the l element, not lb.
+#
+#   <l n="1" part="I">complete first line</l>
+#   <l n="2" part="I">initial part of second line</l>
+#   <l n="2b" part="F">final part of second line</l>
+#   <l n="3" part="I">initial part of third line</l>
+#   <l n="3b" part="M">medial part of third line</l>
+#   <l n="3c" part="F">final part of third line</l>
+#
+# Lines may be interleaved with quotations (q elements) in various ways. The
+# simplest case is when a quotation is contained entirely within a single line
+# (no difficulties with overlapping hierarchies in this case):
+#
+#   <l n="1">Say <q>goodnight</q>, Gracie</l>
+#
+#   <lb n="1"/>Say <q>goodnight</q>, Gracie
+#
+# A q element may *enclose* multiple while lines. When this happens, we
+# interpret it as if there where an opening quotation mark at the beginning of
+# the first enclosed line, and a closing quotation mark at the end of the final
+# enclosed line.
+#
+#   <l n="1">The priestess of Mercury intones:</l>
+#   <q>
+#   <l n="2">Pilgrim, you enter</l>
+#   <l n="3">a sacred place!</l>
+#   </q>
+#   <l n="4">You experience a sense of peace.</l>
+#
+# With lb elements, q elements may span multiple lines and may begin and end at
+# the beginning, end, or middle of lines:
+#
+#   <lb n="1"/>She said: <q>I think
+#   <lb n="2"/>that you should leave</q>
+#   <lb n="3"/>before long.</q><q>Only
+#   <lb n="4"/>too gladly</q> was the other's reply.
 
-    def __init__(self):
-        self.book_n = None
-        self.in_line = False # Are we in a context that counts as being part of a line (i.e., not between l elements)?
-        # The depth of nesting of div elements.
-        # https://tei-c.org/release/doc/tei-p5-doc/en/html/DS.html#DSDIV
-        self.div_depth = 0
+# To cope with these challenges, we parse TEI in multiple layers. The lowest
+# layer, the events function below, digests the hierarchical XML structure and
+# decomposes it into a nonhierarchical sequence of "events", represented by the
+# Event type (which is internal to this module). Events are things like
+# LINE_BEGIN and LINE_END, QUOTE_BEGIN and QUOTE_END. At this layer, the events
+# are not necessarily interleaved semantically they way we want them: for
+# example, <q><l></l><l></l></q> will have the QUOTE_BEGIN and QUOTE_END events
+# entirely outside the LINE_BEGIN and LINE_END events. Partial lines are not
+# joined but are represented by multiple LINE_BEGIN/LINE_END pairs.
+#
+# The next layer up is the filter_events function. This function consumes the
+# low-level sequence of events and makes local adjustments to make the sequence
+# more amenable to interpretation. It pushes QUOTE_BEGIN and QUOTE_END "inside"
+# the lines they belong to, and joins partial lines.
+#
+# The top layer is TEI.lines, which consumes the processed sequence of events
+# from filter_events. Comparatively little processing is required at this layer,
+# mostly just bundling up text between successive LINE_BEGIN and LINE_END
+# events.
 
-    def copy(self):
-        return copy.copy(self)
+# The meaning of the data field depends on the event type:
+# BOOK_BEGIN: book number (as a string)
+# BOOK_END: not allowed
+# LINE_BEGIN: (line_n, line_part), where line_n is a string or None and line_part is "I", "M", "F", or None
+# LINE_END: not allowed
+# QUOTE_BEGIN: not allowed
+# QUOTE_END: not allowed
+# TEXT: text content
+class Event:
+    class Type(enum.Enum):
+        BOOK_BEGIN = enum.auto()
+        BOOK_END = enum.auto()
+        LINE_BEGIN = enum.auto()
+        LINE_END = enum.auto()
+        QUOTE_BEGIN = enum.auto()
+        QUOTE_END = enum.auto()
+        TEXT = enum.auto()
+
+    def __init__(self, type, data = None):
+        self.type = type
+        if type in (Event.Type.BOOK_END, Event.Type.LINE_END, Event.Type.QUOTE_BEGIN, Event.Type.QUOTE_END,):
+            assert data is None, (type, data)
+        self.data = data
+
+    def __repr__(self):
+        if self.data is None:
+            return f"Event({self.type})"
+        else:
+            return f"Event({self.type}, {self.data!r}))"
+
+# Generate a sequence of raw Events from a TEI element. div_depth is the number
+# of div elements that are ancestors of elem. in_line indicates whether the
+# given elem is inside a line (within <l></l> or after <lb/>).
+def events(elem, div_depth, in_line):
+    for child in elem:
+        if child.tag == f"{NS}div":
+            # https://tei-c.org/release/doc/tei-p5-doc/en/html/DS.html#DSDIV1
+            div_type = child.get("type")
+            div_subtype = child.get("subtype")
+            if div_depth == 0 and div_type in ("edition",):
+                pass
+            elif div_depth == 1 and div_type == "textpart" and div_subtype in ("book", "Book", "poem", "Poem"):
+                yield Event(Event.Type.BOOK_BEGIN, child.get("n"))
+            elif div_depth >= 1 and div_type == "textpart" and div_subtype is None:
+                # Hom.Hymn 3 uses <div type="textpart"> with no subtype
+                # to separate the Delian and Pythian parts.
+                # https://github.com/PerseusDL/canonical-greekLit/blob/2f26022a1c47089e6469b44d78f14b94aedc447d/data/tlg0013/tlg003/tlg0013.tlg003.perseus-grc2.xml#L85
+                # https://github.com/PerseusDL/canonical-greekLit/blob/2f26022a1c47089e6469b44d78f14b94aedc447d/data/tlg0013/tlg003/tlg0013.tlg003.perseus-grc2.xml#L85
+                pass
+            else:
+                raise ValueError(f"unknown div type={div_type!r} subtype={div_subtype!r} at nesting level {div_depth}")
+            div_depth += 1
+        elif child.tag == f"{NS}l":
+            # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
+            if in_line:
+                raise ValueError(f"{child.tag} element while already in a line")
+            in_line = True
+            yield Event(Event.Type.LINE_BEGIN, (child.get("n"), child.get("part")))
+        elif child.tag == f"{NS}lb":
+            # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
+            if in_line:
+                yield Event(Event.Type.LINE_END)
+            in_line = True
+            if child.get("part") is not None:
+                raise ValueError(f"the part attribute is not allowed on the lb element")
+            yield Event(Event.Type.LINE_BEGIN, (child.get("n"), None))
+        elif child.tag == f"{NS}q":
+            # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
+            yield Event(Event.Type.QUOTE_BEGIN)
+
+        if child.tag in (f"{NS}milestone", f"{NS}head", f"{NS}gap", f"{NS}pb", f"{NS}note", f"{NS}speaker"):
+            # Ignore the contents of these elements.
+            pass
+        elif child.tag in (
+            f"{NS}div",
+            f"{NS}l", f"{NS}lb", f"{NS}lg", f"{NS}p", f"{NS}sp",
+            f"{NS}q",
+            f"{NS}add", f"{NS}del", f"{NS}name", f"{NS}supplied", f"{NS}surplus", f"{NS}sic",
+        ):
+            # Handle any text preceding the start tag. If we're in a line, yield a
+            # TEXT event. Outside a line, ignore whitespace and raise an error for
+            # any non-whitespace.
+            if in_line:
+                if child.text:
+                    yield Event(Event.Type.TEXT, child.text)
+            elif not (child.text is None or child.text.strip() == ""):
+                raise ValueError(f"non-whitespace text outside line: {child.text!r}")
+
+            # Recurse into the children of this element.
+            yield from events(child, div_depth, in_line)
+        else:
+            raise ValueError(f"don't understand element {child.tag!r}")
+
+        if child.tag == f"{NS}div":
+            div_depth -= 1
+            if div_depth == 1 and div_type == "textpart" and div_subtype in ("book", "Book", "poem", "Poem"):
+                yield Event(Event.Type.BOOK_END)
+        elif child.tag == f"{NS}l":
+            assert in_line
+            in_line = False
+            yield Event(Event.Type.LINE_END)
+        elif child.tag == f"{NS}lb":
+            pass
+        elif child.tag == f"{NS}q":
+            yield Event(Event.Type.QUOTE_END)
+
+        # Handle any text after the end tag. If we're in a line, yield a TEXT
+        # event. Outside a line, ignore whitespace and raise an error for any
+        # non-whitespace.
+        if in_line:
+            if child.tail:
+                yield Event(Event.Type.TEXT, child.tail)
+        elif not (child.tail is None or child.tail.strip() == ""):
+            raise ValueError(f"non-whitespace text outside line: {child.tail!r}")
+
+def filter_events(events):
+    # An adjusted iterator over events that lets you defer events until after
+    # the next LINE_BEGIN event by appending them to after_next_line_begin.
+    after_next_line_begin = []
+    def deferred(events):
+        for event in events:
+            yield event
+            if event.type == Event.Type.LINE_BEGIN:
+                for event in after_next_line_begin:
+                    yield event
+                after_next_line_begin.clear()
+    # A buffer of events that have not been output yet.
+    buf = []
+    # Whether we are currently in a line.
+    in_line = False
+    # prev_line_part is the @part attribute of the previous line. It is None
+    # when there is no previous line yet, or when the previous line had the
+    # attribute unset. Otherwise it may have the value "I", "M", or "F" for the
+    # initial, medial, or final part of a line.
+    # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.fragmentable.html#tei_att.part
+    # When prev_line_part is not None, it means the previous line was incomplete
+    # and will be extended by the current line.
+    prev_line_part = None
+    # The index in buf of the most recent LINE_END event, set whenever we may
+    # still need to insert a QUOTE_BEGIN event before the end of the line.
+    most_recent_line_end = None
+    for event in deferred(events):
+        if event.type == Event.Type.BOOK_BEGIN:
+            in_line = False
+            assert not buf, buf
+            assert prev_line_part is None, prev_line_part
+            most_recent_line_end = None
+            buf.append(event)
+        elif event.type == Event.Type.BOOK_END:
+            in_line = False
+            if not (prev_line_part is None or prev_line_part == "F"):
+                raise ValueError(f"unfinished line part at BOOK_END: part={prev_line_part!r}")
+            prev_line_part = None
+            most_recent_line_end = None
+            buf.append(event)
+        elif event.type == Event.Type.LINE_BEGIN:
+            assert not in_line, event
+            in_line = True
+
+            line_n, line_part = event.data
+            if (prev_line_part is None or prev_line_part == "F") and (line_part is None or line_part == "I"):
+                # This is the the beginning of a new line (the usual case).
+                # Remove the line_part from the event, because it is needed only
+                # by this processing layer.
+                buf.append(Event(Event.Type.LINE_BEGIN, (line_n, None)))
+            elif ((prev_line_part == "I" and (line_part == "M" or line_part == "F")) or
+                  (prev_line_part == "M" and line_part == "F")):
+                # This is a continuation of the previous line. Throw away this
+                # LINE_BEGIN event (and its line number) and replace the earlier
+                # LINE_END with a space.
+                buf[most_recent_line_end] = Event(Event.Type.TEXT, " ")
+            else:
+                raise ValueError(f"unhandled sequence of @part: {prev_line_part!r}, {line_part!r}")
+            prev_line_part = line_part
+
+            most_recent_line_end = None
+        elif event.type == Event.Type.LINE_END:
+            assert in_line, event
+            in_line = False
+            most_recent_line_end = len(buf)
+            buf.append(event)
+        elif event.type == Event.Type.QUOTE_BEGIN:
+            if in_line:
+                # Add this QUOTE_BEGIN to the events of this line.
+                buf.append(event)
+            else:
+                # We're not currently in a line; save this QUOTE_BEGIN to go
+                # after the next LINE_BEGIN.
+                after_next_line_begin.append(event)
+        elif event.type == Event.Type.QUOTE_END:
+            if in_line:
+                # Add this QUOTE_END to the events of this line.
+                buf.append(event)
+            else:
+                # We're not currently in a line; insert this QUOTE_END at the
+                # end of the most recent line.
+                assert most_recent_line_end is not None
+                buf.insert(most_recent_line_end, event)
+                most_recent_line_end += 1
+        elif event.type == Event.Type.TEXT:
+            assert in_line, event
+            # Add this TEXT event to the current line.
+            buf.append(event)
+        else:
+            raise ValueError(event.type)
+        # If prev_line_part and most_recent_line_end are unset, there is nothing
+        # in buf that we may have to adjust. Flush it all to the output.
+        if prev_line_part is None and most_recent_line_end is None:
+            for event in buf:
+                yield event
+            buf.clear()
+    for event in buf:
+        yield event
+    # The final line may have been a <lb/> without a LINE_END event. Add a
+    # LINE_END if so.
+    if in_line:
+        in_line = False
+        yield Event(Event.Type.LINE_END)
+    if not (prev_line_part is None or prev_line_part == "F"):
+        raise ValueError(f"unfinished line part at BOOK_END: part={prev_line_part!r}")
 
 class Token:
     """Token represents part of a text string, distinguishing words from
@@ -209,179 +499,37 @@ class TEI:
         """Return an iterator over (Locator, str) extracted from the text of the
         TEI document."""
 
-        # Internally this function works using recursion in the do_elem
-        # function. The current line number (line_n), the previous lines @part
-        # attribute (prev_part), and the partial contents of the current line
-        # (partial and next_partial) are shared in common across all calls, in
-        # contrast to the Environment (env), which belongs to one call. The
-        # flush function is called at the end of a line to yield a line to the
-        # caller.
-        line_n = None
-        # prev_part is the @part attribute of the previous line. It is None when
-        # there is no previous line or the previous line had the attribute
-        # unset. Otherwise it may have the value "I", "M", or "F" for the
-        # initial, medial, or final part of a line.
-        # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.fragmentable.html#tei_att.part
-        prev_part = None
-        partial = []
-        # next_partial is a list of tokens to be prepended to the beginning of
-        # the next line, when it starts.
-        next_partial = []
+        cur_loc = Locator(None, None)
+        tokens = []
 
-        def flush(env):
-            """Yield the Line represented by the current partial list and clear
-            the list."""
-            nonlocal line_n, partial
-
-            if partial:
-                tokens = trim_tokens(partial)
-                partial.clear()
-                if tokens:
-                    yield Locator(env.book_n, line_n), Line(tokens)
-
-        def do_elem(root, env):
-            nonlocal line_n, prev_part, partial, next_partial
-
-            # Handle any text before the first child element.
-            if root.text is not None and env.in_line:
-                partial.extend(tokenize_text(root.text))
-
-            for elem in root:
-                # Make a copy of the environment to pass to recursive calls to
-                # do_elem. This allows them to know, for example, what book_n
-                # they're in, while enabling us to remember the environment
-                # before the call.
-                sub_env = env.copy()
-
-                # Lines may be marked up in any of these ways:
-                #
-                #   <l n="100">first line</l>
-                #   <l n="101">next line</l>
-                #
-                #   <lb n="100"/>first line
-                #   <lb n="101"/>next line
-                #
-                #   <l n="100" part="I">start of first line</l>
-                #   <l n="100b" part="F">end of first line</l>
-                #
-                #   <l n="100" part="I">start of first line</l>
-                #   <l n="100b" part="M">middle of first line</l>
-                #   <l n="100c" part="F">end of first line</l>
-                #
-                # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
-                # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
-                # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.fragmentable.html#tei_att.part
-                if elem.tag in (f"{NS}l", f"{NS}lb"):
-                    cur_loc = Locator(env.book_n, line_n)
-                    part = elem.get("part")
-                    if (part is None or part == "I") and (prev_part is None or prev_part == "F"):
-                        # This is the beginning of a new line (the most common case).
-                        # Output the previous line.
-                        yield from flush(env)
-                        partial.extend(next_partial)
-                        next_partial.clear()
-                        # Infer a line number for the new line.
-                        n = elem.get("n")
-                        if n is not None:
-                            # If this line has an explicit number, check it
-                            # against the number of the previous line.
-                            new_loc = Locator(env.book_n, n)
-                            if not cur_loc.may_precede(new_loc):
-                                warn("after line {!r}, expected {!r}, got {!r}".format(cur_loc, cur_loc.successor(), new_loc))
-                        else:
-                            # If there's no explicit number is provided, guess
-                            # based on the previous line number.
-                            new_loc = cur_loc.successor()
-                    elif (prev_part == "I" and (part == "M" or part == "F")) or (prev_part == "M" and part == "F"):
-                        # This is a continuation of the previous line. Ignore
-                        # any explicit line number and reuse the previous one.
-                        new_loc = cur_loc
-                        # Add a space token between parts of a split line.
-                        partial.append(Token(Token.Type.NONWORD, " "))
-                    else:
-                        raise ValueError(f"unhandled sequence of @part: {prev_part!r}, {part!r}")
-                    assert env.book_n == new_loc.book_n
-                    line_n = new_loc.line_n
-                    prev_part = part
-
-                    if elem.tag == f"{NS}l":
-                        sub_env.in_line = True
-                    elif elem.tag == f"{NS}lb":
-                        env.in_line = True
-                elif elem.tag == f"{NS}div":
-                    # https://tei-c.org/release/doc/tei-p5-doc/en/html/DS.html#DSDIV1
-                    sub_env.div_depth += 1
-                    div_type = elem.get("type")
-                    div_subtype = elem.get("subtype")
-                    if env.div_depth == 0 and div_type in ("edition",):
-                        pass
-                    elif env.div_depth == 1 and div_type == "textpart" and div_subtype in ("book", "Book", "poem", "Poem"):
-                        sub_env.book_n = elem.get("n")
-                        # Reset the line counter at the beginning of a new book.
-                        line_n = None
-                    elif env.div_depth >= 1 and div_type == "textpart" and div_subtype is None:
-                        # Hom.Hymn 3 uses <div type="textpart"> with no subtype
-                        # to separate the Delian and Pythian parts. Line
-                        # numbering should not restart.
-                        # https://github.com/PerseusDL/canonical-greekLit/blob/2f26022a1c47089e6469b44d78f14b94aedc447d/data/tlg0013/tlg003/tlg0013.tlg003.perseus-grc2.xml#L85
-                        # https://github.com/PerseusDL/canonical-greekLit/blob/2f26022a1c47089e6469b44d78f14b94aedc447d/data/tlg0013/tlg003/tlg0013.tlg003.perseus-grc2.xml#L85
-                        pass
-                    else:
-                        raise ValueError(f"unknown div type={div_type!r} subtype={div_subtype!r} at nesting level {env.div_depth}")
-
-                if elem.tag in (f"{NS}milestone", f"{NS}head", f"{NS}gap", f"{NS}pb", f"{NS}note", f"{NS}speaker"):
-                    pass
-                elif elem.tag in (
-                    f"{NS}div",
-                    f"{NS}l", f"{NS}lb", f"{NS}lg", f"{NS}p", f"{NS}sp",
-                    f"{NS}add", f"{NS}del", f"{NS}name", f"{NS}supplied", f"{NS}surplus", f"{NS}sic",
-                ):
-                    yield from do_elem(elem, sub_env)
-                elif elem.tag == f"{NS}q":
-                    # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
-                    # Quotation is tricky because it can appear in two forms
-                    # with essentially opposite nesting:
-                    #   <lb/><q>abcd abcd abcd
-                    #   <lb/>efgh efgh efgh efgh</q>
-                    #
-                    #   <q><l>abcd abcd abcd</l>
-                    #   <l>efgh efgh efgh</l></q>
-                    # The first case is easy: we just add open and close
-                    # quotation marks where the open and close q tags
-                    # appear. In the second case, the q element doesn't
-                    # actually belong to either line; we have to migrate the
-                    # open quotation mark to the beginning of the first
-                    # line, and the close quotation mark to the end of the
-                    # last line.
-                    if env.in_line:
-                        partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
-                        yield from do_elem(elem, sub_env)
-                        partial.append(Token(Token.Type.CLOSE_QUOTE, "’"))
-                    else:
-                        # Put the open quotation mark in a queue to be
-                        # prepended to the next line that begins.
-                        next_partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
-                        # Append the close quotation mark to the final
-                        # yielded line.
-                        yield from do_elem(elem, sub_env)
-                        partial.append(Token(Token.Type.CLOSE_QUOTE, "’"))
+        for event in filter_events(events(self.tree.find(f".//{NS}text/{NS}body"), 0, False)):
+            if event.type == Event.Type.BOOK_BEGIN:
+                book_n = event.data
+                cur_loc = Locator(book_n, None)
+            elif event.type == Event.Type.BOOK_END:
+                cur_loc = Locator(None, None)
+            elif event.type == Event.Type.LINE_BEGIN:
+                assert not tokens, tokens
+                line_n, _ = event.data
+                if line_n is not None:
+                    # If this line has an explicit number, check it against the
+                    # number of the previous line.
+                    new_loc = Locator(cur_loc.book_n, line_n)
+                    if not cur_loc.may_precede(new_loc):
+                        warn("after line {!r}, expected {!r}, got {!r}".format(cur_loc, cur_loc.successor(), new_loc))
                 else:
-                    raise ValueError("don't understand element {!r}".format(elem.tag))
+                    # If there's no explicit line number, guess based on the
+                    # previous line number.
+                    new_loc = cur_loc.successor()
+                cur_loc = new_loc
+            elif event.type == Event.Type.LINE_END:
+                yield cur_loc, Line(trim_tokens(tokens))
+                tokens.clear()
+            elif event.type == Event.Type.QUOTE_BEGIN:
+                tokens.append(Token(Token.Type.OPEN_QUOTE, "‘"))
+            elif event.type == Event.Type.QUOTE_END:
+                tokens.append(Token(Token.Type.CLOSE_QUOTE, "’"))
+            elif event.type == Event.Type.TEXT:
+                tokens.extend(tokenize_text(event.data))
 
-                if elem.tag == f"{NS}div":
-                    # Flush the last line of the div we have just processed.
-                    yield from flush(sub_env)
-                    partial.extend(next_partial)
-                    next_partial.clear()
-                    # Partial lines may not cross div boundaries.
-                    if not (prev_part is None or prev_part == "F"):
-                        raise ValueError(f"unfinished line at end of book: part={prev_part!r}")
-                    prev_part = None
-
-                # Handle any text between this child element and the next child
-                # element, or between the end tag of this child element and the
-                # end tag of the parent element.
-                if elem.tail is not None and env.in_line:
-                    partial.extend(tokenize_text(elem.tail))
-
-        yield from do_elem(self.tree.find(f".//{NS}text/{NS}body"), Environment())
+        assert not tokens, tokens
