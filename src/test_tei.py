@@ -79,6 +79,131 @@ class TestQuotes(unittest.TestCase):
             lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
             self.assertEqual(lines, expected_lines)
 
+class TestFragments(unittest.TestCase):
+                #   <l n="100" part="I">start of first line</l>
+                #   <l n="100b" part="F">end of first line</l>
+                #
+                #   <l n="100" part="I">start of first line</l>
+                #   <l n="100b" part="M">middle of first line</l>
+                #   <l n="100c" part="F">end of first line</l>
+    def test_good(self):
+        WORD = lambda text: tei.Token(tei.Token.Type.WORD, text)
+        NONWORD = lambda text: tei.Token(tei.Token.Type.NONWORD, text)
+        OPEN_QUOTE = tei.Token(tei.Token.Type.OPEN_QUOTE, "‘")
+        CLOSE_QUOTE = tei.Token(tei.Token.Type.CLOSE_QUOTE, "’")
+        for text, expected_lines in (
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1">first line</l>
+<l n="2">second line</l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "first line"),
+                ("2", "second line"),
+             )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1" part="I">start of line</l>
+<l n="1b" part="F">end of line</l>
+<l n="2">new line</l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "start of line end of line"),
+                ("2", "new line"),
+             )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1" part="I">start of line</l>
+<l n="1b" part="M">middle of line</l>
+<l n="1c" part="F">end of line</l>
+<l n="2">new line</l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "start of line middle of line end of line"),
+                ("2", "new line"),
+             )),
+        ):
+            lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
+            self.assertEqual(lines, expected_lines)
+
+    def test_bad(self):
+        for text in (
+            # F with no preceding I.
+            """
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1">first line</l>
+<l n="2b" part="F">end of line</l>
+</div>
+</body></text></TEI>
+""",
+            # M with no preceding I.
+            """
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1">first line</l>
+<l n="2b" part="M">middle of line</l>
+<l n="2c" part="F">end of line</l>
+</div>
+</body></text></TEI>
+""",
+            # I with no M or F.
+            """
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1" part="I">start of line</l>
+<l n="2">new line</l>
+</div>
+</body></text></TEI>
+""",
+            """
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<div type="textpart" subtype="book" n="1">
+<l n="1" part="I">start of line</l>
+</div>
+<div type="textpart" subtype="book" n="2">
+<l n="1">new book</l>
+</div>
+</div>
+</body></text></TEI>
+""",
+            # I, M with no F.
+            """
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1" part="I">start of line</l>
+<l n="1b" part="M">middle of line</l>
+<l n="2">new line</l>
+</div>
+</body></text></TEI>
+""",
+            """
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<div type="textpart" subtype="book" n="1">
+<l n="1" part="I">start of line</l>
+<l n="1b" part="M">middle of line</l>
+</div>
+<div type="textpart" subtype="book" n="2">
+<l n="1">new book</l>
+</div>
+</div>
+</body></text></TEI>
+""",
+        ):
+            with self.assertRaises(ValueError):
+                tuple(tei.TEI(io.StringIO(text)).lines())
+
 class TestTokenizeText(unittest.TestCase):
     def test(self):
         WORD = tei.Token.Type.WORD
