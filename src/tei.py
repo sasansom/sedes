@@ -272,15 +272,14 @@ class TEI:
                 # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
                 # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.fragmentable.html#tei_att.part
                 if elem.tag in (f"{NS}l", f"{NS}lb"):
-                    partial.extend(next_partial)
-                    next_partial.clear()
-
                     cur_loc = Locator(env.book_n, line_n)
                     part = elem.get("part")
                     if (part is None or part == "I") and (prev_part is None or prev_part == "F"):
                         # This is the beginning of a new line (the most common case).
                         # Output the previous line.
                         yield from flush(env)
+                        partial.extend(next_partial)
+                        next_partial.clear()
                         # Infer a line number for the new line.
                         n = elem.get("n")
                         if n is not None:
@@ -364,21 +363,16 @@ class TEI:
                         next_partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
                         # Append the close quotation mark to the final
                         # yielded line.
-                        buf = None
-                        for x in do_elem(elem, sub_env):
-                            if buf is not None:
-                                yield buf
-                            buf = x
-                        assert buf is not None, buf
-                        loc, line = buf
-                        line.tokens.append(Token(Token.Type.CLOSE_QUOTE, "’"))
-                        yield loc, line
+                        yield from do_elem(elem, sub_env)
+                        partial.append(Token(Token.Type.CLOSE_QUOTE, "’"))
                 else:
                     raise ValueError("don't understand element {!r}".format(elem.tag))
 
                 if elem.tag == f"{NS}div":
                     # Flush the last line of the div we have just processed.
                     yield from flush(sub_env)
+                    partial.extend(next_partial)
+                    next_partial.clear()
                     # Partial lines may not cross div boundaries.
                     if not (prev_part is None or prev_part == "F"):
                         raise ValueError(f"unfinished line at end of book: part={prev_part!r}")

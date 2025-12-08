@@ -75,6 +75,22 @@ class TestQuotes(unittest.TestCase):
                 ("1", "how now ‘brown cow"),
                 ("2", "it’s a ‘nested’’ quote"),
              )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1">quote outside</l>
+<q>
+<l n="2">line</l>
+<l n="3">elements</l>
+</q>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "quote outside"),
+                ("2", "‘line"),
+                ("3", "elements’"),
+             )),
         ):
             lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
             self.assertEqual(lines, expected_lines)
