@@ -177,6 +177,13 @@ class TestFragments(unittest.TestCase):
 <TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
 <div type="edition">
 <l n="1" part="I">start of line</l>
+</div>
+</body></text></TEI>
+""",
+            """
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1" part="I">start of line</l>
 <l n="2">new line</l>
 </div>
 </body></text></TEI>
@@ -194,6 +201,14 @@ class TestFragments(unittest.TestCase):
 </body></text></TEI>
 """,
             # I, M with no F.
+            """
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1" part="I">start of line</l>
+<l n="1b" part="M">middle of line</l>
+</div>
+</body></text></TEI>
+""",
             """
 <TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
 <div type="edition">
@@ -217,7 +232,7 @@ class TestFragments(unittest.TestCase):
 </body></text></TEI>
 """,
         ):
-            with self.assertRaises(ValueError):
+            with self.assertRaises(ValueError, msg = text):
                 tuple(tei.TEI(io.StringIO(text)).lines())
 
 class TestTokenizeText(unittest.TestCase):
