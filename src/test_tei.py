@@ -27,6 +27,58 @@ class TestParser(unittest.TestCase):
             for loc, line in doc.lines():
                 pass
 
+class TestQuotes(unittest.TestCase):
+    def test(self):
+        WORD = lambda text: tei.Token(tei.Token.Type.WORD, text)
+        NONWORD = lambda text: tei.Token(tei.Token.Type.NONWORD, text)
+        OPEN_QUOTE = tei.Token(tei.Token.Type.OPEN_QUOTE, "‘")
+        CLOSE_QUOTE = tei.Token(tei.Token.Type.CLOSE_QUOTE, "’")
+        for text, expected_lines in (
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+</body></text></TEI>
+""",
+             ()),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1">how now <q>brown cow</q></l>
+<l n="2">it’s a <q>nested <q>quote</q></q></l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "how now ‘brown cow’"),
+                ("2", "it’s a ‘nested ‘quote’’"),
+             )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<lb n="1"/>how now <q>brown cow</q>
+<lb n="2"/>it’s a <q>nested <q>quote</q></q>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "how now ‘brown cow’"),
+                ("2", "it’s a ‘nested ‘quote’’"),
+             )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<lb n="1"/>how now <q>brown cow
+<lb n="2"/>it’s a <q>nested</q></q> quote
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "how now ‘brown cow"),
+                ("2", "it’s a ‘nested’’ quote"),
+             )),
+        ):
+            lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
+            self.assertEqual(lines, expected_lines)
+
 class TestTokenizeText(unittest.TestCase):
     def test(self):
         WORD = tei.Token.Type.WORD
