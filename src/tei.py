@@ -277,7 +277,7 @@ class TEI:
 
                     cur_loc = Locator(env.book_n, line_n)
                     part = elem.get("part")
-                    if (part is None) or ((prev_part is None or prev_part == "F") and part == "I"):
+                    if (part is None or part == "I") and (prev_part is None or prev_part == "F"):
                         # This is the beginning of a new line (the most common case).
                         # Output the previous line.
                         yield from flush(env)
