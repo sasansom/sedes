@@ -10,9 +10,6 @@ import xml.etree.ElementTree
 
 import betacode
 
-def warn(msg):
-    print("warning: {}".format(msg), file=sys.stderr)
-
 def split_line_n(line_n):
     """Split a line number string into an (integer, everything else) pair. A
     line_n of None is treated as an empty string."""
@@ -42,28 +39,6 @@ class Locator:
             number = "0"
         number = str(int(number) + 1)
         return Locator(book_n=self.book_n, line_n=number)
-
-    def may_precede(self, other):
-        """Is other a plausible line number to follow self?"""
-        self_book = self.book_n
-        self_number, self_extra = split_line_n(self.line_n)
-
-        other_book = other.book_n
-        other_number, other_extra = split_line_n(other.line_n)
-
-        if self_number is None or self_book != other_book:
-            # A new book means we start over at line "1" or "1a".
-            # Could additionally check that other_book == self_book + 1, in the
-            # case where both other_book and self_book represent integers.
-            return other_number is None or (other_number == 1 and other_extra in ("", "a"))
-        if self_number != other_number:
-            # Within the same book, line n should be followed by line n+1 or
-            # n+1"a".
-            return other_number == self_number + 1 and other_extra in ("", "a")
-        if self_extra == "":
-            # Line n may be followed by line n"a".
-            return other_extra == "a"
-        return len(self_extra) == 1 and len(other_extra) == 1 and other_extra == chr(ord(self_extra) + 1)
 
     def __str__(self):
         if self.book_n is None:
@@ -254,8 +229,6 @@ class TEI:
                         # If the new line is marked with a number, check it
                         # against the previous line.
                         new_loc = Locator(env.book_n, n)
-                        if not cur_loc.may_precede(new_loc):
-                            warn("after line {!r}, expected {!r}, got {!r}".format(cur_loc, cur_loc.successor(), new_loc))
                     else:
                         # If no line number is provided, guess based on the
                         # previous line number.
