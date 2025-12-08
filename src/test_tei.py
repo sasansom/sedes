@@ -2,6 +2,7 @@ import copy
 import io
 import unittest
 import xml.etree.ElementTree
+import unicodedata
 
 import tei
 
@@ -40,11 +41,12 @@ class TestTokenizeText(unittest.TestCase):
             ("‘θαρσήσας μάλα εἰπὲ θεοπρόπιον ὅ τι οἶσθα:", # Il. 1.85
              ((NONWORD, "‘"), (WORD, "θαρσήσας"), (NONWORD, " "), (WORD, "μάλα"), (NONWORD, " "), (WORD, "εἰπὲ"), (NONWORD, " "), (WORD, "θεοπρόπιον"), (NONWORD, " "), (WORD, "ὅ"), (NONWORD, " "), (WORD, "τι"), (NONWORD, " "), (WORD, "οἶσθα"), (NONWORD, ":"))),
         ):
-            tokens = tuple(tei.tokenize_text(text))
-            self.assertEqual(tuple((token.type, token.text) for token in tokens), expected_tokens)
+            tokens = tuple((token.type, token.text) for token in tei.tokenize_text(text))
+            expected_tokens = tuple((type, unicodedata.normalize("NFD", text)) for (type, text) in expected_tokens)
+            self.assertEqual(tokens, expected_tokens)
 
-            line = tei.Line(tokens)
-            self.assertEqual(line.text(), text)
+            line = tei.Line(tuple(tei.tokenize_text(text)))
+            self.assertEqual(line.text(), unicodedata.normalize("NFD", text))
             self.assertEqual(tuple(line.words()), tuple(text for (type, text) in expected_tokens if type == WORD))
 
 class TestTrimTokens(unittest.TestCase):
