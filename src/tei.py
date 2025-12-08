@@ -338,27 +338,6 @@ class TEI:
                     f"{NS}add", f"{NS}del", f"{NS}name", f"{NS}supplied", f"{NS}surplus", f"{NS}sic",
                 ):
                     yield from do_elem(elem, sub_env)
-                elif elem.tag == f"{NS}choice":
-                    # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-choice.html
-                    # We handle only the special case of choice containing
-                    # exactly one sic and one corr element, as added here:
-                    # https://github.com/PerseusDL/canonical-greekLit/commit/26023d612fffdb9ea891c723f82183a747fe2cd4#diff-ba0cff6bfc386d6392d18d1777b2b9915e93d80ed5815e4e0c29760e312dc954
-                    # We ignore the sic and keep the corr.
-                    if elem.text is not None:
-                        raise ValueError(f"text not allowed in {elem.tag!r} element")
-                    children = {}
-                    for child in elem:
-                        if child.tail is not None:
-                            raise ValueError(f"text not allowed in {elem.tag!r} element")
-                        if child.tag not in (f"{NS}sic", f"{NS}corr"):
-                            raise ValueError(f"unknown child of {elem.tag!r}: {child.tag!r}")
-                        if child.tag in children:
-                            raise ValueError(f"duplicate child of {elem.tag!r}: {child.tag!r}")
-                        children[child.tag] = child
-                    corr = children.get(f"{NS}corr")
-                    if corr is None:
-                        raise ValueError(f"no corr child of {elem.tag!r}")
-                    yield from do_elem(corr, sub_env)
                 elif elem.tag == f"{NS}q":
                     # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
                     # Quotation is tricky because it can appear in two forms
