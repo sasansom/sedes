@@ -96,12 +96,6 @@ class TestQuotes(unittest.TestCase):
             self.assertEqual(lines, expected_lines)
 
 class TestFragments(unittest.TestCase):
-                #   <l n="100" part="I">start of first line</l>
-                #   <l n="100b" part="F">end of first line</l>
-                #
-                #   <l n="100" part="I">start of first line</l>
-                #   <l n="100b" part="M">middle of first line</l>
-                #   <l n="100c" part="F">end of first line</l>
     def test_good(self):
         WORD = lambda text: tei.Token(tei.Token.Type.WORD, text)
         NONWORD = lambda text: tei.Token(tei.Token.Type.NONWORD, text)
