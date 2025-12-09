@@ -27,6 +27,28 @@ class TestParser(unittest.TestCase):
             for loc, line in doc.lines():
                 pass
 
+    def test_whitespace(self):
+        for text, expected_lines in (
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1">test1  test1</l>
+<l n="2"> test2  test2</l>
+<l n="3">test3  test3 </l>
+<l n="4"> test4  test4 </l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "test1 test1"),
+                ("2", "test2 test2"),
+                ("3", "test3 test3"),
+                ("4", "test4 test4"),
+             )),
+        ):
+            lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
+            self.assertEqual(lines, expected_lines)
+
 class TestQuotes(unittest.TestCase):
     def test(self):
         WORD = lambda text: tei.Token(tei.Token.Type.WORD, text)
