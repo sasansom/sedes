@@ -147,6 +147,21 @@ class TestFragments(unittest.TestCase):
                 ("1", "start of line middle of line end of line"),
                 ("2", "new line"),
              )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1" part="I">a</l>
+<l n="1b" part="M">b</l>
+<l n="1c" part="M">c</l>
+<l n="1d" part="F">d</l>
+<l n="2">new line</l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "a b c d"),
+                ("2", "new line"),
+             )),
         ):
             lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
             self.assertEqual(lines, expected_lines)

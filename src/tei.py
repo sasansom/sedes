@@ -101,10 +101,9 @@ class Locator:
 # level. This is indicated by the @part attribute.
 # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.fragmentable.html#tei_att.part
 # An unset @part indicates a complete line. Otherwise, @part may be "I"
-# (initial), "M" (medial), or "F" (final). Allowable sequences of non-null @part
-# within a metrical line are ["I", "F"] and ["I", "M", "F"]. It is not possible
-# for a line to be divided into more than three parts using this scheme. @part
-# only works with the l element, not lb.
+# (initial), "M" (medial), or "F" (final). There may be one "I" part, followed
+# by any number of "M" parts, followed by one "F" part. @part only works with
+# the l element, not lb.
 #
 #   <l n="1" part="I">complete first line</l>
 #   <l n="2" part="I">initial part of second line</l>
@@ -327,7 +326,7 @@ def filter_events(events):
                 # by this processing layer.
                 buf.append(Event(Event.Type.LINE_BEGIN, (line_n, None)))
             elif ((prev_line_part == "I" and (line_part == "M" or line_part == "F")) or
-                  (prev_line_part == "M" and line_part == "F")):
+                  (prev_line_part == "M" and (line_part == "M" or line_part == "F"))):
                 # This is a continuation of the previous line. Throw away this
                 # LINE_BEGIN event (and its line number) and replace the earlier
                 # LINE_END with a space.
