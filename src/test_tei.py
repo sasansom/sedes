@@ -47,7 +47,7 @@ class TestParser(unittest.TestCase):
              )),
         ):
             lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
-            self.assertEqual(lines, expected_lines)
+            self.assertEqual(lines, expected_lines, text)
 
 class TestQuotes(unittest.TestCase):
     def test(self):
@@ -115,7 +115,7 @@ class TestQuotes(unittest.TestCase):
              )),
         ):
             lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
-            self.assertEqual(lines, expected_lines)
+            self.assertEqual(lines, expected_lines, text)
 
 class TestFragments(unittest.TestCase):
     def test_good(self):
@@ -180,7 +180,7 @@ class TestFragments(unittest.TestCase):
              )),
         ):
             lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
-            self.assertEqual(lines, expected_lines)
+            self.assertEqual(lines, expected_lines, text)
 
     def test_bad(self):
         for text in (
@@ -282,11 +282,11 @@ class TestTokenizeText(unittest.TestCase):
         ):
             tokens = tuple((token.type, token.text) for token in tei.tokenize_text(text))
             expected_tokens = tuple((type, unicodedata.normalize("NFD", text)) for (type, text) in expected_tokens)
-            self.assertEqual(tokens, expected_tokens)
+            self.assertEqual(tokens, expected_tokens, text)
 
             line = tei.Line(tuple(tei.tokenize_text(text)))
-            self.assertEqual(line.text(), unicodedata.normalize("NFD", text))
-            self.assertEqual(tuple(line.words()), tuple(text for (type, text) in expected_tokens if type == WORD))
+            self.assertEqual(line.text(), unicodedata.normalize("NFD", text), text)
+            self.assertEqual(tuple(line.words()), tuple(text for (type, text) in expected_tokens if type == WORD), text)
 
 class TestTrimTokens(unittest.TestCase):
     def test(self):
@@ -325,6 +325,6 @@ class TestTrimTokens(unittest.TestCase):
             tokens_copy = copy.deepcopy(tokens)
             trimmed = tuple(tei.trim_tokens(tokens_copy))
             # check output of trim_tokens
-            self.assertEqual(trimmed, expected)
+            self.assertEqual(trimmed, expected, tokens)
             # check that input is unmodified
-            self.assertEqual(tokens, tokens_copy)
+            self.assertEqual(tokens, tokens_copy, tokens)
