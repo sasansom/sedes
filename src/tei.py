@@ -79,6 +79,22 @@ class Locator:
     def __repr__(self):
         return repr(str(self))
 
+# Parse a @rend attribute. The return value is a set which contains all the
+# tokens included in the attribute. According to the TEI specification, the
+# delimiter between tokens is whitespace only; but Perseus texts use whitespace
+# and a semicolon.
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.global.rendition.html#tei_att.rend
+# "The values of the rend attribute are a set of sequence-indeterminate
+# individual tokens separated by whitespace."
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/ST.html#STGAre
+# "The @rend attribute values are sequence-indeterminate set of
+# whitespace-separated tokens."
+def parse_rend(s):
+    if s is None:
+        return set()
+    else:
+        return set(re.findall(r'[^\s;]+', s))
+
 # Extracting metrically isolated lines of text from a TEI document is tricky in
 # the general case, because the divisions in the XML structure of TEI do not
 # always correspond to the line divisions we want. The main difficulties have to
@@ -153,7 +169,7 @@ class Locator:
 # The next layer up is the filter_events function. This function consumes the
 # low-level sequence of events and makes local adjustments to make the sequence
 # more amenable to interpretation. It pushes QUOTE_BEGIN and QUOTE_END "inside"
-# the lines they belong to, and joins partial lines.
+# the lines they belong to, joins partial lines, and merges quotations.
 #
 # The top layer is TEI.lines, which consumes the processed sequence of events
 # from filter_events. Comparatively little processing is required at this layer,
@@ -165,7 +181,7 @@ class Locator:
 # BOOK_END: not allowed
 # LINE_BEGIN: (line_n, line_part), where line_n is a string or None and line_part is "I", "M", "F", or None
 # LINE_END: not allowed
-# QUOTE_BEGIN: not allowed
+# QUOTE_BEGIN: boolean indicating rend="merge" or not
 # QUOTE_END: not allowed
 # TEXT: text content
 class Event:
@@ -180,7 +196,7 @@ class Event:
 
     def __init__(self, type, data = None):
         self.type = type
-        if type in (Event.Type.BOOK_END, Event.Type.LINE_END, Event.Type.QUOTE_BEGIN, Event.Type.QUOTE_END,):
+        if type in (Event.Type.BOOK_END, Event.Type.LINE_END, Event.Type.QUOTE_END,):
             assert data is None, (type, data)
         self.data = data
 
@@ -228,7 +244,12 @@ def events(elem, div_depth, in_line):
             yield Event(Event.Type.LINE_BEGIN, (child.get("n"), None))
         elif child.tag == f"{NS}q":
             # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
-            yield Event(Event.Type.QUOTE_BEGIN)
+            # Set a flag if the q element's @rend attribute contains the token
+            # "merge". Perseus uses this token to indicate that this quotation
+            # should be merged with one that was enclosed in a preceding
+            # element.
+            merge = "merge" in parse_rend(child.get("rend"))
+            yield Event(Event.Type.QUOTE_BEGIN, merge)
 
         if child.tag in (f"{NS}milestone", f"{NS}head", f"{NS}gap", f"{NS}pb", f"{NS}note", f"{NS}speaker"):
             # Ignore the contents of these elements.
@@ -301,11 +322,18 @@ def filter_events(events):
     # The index in buf of the most recent LINE_END event, set whenever we may
     # still need to insert a QUOTE_BEGIN event before the end of the line.
     most_recent_line_end = None
+    # A QUOTE_END inserted into buf may get canceled by a later QUOTE_BEGIN that
+    # requests merging. We track a stack of QUOTE_END elements, clearing the
+    # stack whenever something intervenes that would make merging impossible,
+    # like unquoted text or a book boundary. LINE_BEGIN and LINE_END do not
+    # prevent merging.
+    unresolved_quote_ends = []
     for event in deferred(events):
         if event.type == Event.Type.BOOK_BEGIN:
             in_line = False
             assert not buf, buf
             assert prev_line_part is None, prev_line_part
+            assert not unresolved_quote_ends, unresolved_quote_ends
             most_recent_line_end = None
             buf.append(event)
         elif event.type == Event.Type.BOOK_END:
@@ -314,6 +342,8 @@ def filter_events(events):
                 raise ValueError(f"unfinished line part at BOOK_END: part={prev_line_part!r}")
             prev_line_part = None
             most_recent_line_end = None
+            # Quotations cannot merge across book boundaries.
+            unresolved_quote_ends.clear()
             buf.append(event)
         elif event.type == Event.Type.LINE_BEGIN:
             assert not in_line, event
@@ -336,38 +366,64 @@ def filter_events(events):
             prev_line_part = line_part
 
             most_recent_line_end = None
+            # LINE_BEGIN and LINE_END do not affect unresolved_quote_ends.
         elif event.type == Event.Type.LINE_END:
             assert in_line, event
             in_line = False
             most_recent_line_end = len(buf)
+            # LINE_BEGIN and LINE_END do not affect unresolved_quote_ends.
             buf.append(event)
         elif event.type == Event.Type.QUOTE_BEGIN:
-            if in_line:
-                # Add this QUOTE_BEGIN to the events of this line.
-                buf.append(event)
+            merge = event.data
+            if merge:
+                # Cancel the most recent QUOTE_END and throw away this QUOTE_BEGIN.
+                assert most_recent_line_end is None, most_recent_line_end
+                try:
+                    unresolved_quote_end = unresolved_quote_ends.pop()
+                except IndexError:
+                    raise ValueError("<q rend=\"merge\"> without a preceding </q>")
+                buf.pop(unresolved_quote_end)
             else:
-                # We're not currently in a line; save this QUOTE_BEGIN to go
-                # after the next LINE_BEGIN.
-                after_next_line_begin.append(event)
+                # A non-merge QUOTE_BEGIN resolves all outstanding QUOTE_END.
+                unresolved_quote_ends.clear()
+                if in_line:
+                    # Add this QUOTE_BEGIN to the events of this line.
+                    buf.append(event)
+                else:
+                    # We're not currently in a line; save this QUOTE_BEGIN to go
+                    # after the next LINE_BEGIN.
+                    after_next_line_begin.append(event)
         elif event.type == Event.Type.QUOTE_END:
             if in_line:
+                # We may end up canceling this QUOTE_END, if there's a future
+                # "merge" QUOTE_BEGIN.
+                unresolved_quote_ends.append(len(buf))
                 # Add this QUOTE_END to the events of this line.
                 buf.append(event)
             else:
                 # We're not currently in a line; insert this QUOTE_END at the
                 # end of the most recent line.
                 assert most_recent_line_end is not None
+                # Likewise, we may end up canceling this QUOTE_END later.
+                unresolved_quote_ends.append(most_recent_line_end)
                 buf.insert(most_recent_line_end, event)
                 most_recent_line_end += 1
         elif event.type == Event.Type.TEXT:
             assert in_line, event
+            # Any text between quotes resolves all outstanding QUOTE_END.
+            unresolved_quote_ends.clear()
             # Add this TEXT event to the current line.
             buf.append(event)
         else:
             raise ValueError(event.type)
-        # If prev_line_part and most_recent_line_end are unset, there is nothing
-        # in buf that we may have to adjust. Flush it all to the output.
-        if prev_line_part is None and most_recent_line_end is None:
+        # If prev_line_part and most_recent_line_end are unset, and
+        # unresolved_quote_ends is empty, there is nothing in buf that we may
+        # have to adjust. Flush it all to the output.
+        if (
+            prev_line_part is None and
+            most_recent_line_end is None and
+            not unresolved_quote_ends
+        ):
             for event in buf:
                 yield event
             buf.clear()

@@ -6,6 +6,20 @@ import unicodedata
 
 import tei
 
+class TestParseRend(unittest.TestCase):
+    def test(self):
+        for s, expected in (
+            (None, set()),
+            ("merge", set(("merge",))),
+            ("single merge", set(("single", "merge",))),
+            ("single;merge", set(("single", "merge",))),
+            ("single; merge", set(("single", "merge",))),
+            (" single\n;\tmerge ", set(("single", "merge",))),
+            ("merge single", set(("single", "merge",))),
+            ("align(indent)", set(("align(indent)",))),
+        ):
+            self.assertEqual(tei.parse_rend(s), expected, s)
+
 class TestParser(unittest.TestCase):
     # "Make `tei.TEI` parser raise an error when XML is not well-formed"
     # https://github.com/sasansom/sedes/issues/89
@@ -50,11 +64,12 @@ class TestParser(unittest.TestCase):
             self.assertEqual(lines, expected_lines, text)
 
 class TestQuotes(unittest.TestCase):
+    WORD = lambda text: tei.Token(tei.Token.Type.WORD, text)
+    NONWORD = lambda text: tei.Token(tei.Token.Type.NONWORD, text)
+    OPEN_QUOTE = tei.Token(tei.Token.Type.OPEN_QUOTE, "‘")
+    CLOSE_QUOTE = tei.Token(tei.Token.Type.CLOSE_QUOTE, "’")
+
     def test(self):
-        WORD = lambda text: tei.Token(tei.Token.Type.WORD, text)
-        NONWORD = lambda text: tei.Token(tei.Token.Type.NONWORD, text)
-        OPEN_QUOTE = tei.Token(tei.Token.Type.OPEN_QUOTE, "‘")
-        CLOSE_QUOTE = tei.Token(tei.Token.Type.CLOSE_QUOTE, "’")
         for text, expected_lines in (
             ("""
 <TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
@@ -116,6 +131,146 @@ class TestQuotes(unittest.TestCase):
         ):
             lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
             self.assertEqual(lines, expected_lines, text)
+
+    def test_merge(self):
+        for text, expected_lines in (
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1"><q>hello</q><q rend="merge">world</q></l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "‘helloworld’"),
+             )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1">Juliet asked <q>O Romeo, Romeo,</q></l>
+<l n="2"><q rend="merge">wherefore art thou</q></l>
+<l n="3"><q rend="merge">Romeo?</q> Exeunt.</l>
+<l n="4">Merge across <q>nested <q>quotes</q></q></l>
+<l n="5"><q rend="merge"><q rend="merge">that are nested.</q></q></l>
+<l n="6">Merge just <q>the <q>outer</q></q></l>
+<l n="7"><q rend="merge"><q>quote</q></q> this time.</l>
+<l n="8"><q>But don't merge</q> this one.</l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "Juliet asked ‘O Romeo, Romeo,"),
+                ("2", "wherefore art thou"),
+                ("3", "Romeo?’ Exeunt."),
+                ("4", "Merge across ‘nested ‘quotes"),
+                ("5", "that are nested.’’"),
+                ("6", "Merge just ‘the ‘outer’"),
+                ("7", "‘quote’’ this time."),
+                ("8", "‘But don't merge’ this one."),
+             )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<q>
+<l n="1">block</l>
+<l n="2">quote</l>
+</q>
+<l n="3"><q rend="merge">merge it</q></l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "‘block"),
+                ("2", "quote"),
+                ("3", "merge it’"),
+             )),
+            # Test rend with other things mixed in besides "merge".
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1"><q rend="single">Hello</q></l>
+<l n="2"><q rend="merge; single">world</q></l>
+<l n="3"><q rend="single">Hello</q></l>
+<l n="4"><q rend="single; merge">world</q></l>
+<l n="5"><q rend="single">Hello</q></l>
+<l n="6"><q rend="   merge  ;  single  ">world</q></l>
+<l n="7"><q rend="double">Hello</q></l>
+<l n="8"><q rend="double; merge">world</q></l>
+<l n="9"><q rend="single">Hello</q></l>
+<l n="10"><q rend="double; merge">world</q></l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "‘Hello"),
+                ("2", "world’"),
+                ("3", "‘Hello"),
+                ("4", "world’"),
+                ("5", "‘Hello"),
+                ("6", "world’"),
+                ("7", "‘Hello"),
+                ("8", "world’"),
+                ("9", "‘Hello"),
+                ("10", "world’"),
+             )),
+            # Whitespace at the beginning or end of certain elements does not
+            # prevent merging.
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1"><q>hello</q> </l>
+<l n="2"> <q rend="merge">world</q> </l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "‘hello"),
+                ("2", "world’"),
+             )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1"><q>hello <q>world</q> </q> </l>
+<l n="2"><q rend="merge">!!!</q></l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "‘hello ‘world’"),
+                ("2", "!!!’"),
+             )),
+        ):
+            lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
+            self.assertEqual(lines, expected_lines, text)
+
+    def test_merge_bad(self):
+        for text in (
+            """
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1"><q rend="merge">hello</q></l>
+</div>
+</body></text></TEI>
+""",
+            # Text, even whitespace, between q elements prevents merging.
+            """
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1"><q>hello</q> <q rend="merge">world</q></l>
+</div>
+</body></text></TEI>
+""",
+            """
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<l n="1"><q>hello</q> X</l>
+<l n="2"><q rend="merge">world</q></l>
+</div>
+</body></text></TEI>
+""",
+        ):
+            with self.assertRaises(ValueError, msg = text):
+                tuple(tei.TEI(io.StringIO(text)).lines())
 
 class TestFragments(unittest.TestCase):
     def test_good(self):
