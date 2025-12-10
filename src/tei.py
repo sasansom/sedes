@@ -239,9 +239,9 @@ def events(elem, div_depth, in_line):
             f"{NS}q",
             f"{NS}add", f"{NS}del", f"{NS}name", f"{NS}supplied", f"{NS}surplus", f"{NS}sic",
         ):
-            # Handle any text preceding the start tag. If we're in a line, yield a
-            # TEXT event. Outside a line, ignore whitespace and raise an error for
-            # any non-whitespace.
+            # Handle any text after the start tag, preceding the first child
+            # element. If we're in a line, yield a TEXT event. Outside a line,
+            # ignore whitespace and raise an error for any non-whitespace.
             if in_line:
                 if child.text:
                     yield Event(Event.Type.TEXT, child.text)
