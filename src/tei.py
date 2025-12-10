@@ -2,7 +2,6 @@
 # XML files.
 # https://tei-c.org/release/doc/tei-p5-doc/en/html/index.html
 
-import copy
 import enum
 import re
 import sys
@@ -13,9 +12,6 @@ import unicodedata
 # https://tei-c.org/release/doc/tei-p5-doc/en/html/USE.html#CFNS
 # https://docs.python.org/3/library/xml.etree.elementtree.html#parsing-xml-with-namespaces
 NS = "{http://www.tei-c.org/ns/1.0}"
-
-def warn(msg):
-    print("warning: {}".format(msg), file=sys.stderr)
 
 def split_line_n(line_n):
     """Split a line number string into an (integer, everything else) pair. A
@@ -47,28 +43,6 @@ class Locator:
             number = "0"
         number = str(int(number) + 1)
         return Locator(book_n=self.book_n, line_n=number)
-
-    def may_precede(self, other):
-        """Is other a plausible line number to follow self?"""
-        self_book = self.book_n
-        self_number, self_extra = split_line_n(self.line_n)
-
-        other_book = other.book_n
-        other_number, other_extra = split_line_n(other.line_n)
-
-        if self_number is None or self_book != other_book:
-            # A new book means we start over at line "1" or "1a".
-            # Could additionally check that other_book == self_book + 1, in the
-            # case where both other_book and self_book represent integers.
-            return other_number is None or (other_number == 1 and other_extra in ("", "a"))
-        if self_number != other_number:
-            # Within the same book, line n should be followed by line n+1 or
-            # n+1"a".
-            return other_number == self_number + 1 and other_extra in ("", "a")
-        if self_extra == "":
-            # Line n may be followed by line n"a".
-            return other_extra == "a"
-        return len(self_extra) == 1 and len(other_extra) == 1 and other_extra == chr(ord(self_extra) + 1)
 
     def __str__(self):
         if self.book_n is None:
@@ -534,7 +508,7 @@ def consolidate_tokens(tokens):
         else:
             if cur is not None:
                 yield cur
-            cur = copy.deepcopy(token)
+            cur = Token(token.type, token.text)
     if cur is not None:
         yield cur
 
@@ -605,11 +579,8 @@ class TEI:
                 assert not tokens, tokens
                 line_n, _ = event.data
                 if line_n is not None:
-                    # If this line has an explicit number, check it against the
-                    # number of the previous line.
+                    # If this line has an explicit number, use it.
                     new_loc = Locator(cur_loc.book_n, line_n)
-                    if not cur_loc.may_precede(new_loc):
-                        warn("after line {!r}, expected {!r}, got {!r}".format(cur_loc, cur_loc.successor(), new_loc))
                 else:
                     # If there's no explicit line number, guess based on the
                     # previous line number.
