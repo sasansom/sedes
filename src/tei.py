@@ -113,7 +113,7 @@ def consolidate_tokens(tokens):
         else:
             if cur is not None:
                 yield cur
-            cur = copy.deepcopy(token)
+            cur = Token(token.type, token.text)
     if cur is not None:
         yield cur
 
