@@ -206,11 +206,25 @@ class Event:
         else:
             return f"Event({self.type}, {self.data!r}))"
 
+# Elements that should have whitespace trimmed from the beginning and end of
+# their contents. Perseus texts often have whitespace at the ends of lines,
+# especially. We don't want it in any case, but if not removed, it causes
+# problems with quotation merging in cases like this:
+#   <l><q>hello there</q> </l>
+#   <l><q rend="merge">world</q>.</l>
+# The space at the end of the first line looks like content between the
+# quotations, which causes an error when the <q rend="merge"> sees it's not
+# immediately adjacent to a preceding </q>.
+TRIM_WHITESPACE_ELEMENTS = set((f"{NS}l", f"{NS}q"))
+
 # Generate a sequence of raw Events from a TEI element. div_depth is the number
 # of div elements that are ancestors of elem. in_line indicates whether the
 # given elem is inside a line (within <l></l> or after <lb/>).
 def events(elem, div_depth, in_line):
-    for child in elem:
+    # Count the child elements of elem because there's special handling of
+    # child.tail in the final child element only.
+    num_children = sum(1 for _ in elem)
+    for (n, child) in enumerate(elem):
         if child.tag == f"{NS}div":
             # https://tei-c.org/release/doc/tei-p5-doc/en/html/DS.html#DSDIV1
             div_type = child.get("type")
@@ -264,8 +278,18 @@ def events(elem, div_depth, in_line):
             # element. If we're in a line, yield a TEXT event. Outside a line,
             # ignore whitespace and raise an error for any non-whitespace.
             if in_line:
-                if child.text:
-                    yield Event(Event.Type.TEXT, child.text)
+                text = child.text
+                if text is not None and child.tag in TRIM_WHITESPACE_ELEMENTS:
+                    # child is an element that should have whitespace trimmed.
+                    # Trim the left side of child.text.
+                    text = text.lstrip()
+                    # If child has no subelements of its own, only text, then we
+                    # must also trim the right side of child.text.
+                    num_grandchildren = sum(1 for _ in child)
+                    if num_grandchildren == 0:
+                        text = text.rstrip()
+                if text:
+                    yield Event(Event.Type.TEXT, text)
             elif not (child.text is None or child.text.strip() == ""):
                 raise ValueError(f"non-whitespace text outside line: {child.text!r}")
 
@@ -291,8 +315,17 @@ def events(elem, div_depth, in_line):
         # event. Outside a line, ignore whitespace and raise an error for any
         # non-whitespace.
         if in_line:
-            if child.tail:
-                yield Event(Event.Type.TEXT, child.tail)
+            tail = child.tail
+            if tail is not None and elem.tag in TRIM_WHITESPACE_ELEMENTS:
+                # elem is an element that should have whitespace trimmed. If
+                # we're looking at its final child, trim the right side of
+                # child.tail. Note that we check *elem*.tag but modify
+                # *child*.tail. Unlike child.text, child.tail is *outside* the
+                # tags of child: it belongs to the parent element; i.e., elem.
+                if n == num_children - 1:
+                    tail = tail.rstrip()
+            if tail:
+                yield Event(Event.Type.TEXT, tail)
         elif not (child.tail is None or child.tail.strip() == ""):
             raise ValueError(f"non-whitespace text outside line: {child.tail!r}")
 
