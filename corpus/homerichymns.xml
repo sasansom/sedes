@@ -820,9 +820,9 @@ Homeric Hymns</title>
 <lb /><milestone ed="P" unit="Para" />w(\s ei)pw\n e)bi/basken e)pi\ xqono\s eu)ruodei/hs
 <lb />*foi=bos a)kerseko/mhs, e(kathbo/los: ai(\ d' a)/ra pa=sai
 <lb rend="displayNum" n="135" />qa/mbeon a)qa/natai: xrusw=| d' a)/ra *dh=los a(/pasa
-<lb />[bebri/qei, kaqorw=sa *dio\s *lhtou\s te gene/qlhn,
+<lb /><surplus reason="intrusive">bebri/qei, kaqorw=sa *dio\s *lhtou\s te gene/qlhn,
 <lb />ghqosu/nh|, o(/ti min qeo\s ei(/leto oi)ki/a qe/sqai
-<lb />nh/swn h)pei/rou te, fi/lhse de\ khro/qi ma=llon.]
+<lb />nh/swn h)pei/rou te, fi/lhse de\ khro/qi ma=llon.</surplus>
 <lb />h)/nqhs', w(s o(/te te r(i/on ou)/reos a)/nqesin u(/lhs.
 <lb rend="displayNum" n="140" /><milestone ed="P" unit="Para" />au)to\s d', a)rguro/toce, a)/nac e(kathbo/l' *)/apollon,
 <lb />a)/llote me/n t' e)pi\ *ku/nqou e)bh/sao paipalo/entos,
@@ -2429,7 +2429,7 @@ Homeric Hymns</title>
 <lb />la/nqane d' a)qana/tous te qeou\s qnhtou/s t' a)nqrw/pous.
 <lb rend="displayNum" n="10" /><milestone ed="P" unit="Para" />kai\ su\ me\n ou(/tw xai=re, *dio\s kai\ *maia/dos ui(e/:
 <lb />seu= d' e)gw\ a)rca/menos metabh/somai a)/llon e)s u(/mnon.
-<lb />[xai=r'. *(ermh= xaridw=ta, dia/ktore, dw=tor e)a/wn.]
+<lb /><surplus resp="editor" reason="alternative to ll. 10-11">xai=r'. *(ermh= xaridw=ta, dia/ktore, dw=tor e)a/wn.</surplus>
 </p></sp></div1>
 <div1 type="Hymn" n="19" org="uniform" sample="complete">
 <head>*ei)\s *pa=na</head>
