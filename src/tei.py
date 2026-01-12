@@ -267,7 +267,7 @@ class TEI:
 
                 if elem.tag in ("milestone", "head", "gap", "pb", "note", "speaker"):
                     pass
-                elif elem.tag in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name", "supplied"):
+                elif elem.tag in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name", "supplied", "surplus"):
                     yield from do_elem(elem, sub_env)
                 elif elem.tag == "q":
                     # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
