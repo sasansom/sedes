@@ -128,7 +128,7 @@ class TestDecode(unittest.TestCase):
             ("s2toi=xos2", "ςτοῖχος"),
             ("s3toi=xos3", "ϲτοῖχοϲ"),
             ("*s3toi=xos3", "Ϲτοῖχοϲ"),
-            ("h)/las' a)risth/wn", "ἤλασ’ ἀριστήων"), # apostrophe counts as a letter for media sigma purposes (Argon. 1.61 https://archive.org/details/argonauticaedite00apoluoft/page/72/mode/1up)
+            ("h)/las' a)risth/wn", "ἤλασ’ ἀριστήων"), # apostrophe counts as a letter for medial sigma purposes (Argon. 1.61 https://archive.org/details/argonauticaedite00apoluoft/page/72/mode/1up)
             ("[gai/hs]", "[γαίης]"), # nonletters should not cause medial sigma
         ]
         for beta, expected in TESTS:
