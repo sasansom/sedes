@@ -253,7 +253,7 @@ Homeric Hymns</title>
 <lb />dei=pno/n t' e)phrtu/nonto para\ prumnh/sia nho/s:
 <lb />a)ll' e)moi\ ou) do/rpoio meli/fronos h)/rato qumo/s:
 <lb rend="displayNum" n="130" />la/qrh d' o(rmhqei=sa di' h)pei/roio melai/nhs
-<lb />feu/gou u(perfia/lous shma/ntoras, o)/fra ke mh/ me
+<lb />feu=gon u(perfia/lous shma/ntoras, o)/fra ke mh/ me
 <lb />a)pria/thn pera/santes e)mh=s a)ponai/ato timh=s.
 <lb />ou(/tw deu=r' i(ko/mhn a)lalhme/nh, ou)de/ ti oi)=da,
 <lb />h(/ tis dh\ gai=' e)sti kai\ oi(/ tines e)ggega/asin.
@@ -850,15 +850,15 @@ Homeric Hymns</title>
 <lb />mimei=sq' i)/sasin: fai/h de/ ken au)to\s e(/kastos
 <lb />fqe/ggesq': ou(/tw sfin kalh\ suna/rhren a)oidh/.
 </p>
-<sp><p><lb rend="displayNum" n="165" /><milestone ed="P" unit="Para" />a)ll' a)/geq' i(lh/koi me\n *)apo/llwn *)arte/midicu/n,
+<sp><p><lb rend="displayNum" n="165" /><milestone ed="P" unit="Para" />a)ll' a)/geq' i(lh/koi me\n *)apo/llwn *)arte/midi cu/n,
 <lb />xai/rete d' u(mei=s pa=sai: e)mei=o de\ kai\ meto/pisqen
 <lb />mnh/sasq', o(ppo/te ke/n tis e)pixqoni/wn a)nqrw/pwn
-<lb />e)qa/d' a(nei/rhtai cei=nos talapei/rios e)lqw/n:
+<lb />e)nqa/d' a)nei/rhtai cei=nos talapei/rios e)lqw/n:
 <lb />w)= kou=rai, ti/s d' u)/mmin a)nh\r h(/distos a)oidw=n
 <lb rend="displayNum" n="170" />e)nqa/de pwlei=tai, kai\ te/w| te/rpesqe ma/lista;
 <lb />u(mei=s d' eu)= ma/la pa=sai u(pokri/nasqai a)fh/mws:
 <lb />tuflo\s a)nh/r, oi)kei= de\ *xi/w| e)/ni paipaloe/ssh|
-<lb />tou= ma=sai meto/pisqen a)risteu/sousin a)oidai/.
+<lb />tou= pa=sai meto/pisqen a)risteu/sousin a)oidai/.
 <lb />h(mei=s d' u(me/teron kle/os oi)/somen, o(/sson e)p' ai)=an
 <lb rend="displayNum" n="175" />a)nqrw/pwn strefo/mesqa po/leis eu)= naietaw/sas:
 <lb />oi(\ d' e)pi\ dh\ pei/sontai, e)pei\ kai\ e)th/tumo/n e)stin.
@@ -870,7 +870,7 @@ Homeric Hymns</title>
 <head>[*ei)\s *)apo/llwna *pu/qion]</head>
 <sp><p><lb /><milestone ed="P" unit="Para" />w)= a)/na, kai\ *luki/hn kai\ *mh|oni/hn e)rateinh\n
 <lb rend="displayNum" n="180" />kai\ *mi/lhton e)/xeis, e)/nalon po/lin i(mero/essan,
-<lb />au)to\s d' au)= *dh/loio periklu/stou me/g' a)na/sseis.</p></sp>
+<lb />au)to\s d' au)= *dh/loio periklu/sths me/g' a)na/sseis.</p></sp>
 <p>
 <lb /><milestone ed="P" unit="Para" />ei)=si de\ formi/zwn *lhtou=s e)rikude/os ui(o\s
 <lb />fo/rmiggi glafurh=| pro\s *puqw\ petrh/essan,
@@ -1487,7 +1487,7 @@ Homeric Hymns</title>
 <milestone ed="P" n="215" unit="card" />
 <lb rend="displayNum" n="215" />e)ssume/nws d' h)/icen a)/nac *dio\s ui(o\s *)apo/llwn
 <lb />e)s *pu/lon h)gaqe/hn dizh/menos ei)li/podas bou=s,
-<lb />porfure/h| nefe/lh| kekalumme/nos eu)re/as w)/mous'
+<lb />porfure/h| nefe/lh| kekalumme/nos eu)re/as w)/mous:
 <lb />i)/xnia/ t' ei)seno/hsen *(ekhbo/los ei)=pe/ te mu=qon:
 <lb /><milestone ed="P" unit="Para" />w)= po/poi, h)= me/ga qau=ma to/d' o)fqalmoi=sin o(rw=mai:
 <lb rend="displayNum" n="220" />i)/xnia me\n ta/de g' e)sti\ bow=n o)rqokraira/wn,
@@ -2508,7 +2508,7 @@ Homeric Hymns</title>
 <div1 type="Hymn" n="22" org="uniform" sample="complete">
 <head>*ei)\s *poseidw=na</head>
 <sp><p>	<milestone ed="P" n="1" unit="card" />
-<lb /><milestone ed="P" unit="Para" />a)mfi\ *poseida/wta, me/gan qeo/n, a)/rxom' a)ei/dein,
+<lb /><milestone ed="P" unit="Para" />a)mfi\ *poseida/wna, me/gan qeo/n, a)/rxom' a)ei/dein,
 <lb />gai/hs kinhth=ra kai\ a)truge/toio qala/sshs,
 <lb />po/ntion, o(/sq' *(elikw=na kai\ eu)rei/as e)/xei *ai)ga/s.
 <lb />dixqa/ toi, *)ennosi/gaie, qeoi\ timh\n e)da/santo,
