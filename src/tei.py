@@ -178,6 +178,8 @@ class TEI:
         # flush function is called at the end of a line to yield a line to the
         # caller.
         line_n = None
+        # partial contains a mix of betacode strings and literal Tokens. The
+        # flush function converts the betacode strings to Tokens themselves.
         partial = []
         # next_partial is a list of tokens to be prepended to the beginning of
         # the next line, when it starts.
@@ -188,18 +190,35 @@ class TEI:
             the list."""
             nonlocal line_n, partial
 
-            if partial:
-                tokens = trim_tokens(partial)
-                partial.clear()
+            # Convert betacode strings to tokens, output tokens directly.
+            tokens = []
+            for x in partial:
+                if type(x) == str:
+                    tokens.extend(tokenize_betacode(x))
+                else:
+                    tokens.append(x)
+            partial.clear()
+
+            if tokens:
+                tokens = trim_tokens(tokens)
                 if tokens:
                     yield Locator(env.book_n, line_n), Line(tokens)
+
+        def output_betacode(beta):
+            if not partial or type(partial[-1]) != str:
+                partial.append(beta)
+            else:
+                partial[-1] += beta
+
+        def output_token(token):
+            partial.append(token)
 
         def do_elem(root, env):
             nonlocal line_n, partial, next_partial
 
             # Handle any text before the first child element.
             if root.text is not None:
-                partial.extend(tokenize_betacode(root.text))
+                output_betacode(root.text)
 
             for elem in root:
                 # Make a copy of the environment to pass to recursive calls to
@@ -267,9 +286,9 @@ class TEI:
                     # line, and the close quotation mark to the end of the
                     # last line.
                     if env.in_line:
-                        partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
+                        output_token(Token(Token.Type.OPEN_QUOTE, "‘"))
                         yield from do_elem(elem, sub_env)
-                        partial.append(Token(Token.Type.CLOSE_QUOTE, "’"))
+                        output_token(Token(Token.Type.CLOSE_QUOTE, "’"))
                     else:
                         # Put the open quotation mark in a queue to be
                         # prepended to the next line that begins.
@@ -299,6 +318,6 @@ class TEI:
                 # element, or between the end tag of this child element and the
                 # end tag of the parent element.
                 if elem.tail is not None:
-                    partial.extend(tokenize_betacode(elem.tail))
+                    output_betacode(elem.tail)
 
         yield from do_elem(self.tree.find(".//text/body"), Environment())
