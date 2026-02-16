@@ -64,11 +64,6 @@ class TestParser(unittest.TestCase):
             self.assertEqual(lines, expected_lines, text)
 
 class TestQuotes(unittest.TestCase):
-    WORD = lambda text: tei.Token(tei.Token.Type.WORD, text)
-    NONWORD = lambda text: tei.Token(tei.Token.Type.NONWORD, text)
-    OPEN_QUOTE = tei.Token(tei.Token.Type.OPEN_QUOTE, "‘")
-    CLOSE_QUOTE = tei.Token(tei.Token.Type.CLOSE_QUOTE, "’")
-
     def test(self):
         for text, expected_lines in (
             ("""
@@ -274,10 +269,6 @@ class TestQuotes(unittest.TestCase):
 
 class TestFragments(unittest.TestCase):
     def test_good(self):
-        WORD = lambda text: tei.Token(tei.Token.Type.WORD, text)
-        NONWORD = lambda text: tei.Token(tei.Token.Type.NONWORD, text)
-        OPEN_QUOTE = tei.Token(tei.Token.Type.OPEN_QUOTE, "‘")
-        CLOSE_QUOTE = tei.Token(tei.Token.Type.CLOSE_QUOTE, "’")
         for text, expected_lines in (
             ("""
 <TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
