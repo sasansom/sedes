@@ -191,6 +191,75 @@ class Event:
 # immediately adjacent to a preceding </q>.
 TRIM_WHITESPACE_ELEMENTS = set((f"{NS}l", f"{NS}q"))
 
+# Helper function for trim_whitespace. Trim whitespace from the left side of
+# elem *in place*, recursing into child elements and also trimming elem.tail if
+# there was no non-whitespace text inside the element itself. The return value
+# is a boolean flag that is true when *all* this element's text was removed for
+# being whitespace; i.e., when the caller should keep trimming in the next
+# sibling element.
+def trim_whitespace_left(elem):
+    flag = True
+    if flag and elem.text is not None:
+        elem.text = elem.text.lstrip()
+        flag = not elem.text
+    for child in elem:
+        if not flag:
+            break
+        flag = trim_whitespace_left(child)
+    if flag and elem.tail is not None:
+        elem.tail = elem.tail.lstrip()
+        flag = not elem.tail
+    return flag
+
+# Helper function for trim_whitespace. Trim whitespace from the right side of
+# elem *in place*, starting from elem.tail and recursing into child elements in
+# reverse order. there was no non-whitespace text inside the element itself. The
+# return value is a boolean flag that is true when *all* this element's text was
+# removed for being whitespace; i.e., when the caller should keep trimming in
+# the previous sibling element.
+def trim_whitespace_right(elem):
+    flag = True
+    if flag and elem.tail is not None:
+        elem.tail = elem.tail.rstrip()
+        flag = not elem.tail
+    for child in reversed(elem):
+        if not flag:
+            break
+        flag = trim_whitespace_right(child)
+    if flag and elem.text is not None:
+        elem.text = elem.text.rstrip()
+        flag = not elem.text
+    return flag
+
+# Trim leading and trailing whitespace from elem *in place*, recursing into
+# child elements until hitting the first non-whitespace text character from the
+# left and the right. For example, given this input:
+#   <a>   <b>  X <c> Y </c>   </b>Z </a>
+# this function will transform it into
+#        <a><b>X <c> Y </c>   </b>Z</a>
+# Unlike trim_whitespace_left and trim_whitespace_right, this function never
+# touches elem.tail (which is after the end tag).
+def trim_whitespace(elem):
+    # Left whitespace.
+    flag = True
+    if flag and elem.text is not None:
+        elem.text = elem.text.lstrip()
+        flag = not elem.text
+    for child in elem:
+        if not flag:
+            break
+        flag = trim_whitespace_left(child)
+
+    # Right whitespace.
+    flag = True
+    for child in reversed(elem):
+        if not flag:
+            break
+        flag = trim_whitespace_right(child)
+    if flag and elem.text is not None:
+        elem.text = elem.text.rstrip()
+        flag = not elem.text
+
 # Generate a sequence of raw Events from a TEI element. div_depth is the number
 # of div elements that are ancestors of elem. in_line indicates whether the
 # given elem is inside a line (within <l></l> or after <lb/>).
@@ -199,6 +268,9 @@ def events(elem, div_depth, in_line):
     # child.tail in the final child element only.
     num_children = sum(1 for _ in elem)
     for (n, child) in enumerate(elem):
+        if child.tag in TRIM_WHITESPACE_ELEMENTS:
+            trim_whitespace(child)
+
         if child.tag == f"{NS}div":
             # https://tei-c.org/release/doc/tei-p5-doc/en/html/DS.html#DSDIV1
             div_type = child.get("type")
@@ -257,18 +329,8 @@ def events(elem, div_depth, in_line):
             # element. If we're in a line, yield a TEXT event. Outside a line,
             # ignore whitespace and raise an error for any non-whitespace.
             if in_line:
-                text = child.text
-                if text is not None and child.tag in TRIM_WHITESPACE_ELEMENTS:
-                    # child is an element that should have whitespace trimmed.
-                    # Trim the left side of child.text.
-                    text = text.lstrip()
-                    # If child has no subelements of its own, only text, then we
-                    # must also trim the right side of child.text.
-                    num_grandchildren = sum(1 for _ in child)
-                    if num_grandchildren == 0:
-                        text = text.rstrip()
-                if text:
-                    yield Event(Event.Type.TEXT, text)
+                if child.text:
+                    yield Event(Event.Type.TEXT, child.text)
             elif not (child.text is None or child.text.strip() == ""):
                 raise ValueError(f"non-whitespace text outside line: {child.text!r}")
 
@@ -294,17 +356,8 @@ def events(elem, div_depth, in_line):
         # event. Outside a line, ignore whitespace and raise an error for any
         # non-whitespace.
         if in_line:
-            tail = child.tail
-            if tail is not None and elem.tag in TRIM_WHITESPACE_ELEMENTS:
-                # elem is an element that should have whitespace trimmed. If
-                # we're looking at its final child, trim the right side of
-                # child.tail. Note that we check *elem*.tag but modify
-                # *child*.tail. Unlike child.text, child.tail is *outside* the
-                # tags of child: it belongs to the parent element; i.e., elem.
-                if n == num_children - 1:
-                    tail = tail.rstrip()
-            if tail:
-                yield Event(Event.Type.TEXT, tail)
+            if child.tail:
+                yield Event(Event.Type.TEXT, child.tail)
         elif not (child.tail is None or child.tail.strip() == ""):
             raise ValueError(f"non-whitespace text outside line: {child.tail!r}")
 

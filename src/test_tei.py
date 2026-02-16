@@ -50,6 +50,7 @@ class TestParser(unittest.TestCase):
 <l n="2"> test2  test2</l>
 <l n="3">test3  test3 </l>
 <l n="4"> test4  test4 </l>
+<l n="5"> <milestone/> test5 test5 <milestone/> </l>
 </div>
 </body></text></TEI>
 """,
@@ -58,6 +59,7 @@ class TestParser(unittest.TestCase):
                 ("2", "test2 test2"),
                 ("3", "test3 test3"),
                 ("4", "test4 test4"),
+                ("5", "test5 test5"),
              )),
         ):
             lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
@@ -122,6 +124,18 @@ class TestQuotes(unittest.TestCase):
                 ("1", "quote outside"),
                 ("2", "‘line"),
                 ("3", "elements’"),
+             )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<q><l n="1"> <milestone/> text <milestone/> </l></q>
+<l n="2"> <q> <milestone/> text <milestone/> </q> </l>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "‘text’"),
+                ("2", "‘text’"),
              )),
         ):
             lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
