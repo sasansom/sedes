@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><?xml-model href="http://www.stoa.org/epidoc/schema/8.19/tei-epidoc.rng"
 schematypens="http://relaxng.org/ns/structure/1.0"?><?xml-model href="http://www.stoa.org/epidoc/schema/8.19/tei-epidoc.rng"
-schematypens="http://purl.oclc.org/dsdl/schematron"?><TEI xmlns="http://www.tei-c.org/ns/1.0">
+schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
   <teiHeader xml:lang="eng">
     <fileDesc>
       <titleStmt>
@@ -173,7 +174,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?><TEI xmlns="http://www.tei-
           <l n="79">ἀλλʼ εἴ μοι τλαίης γε, θεά, μέγαν ὅρκον ὀμόσσαι, </l>
           <l n="80">ἐνθάδε μιν πρῶτον τεύξειν περικαλλέα νηὸν </l>
           <l n="81">ἔμμεναι ἀνθρώπων χρηστήριον, αὐτὰρ ἔπειτα </l>
-          <l n="81a"> [<supplied reason="lost">τεύξασθαι νηούς τε καὶ ἄλσεα δενδρηέντα<note resp="ed" xml:lang="eng">Allen.</note></supplied>]</l>
+          <l n="81a"><supplied reason="lost">τεύξασθαι νηούς τε καὶ ἄλσεα δενδρηέντα<note resp="ed" xml:lang="eng">Allen.</note></supplied></l>
           <l n="82">πάντας ἐπʼ ἀνθρώπους, ἐπεὶ ἦ πολυώνυμος ἔσται.<!-- <milestone type="endquote" --></l>
         <l n="83"><milestone unit="Para" ed="P"/>ὣς ἄρ ἔφη· Λητὼ δὲ θεῶν μέγαν ὅρκον ὄμοσσε· </l>
         <l n="84"><!-- <milestone type="startquote" -->ἴστω νῦν τάδε Γαῖα καὶ Οὐρανὸς εὐρὺς ὕπερθεν </l>
@@ -235,11 +236,11 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?><TEI xmlns="http://www.tei-
         <l n="133"><milestone unit="Para" ed="P"/>ὣς εἰπὼν ἐβίβασκεν ἐπὶ χθονὸς εὐρυοδείης </l>
         <l n="134">Φοῖβος ἀκερσεκόμης, ἑκατηβόλος· αἳ δʼ ἄρα πᾶσαι </l>
         <l n="135">θάμβεον ἀθάναται· χρυσῷ δʼ ἄρα Δῆλος ἅπασα </l>
-        <l n="136">[<surplus reason="intrusive">βεβρίθει, καθορῶσα Διὸς Λητοὺς τε γενέθλην,</surplus></l>
+        <l n="136"><surplus reason="intrusive">βεβρίθει, καθορῶσα Διὸς Λητοὺς τε γενέθλην,</surplus></l>
           <l n="137"><surplus reason="intrusive">γηθοσύνῃ, ὅτι μιν θεὸς εἵλετο οἰκία θέσθαι</surplus></l>
           <l n="138"><surplus reason="intrusive">νήσων ἠπείρου τε, φίλησε δὲ κηρόθι μᾶλλον.</surplus><note resp="ed" xml:lang="eng">ll. 136-8 are instrusive, being alternative for l. 139. They
               are found in Π and the edition of Stephanus (in text), and in the margin of the ETL
-              (with the note “in another copy these verses are also extant”). In D they are added by a second hand.</note>]</l>
+              (with the note “in another copy these verses are also extant”). In D they are added by a second hand.</note></l>
         <l n="139">ἤνθησʼ, ὡς ὅτε τε ῥίον οὔρεος ἄνθεσιν ὕλης. </l>
         <l n="140"><milestone unit="Para" ed="P"/>αὐτὸς δʼ, ἀργυρότοξε, ἄναξ ἑκατηβόλʼ Ἄπολλον, </l>
         <l n="141">ἄλλοτε μέν τʼ ἐπὶ Κύνθου ἐβήσαο παιπαλόεντος, </l>
@@ -286,7 +287,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?><TEI xmlns="http://www.tei-
         <milestone unit="card" n="179" ed="P"/><sp>
           <l n="179"><milestone unit="Para" ed="P"/>ὦ ἄνα, καὶ Λυκίην καὶ Μῃονίην ἐρατεινὴν </l>
           <l n="180">καὶ Μίλητον ἔχεις, ἔναλον πόλιν ἱμερόεσσαν, </l>
-          <l n="181">αὐτὸς δʼ αὖ Δήλοιο περικλύστοιο μέγʼ ἀνάσσεις. </l>
+          <l n="181">αὐτὸς δʼ αὖ Δήλοιο περικλύστης μέγʼ ἀνάσσεις. </l>
         </sp>
 
         <l n="182"><milestone unit="Para" ed="P"/>εἶσι δὲ φορμίζων Λητοῦς ἐρικυδέος υἱὸς </l>
@@ -308,7 +309,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?><TEI xmlns="http://www.tei-
         <l n="198">ἀλλὰ μάλα μεγάλη τε ἰδεῖν καὶ εἶδος ἀγητή, </l>
         <l n="199">Ἄρτεμις ἰοχέαιρα ὁμότροφος Ἀπόλλωνι. </l>
         <l n="200">ἐν δʼ αὖ τῇσιν Ἄρης καὶ ἐύσκοπος Ἀργειφόντης </l>
-        <l n="201">παίζουσʼ· αὐτὰρ ὁ Φοῖβος Αʼπόλλων ἐγκιθαρίζει </l>
+        <l n="201">παίζουσʼ· αὐτὰρ ὁ Φοῖβος Ἀπόλλων ἐγκιθαρίζει </l>
         <l n="202">καλὰ καὶ ὕψι βιβάς· αἴγλη δέ μιν ἀμφιφαείνει </l>
         <l n="203">μαρμαρυγαί τε ποδῶν καὶ ἐυκλώστοιο χιτῶνος. </l>
         <l n="204">οἳ δʼ ἐπιτέρπονται θυμὸν μέγαν εἰσορόωντες </l>
@@ -420,7 +421,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?><TEI xmlns="http://www.tei-
           <l n="315">ἣ πᾶσιν μακάρεσσι μεταπρέπει ἀθανάτοισιν· </l>
           <l n="316">αὐτὰρ ὅ γʼ ἠπεδανὸς γέγονεν μετὰ πᾶσι θεοῖσι </l>
           <l n="317">παῖς ἐμὸς Ἥφαιστος, ῥικνὸς πόδας, ὃν τέκον αὐτή· </l>
-          <l n="317a"> [<supplied reason="lost">αἶσχος ἐμοὶ καὶ ὄνειδος ἐν οὐρανῷ ὅντε καὶ αὐτή</supplied><note resp="ed" xml:lang="eng">Suggested by Allen-Sikes to fill up the lacuna.</note>] </l>
+          <l n="317a"><supplied reason="lost">αἶσχος ἐμοὶ καὶ ὄνειδος ἐν οὐρανῷ ὅντε καὶ αὐτή</supplied><note resp="ed" xml:lang="eng">Suggested by Allen-Sikes to fill up the lacuna.</note> </l>
           <l n="318">ῥῖψʼ ἀνὰ χερσὶν ἑλοῦσα καὶ ἔμβαλον εὐρέι πόντῳ· </l>
           <l n="319">ἀλλά ἑ Νηρῆος θυγάτηρ Θέτις ἀργυρόπεζα </l>
           <l n="320">δέξατο καὶ μετὰ ᾗσι κασιγνήτῃσι κόμισσεν. </l>
@@ -493,7 +494,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?><TEI xmlns="http://www.tei-
           <l n="385">ἄγχι μάλα κρήνης καλλιρρόου· ἔνθαδʼ ἄνακτι </l>
           <l n="386">πάντες ἐπίκλησιν Τελφουσίῳ εὐχετόωνται, </l>
           <l n="387">οὕνεκα Τελφούσης ἱερῆς ᾔσχυνε ῥέεθρα. </l>
-          <l n="388"><milestone unit="Para" ed="P"/>καὶ τότε δὴ κατὰ θυμὸν ἐφράζετο Φοῖβος Απόλλων, </l>
+          <l n="388"><milestone unit="Para" ed="P"/>καὶ τότε δὴ κατὰ θυμὸν ἐφράζετο Φοῖβος Ἀπόλλων, </l>
           <l n="389">οὕστινας ἀνθρώπους ὀργείονας εἰσαγάγοιτο, </l>
           <l n="390">οἳ θεραπεύσονται Πυθοῖ ἔνι πετρηέσσῃ· </l>
           <l n="391">ταῦτʼ ἄρα ὁρμαίνων ἐνόησʼ ἐπὶ οἴνοπι πόντῳ </l>
@@ -508,8 +509,8 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?><TEI xmlns="http://www.tei-
           <l n="400">ἐν πόντῳ δʼ ἐπόρουσε δέμας δελφῖνι ἐοικὼς </l>
           <l n="401">νηὶ θοῇ καὶ κεῖτο πέλωρ μέγα τε δεινόν τε· </l>
           <l n="402">τῶν δʼ οὔτις κατὰ θυμὸν ἐπεφράσαθʼ ὥστε νοῆσαι </l>
-          <l n="402a"> [<supplied reason="lost">ἐκβάλλειν δʼ ἔθελον δελφῖνʼ· ὁ δὲ νῆα
-                μέλαιναν</supplied><note resp="ed" xml:lang="eng">Allen-Sikes’s supplement.</note>] </l>
+          <l n="402a"><supplied reason="lost">ἐκβάλλειν δʼ ἔθελον δελφῖνʼ· ὁ δὲ νῆα
+                μέλαιναν</supplied><note resp="ed" xml:lang="eng">Allen-Sikes’s supplement.</note> </l>
           <l n="403">πάντοσʼ ἀνασσείσασκε, τίνασσε δὲ νήια δοῦρα. </l>
           <l n="404">οἳ δʼ ἀκέων ἐνὶ νηὶ καθήατο δειμαίνοντες· </l>
           <l n="405">οὐδʼ οἵ γʼ ὅπλʼ ἔλυον κοίλην ἀνὰ νῆα μέλαιναν, </l>
@@ -639,8 +640,8 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?><TEI xmlns="http://www.tei-
              <l n="537">ὅσσα τʼ ἐμοί κʼ ἀγάγωσι περικλυτὰ φῦλʼ ἀνθρώπων· </l>
             <l n="538">νηὸν δὲ προφύλαχθε, δέδεχθε δὲ φῦλʼ ἀνθρώπων</l>
              <l n="539">ἐνθάδʼ ἀγειρομένων καὶ ἐμὴν ἰθύν τε μάλιστα. </l>
-              <l n="539a">[<supplied reason="lost">δείκνυσθε θνητοῖσι· σὺ δὲ φρεσὶ δέξο θέμιστα.</supplied> </l>
-              <l n="539b"><supplied reason="lost">εἰ δέ τις ἀφραδίῃς οὐ πείσεται,  ἀλλʼ ἀλογήσει</supplied><note resp="ed" xml:lang="eng">Allen suggests these two lines to fill the lacuna.</note>] </l>
+              <l n="539a"><supplied reason="lost">δείκνυσθε θνητοῖσι· σὺ δὲ φρεσὶ δέξο θέμιστα.</supplied> </l>
+              <l n="539b"><supplied reason="lost">εἰ δέ τις ἀφραδίῃς οὐ πείσεται,  ἀλλʼ ἀλογήσει</supplied><note resp="ed" xml:lang="eng">Allen suggests these two lines to fill the lacuna.</note> </l>
                 <l n="540">ἠέ τι τηΰσιον ἔπος ἔσσεται ἠέ τι ἔργον </l>
                 <l n="541">ὕβρις θʼ, ἣ θέμις ἐστὶ καταθνητῶν ἀνθρώπων, </l>
                 <l n="542">ἄλλοι ἔπειθʼ ὑμῖν σημάντορες ἄνδρες ἔσονται,</l>
