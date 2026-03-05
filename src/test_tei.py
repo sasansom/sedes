@@ -26,6 +26,116 @@ class TestParser(unittest.TestCase):
             for loc, line in doc.lines():
                 pass
 
+class TestQuotes(unittest.TestCase):
+    def test(self):
+        for text, expected_lines in (
+            ("""\
+<?xml version="1.0" encoding="utf-8"?>
+<TEI.2>
+<text><body>
+</body></text></TEI.2>
+""",
+             ()),
+            ("""
+<TEI.2><text><body>
+<div1 type="Book">
+<l n="1">how now <q>brown cow</q></l>
+<l n="2">it’s a <q>nested <q>quote</q></q></l>
+</div1>
+</body></text></TEI.2>
+""",
+             (
+                ("1", "ηοω νοω ‘βροων ξοω’"),
+                ("2", "ιτ’σ α ‘νεστεδ ‘θυοτε’’"),
+             )),
+            ("""
+<TEI.2><text><body>
+<div1 type="Book">
+<lb n="1"/>how now <q>brown cow</q>
+<lb n="2"/>it’s a <q>nested <q>quote</q></q>
+</div1>
+</body></text></TEI.2>
+""",
+             (
+                ("1", "ηοω νοω ‘βροων ξοω’"),
+                ("2", "ιτ’σ α ‘νεστεδ ‘θυοτε’’"),
+             )),
+            ("""
+<TEI.2><text><body>
+<div1 type="Book">
+<lb n="1"/>how now <q>brown cow
+<lb n="2"/>it’s a <q>nested</q></q> quote
+</div1>
+</body></text></TEI.2>
+""",
+             (
+                ("1", "ηοω νοω ‘βροων ξοω"),
+                ("2", "ιτ’σ α ‘νεστεδ’’ θυοτε"),
+             )),
+            ("""
+<TEI.2><text><body>
+<div1 type="Book">
+<l n="1">quote outside</l>
+<q>
+<l n="2">line</l>
+<l n="3">elements</l>
+</q>
+</div1>
+</body></text></TEI.2>
+""",
+             (
+                ("1", "θυοτε ουτσιδε"),
+                ("2", "‘λινε"),
+                ("3", "ελεμεντς’"),
+             )),
+            ("""
+<TEI.2><text><body>
+<div1 type="Book">
+<q><l n="1"> <milestone/> text <milestone/> </l></q>
+<l n="2"> <q> <milestone/> text <milestone/> </q> </l>
+</div1>
+</body></text></TEI.2>
+""",
+             (
+                ("1", "‘ τεχτ’"),
+                ("2", "‘ τεχτ ’"),
+             )),
+            ("""
+<TEI.2><text><body>
+<div1 type="Book">
+<p><lb n="1"/>quote with intervening
+</p><q><p>
+<lb n="2"/>paragraph
+<lb n="3"/>elements
+</p></q>
+</div1>
+</body></text></TEI.2>
+""",
+             (
+                ("1", "θυοτε ωιτη ιντερϝενινγ"),
+                ("2", "‘παραγραπη"),
+                ("3", "ελεμεντς’"),
+             )),
+            ("""
+<TEI.2><text><body>
+<div1 type="Book">
+<p><l n="1">quote with intervening</l>
+</p><q><p>
+<l n="2">paragraph</l>
+<l n="3">elements</l>
+</p></q>
+</div1>
+</body></text></TEI.2>
+""",
+             (
+                ("1", "θυοτε ωιτη ιντερϝενινγ"),
+                ("2", "‘παραγραπη"),
+                ("3", "ελεμεντς’"),
+             )),
+        ):
+            lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
+            self.assertEqual(lines, expected_lines, text)
+
 class TestTokenizeText(unittest.TestCase):
     def test(self):
         WORD = tei.Token.Type.WORD
