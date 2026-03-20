@@ -98,7 +98,7 @@ class TestQuotes(unittest.TestCase):
 """,
              (
                 ("1", "‘ τεχτ’"),
-                ("2", "‘ τεχτ ’"),
+                ("2", "‘ τεχτ’"),
              )),
             ("""
 <TEI.2><text><body>

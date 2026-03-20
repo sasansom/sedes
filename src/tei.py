@@ -217,7 +217,7 @@ class TEI:
             nonlocal line_n, partial, next_partial
 
             # Handle any text before the first child element.
-            if root.text is not None:
+            if env.in_line and root.text is not None:
                 output_betacode(root.text)
 
             for elem in root:
@@ -278,6 +278,16 @@ class TEI:
                     #
                     #   <q><l>abcd abcd abcd</l>
                     #   <l>efgh efgh efgh</l></q>
+                    # There may even be an intervening element inside the q
+                    # element, as in:
+                    #   <q><p>
+                    #   <lb/>abcd abcd abcd
+                    #   <lb/>efgh efgh efgh efgh
+                    #   </p></q>
+                    # If we are in a line already, we add an open quotation mark
+                    # wherever the <q> appears; if not, we add the open
+                    # quotation mark to the next_partial queue to be added to
+                    # the beginning of the next line.
                     # The first case is easy: we just add open and close
                     # quotation marks where the open and close q tags
                     # appear. In the second case, the q element doesn't
@@ -287,19 +297,35 @@ class TEI:
                     # last line.
                     if env.in_line:
                         output_token(Token(Token.Type.OPEN_QUOTE, "‘"))
-                        yield from do_elem(elem, sub_env)
-                        output_token(Token(Token.Type.CLOSE_QUOTE, "’"))
                     else:
                         # Put the open quotation mark in a queue to be
                         # prepended to the next line that begins.
                         next_partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
-                        # Append the close quotation mark to the final
-                        # yielded line.
-                        buf = None
-                        for x in do_elem(elem, sub_env):
-                            if buf is not None:
-                                yield buf
-                            buf = x
+                    # Yield all but the final line within the quotation. The
+                    # final line is left in buf.
+                    buf = None
+                    for x in do_elem(elem, sub_env):
+                        if buf is not None:
+                            yield buf
+                        buf = x
+                    if partial:
+                        # If partial is non-empty, then that incomplete line,
+                        # and not buf, is the final partial line. Flush buf and
+                        # tokenize partial, then add the close quotation mark to
+                        # the end of partial.
+                        if buf is not None:
+                            yield buf
+                        tokens = []
+                        for x in partial:
+                            if type(x) == str:
+                                tokens.extend(tokenize_betacode(x))
+                            else:
+                                tokens.append(x)
+                        partial = trim_tokens(tokens)
+                        output_token(Token(Token.Type.CLOSE_QUOTE, "’"))
+                    else:
+                        # If partial is empty, then buf is the final line.
+                        # Append the close quotation mark to it.
                         assert buf is not None, buf
                         loc, line = buf
                         line.tokens.append(Token(Token.Type.CLOSE_QUOTE, "’"))
@@ -317,7 +343,7 @@ class TEI:
                 # Handle any text between this child element and the next child
                 # element, or between the end tag of this child element and the
                 # end tag of the parent element.
-                if elem.tail is not None:
+                if env.in_line and elem.tail is not None:
                     output_betacode(elem.tail)
 
         yield from do_elem(self.tree.find(".//text/body"), Environment())
