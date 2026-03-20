@@ -264,6 +264,7 @@ def trim_whitespace(elem):
 # of div elements that are ancestors of elem. in_line indicates whether the
 # given elem is inside a line (within <l></l> or after <lb/>).
 def events(elem, div_depth, in_line):
+    originally_in_line = in_line
     # Count the child elements of elem because there's special handling of
     # child.tail in the final child element only.
     num_children = sum(1 for _ in elem)
@@ -360,6 +361,19 @@ def events(elem, div_depth, in_line):
                 yield Event(Event.Type.TEXT, child.tail)
         elif not (child.tail is None or child.tail.strip() == ""):
             raise ValueError(f"non-whitespace text outside line: {child.tail!r}")
+
+    # If we were not originally in a line when this function was called, but we
+    # are in a line here at the end, yield a LINE_END event. This can happen
+    # when lines are delimited by <lb/> and also enclosed in another element
+    # such as <p></p>.
+    #   <p>
+    #   <lb/>line 1
+    #   <lb/>line 2
+    #   </p>  ← LINE_END inserted here.
+    #   <lb/>line 3
+    if not originally_in_line and in_line:
+        yield Event(Event.Type.LINE_END)
+        in_line = False
 
 def filter_events(events):
     # An adjusted iterator over events that lets you defer events until after
@@ -494,11 +508,6 @@ def filter_events(events):
             buf.clear()
     for event in buf:
         yield event
-    # The final line may have been a <lb/> without a LINE_END event. Add a
-    # LINE_END if so.
-    if in_line:
-        in_line = False
-        yield Event(Event.Type.LINE_END)
     if not (prev_line_part is None or prev_line_part == "F"):
         raise ValueError(f"unfinished line part at BOOK_END: part={prev_line_part!r}")
 
