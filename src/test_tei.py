@@ -137,6 +137,38 @@ class TestQuotes(unittest.TestCase):
                 ("1", "‘text’"),
                 ("2", "‘text’"),
              )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<p><lb n="1"/>quote with intervening
+</p><q><p>
+<lb n="2"/>paragraph
+<lb n="3"/>elements
+</p></q>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "quote with intervening"),
+                ("2", "‘paragraph"),
+                ("3", "elements’"),
+             )),
+            ("""
+<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+<div type="edition">
+<p><l n="1">quote with intervening</l>
+</p><q><p>
+<l n="2">paragraph</l>
+<l n="3">elements</l>
+</p></q>
+</div>
+</body></text></TEI>
+""",
+             (
+                ("1", "quote with intervening"),
+                ("2", "‘paragraph"),
+                ("3", "elements’"),
+             )),
         ):
             lines = tuple((str(loc), line.text()) for (loc, line) in tuple(tei.TEI(io.StringIO(text)).lines()))
             self.assertEqual(lines, expected_lines, text)
