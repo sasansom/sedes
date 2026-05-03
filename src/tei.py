@@ -313,7 +313,7 @@ def events(elem, div_depth, in_line):
             yield Event(Event.Type.QUOTE_BEGIN, merge)
 
         if (
-            child.tag in (f"{NS}milestone", f"{NS}head", f"{NS}gap", f"{NS}pb", f"{NS}note", f"{NS}speaker")
+            child.tag in (f"{NS}milestone", f"{NS}head", f"{NS}gap", f"{NS}pb", f"{NS}note", f"{NS}speaker", f"{NS}label")
             # nonnusdionysiaca.xml uses <l rend="argument"> for per-book headings.
             # https://github.com/sasansom/sedes/issues/57#issuecomment-3348714105
             or (child.tag == f"{NS}l" and "argument" in parse_rend(child.get("rend")))
