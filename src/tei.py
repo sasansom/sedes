@@ -233,11 +233,10 @@ class TEI:
                 # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
                 # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
                 if elem.tag in ("l", "lb"):
-                    if elem.tag == "lb":
-                        # Output the previous line. l elements are flushed
-                        # at the end of the loop iteration, where the
-                        # element is closed.
-                        yield from flush(env)
+                    # Output the previous line. l elements are also flushed
+                    # at the end of the loop iteration, where the
+                    # element is closed.
+                    yield from flush(env)
 
                     partial.extend(next_partial)
                     next_partial.clear()
@@ -256,6 +255,7 @@ class TEI:
                     line_n = new_loc.line_n
 
                     if elem.tag == "l":
+                        env.in_line = False
                         sub_env.in_line = True
                     elif elem.tag == "lb":
                         env.in_line = True
