@@ -262,9 +262,9 @@ def trim_whitespace(elem):
 
 # Generate a sequence of raw Events from a TEI element. div_depth is the number
 # of div elements that are ancestors of elem. in_line indicates whether the
-# given elem is inside a line (within <l></l> or after <lb/>).
+# given elem is inside a line (within <l></l> or after <lb/>). The return value
+# is the value of in_line on exiting the function.
 def events(elem, div_depth, in_line):
-    originally_in_line = in_line
     # Count the child elements of elem because there's special handling of
     # child.tail in the final child element only.
     num_children = sum(1 for _ in elem)
@@ -292,7 +292,7 @@ def events(elem, div_depth, in_line):
         elif child.tag == f"{NS}l":
             # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
             if in_line:
-                raise ValueError(f"{child.tag} element while already in a line")
+                yield Event(Event.Type.LINE_END)
             in_line = True
             yield Event(Event.Type.LINE_BEGIN, (child.get("n"), child.get("part")))
         elif child.tag == f"{NS}lb":
@@ -336,7 +336,21 @@ def events(elem, div_depth, in_line):
                 raise ValueError(f"non-whitespace text outside line: {child.text!r}")
 
             # Recurse into the children of this element.
-            yield from events(child, div_depth, in_line)
+            sub_in_line = yield from events(child, div_depth, in_line)
+            if not in_line and sub_in_line:
+                # If we were not originally in a line when this function was
+                # called, but we are in a line here at the end, yield a LINE_END
+                # event. This can happen when lines are delimited by <lb/> and
+                # also enclosed in another element such as <p></p>.
+                #   <p>
+                #   <lb/>line 1
+                #   <lb/>line 2
+                #   </p>  ← LINE_END inserted here.
+                #   <lb/>line 3
+                yield Event(Event.Type.LINE_END)
+                in_line = False
+            else:
+                in_line = sub_in_line
         else:
             raise ValueError(f"don't understand element {child.tag!r}")
 
@@ -362,18 +376,7 @@ def events(elem, div_depth, in_line):
         elif not (child.tail is None or child.tail.strip() == ""):
             raise ValueError(f"non-whitespace text outside line: {child.tail!r}")
 
-    # If we were not originally in a line when this function was called, but we
-    # are in a line here at the end, yield a LINE_END event. This can happen
-    # when lines are delimited by <lb/> and also enclosed in another element
-    # such as <p></p>.
-    #   <p>
-    #   <lb/>line 1
-    #   <lb/>line 2
-    #   </p>  ← LINE_END inserted here.
-    #   <lb/>line 3
-    if not originally_in_line and in_line:
-        yield Event(Event.Type.LINE_END)
-        in_line = False
+    return in_line
 
 def filter_events(events):
     # An adjusted iterator over events that lets you defer events until after
