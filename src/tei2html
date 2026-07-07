@@ -680,10 +680,16 @@ summary, .word {
     # avoid duplicated.
     seen_ids = set()
 
-    book_n = None
+    # We will emit a heading for each book, detecting a transition between books
+    # when loc.book_n changes. For the first book, use a special sentinel
+    # NO_BOOK value. (It cannot have the value None, because None is a valid
+    # value of loc.book_n.)
+    NO_BOOK = object()
+    book_n = NO_BOOK
     for loc, line in doc.lines():
         if loc.book_n != book_n:
-            if book_n is not None:
+            if book_n is not NO_BOOK:
+                # End the previous book.
                 print_end_tag("div")
                 print_end_tag("section")
             print()
@@ -696,14 +702,15 @@ summary, .word {
 
             # Begin book.
             print_start_tag("section", (
-                ("id", book_id) if book_id else None,
-                ("data-bookno", loc.book_n),
+                ("id", book_id) if book_id is not None else None,
+                ("data-bookno", loc.book_n) if loc.book_n is not None else None,
             ))
 
-            with html_element("h2", end=""):
-                with html_element("a", (("href", f"#book-{loc.book_n}"),), end=""):
-                    print(esc(loc.book_n), end="")
-            print()
+            if loc.book_n is not None:
+                with html_element("h2", end=""):
+                    with html_element("a", (("href", f"#book-{loc.book_n}"),), end=""):
+                        print(esc(loc.book_n), end="")
+                print()
 
             print("""\
 <div class="grid-markers grid">
@@ -908,7 +915,7 @@ summary, .word {
         print_start_tag("br")
 
     # End book.
-    if book_n is not None:
+    if book_n is not NO_BOOK:
         print_end_tag("div")
         print_end_tag("section")
 
