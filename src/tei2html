@@ -228,6 +228,15 @@ def windows(seq, n):
 def windows_2(seq):
     return windows(seq, 2)
 
+# Return a string suitable for an HTML id, taking what is not None from book_n,
+# line_n, and word_n. Returns None if all arguments are None.
+def loc_id(book_n = None, line_n = None, word_n = None):
+    return "-".join(f"{type}-{n}" for type, n in (
+        ("book", book_n),
+        ("line", line_n),
+        ("word", word_n),
+    ) if n is not None) or None
+
 def process(f, work_identifier, expectancy, dist_vars, cond_vars, merge_word):
     doc = tei.TEI(f)
 
@@ -660,13 +669,6 @@ summary, .word {
                       ", ".join(f"<var>{esc(var)}</var>" for var in cond_vars),
 ))
 
-    print_start_tag("article")
-
-    with html_element("header"):
-        with html_element("h1", end=""):
-            print(esc(normalize(doc.title)), end="")
-        print()
-
     # Values of cond_vars whose expectancy entries we actually need for this
     # text, built up as we go.
     expectancy_needed = set()
@@ -680,30 +682,46 @@ summary, .word {
     # avoid duplicated.
     seen_ids = set()
 
-    book_n = None
+    print_start_tag("article")
+
+    with html_element("header"):
+        with html_element("h1", end=""):
+            print(esc(normalize(doc.title)), end="")
+        print()
+
+    # We will emit a heading for each book, detecting a transition between books
+    # when loc.book_n changes. For the first book, use a special sentinel
+    # NO_BOOK value. (It cannot have the value None, because None is a valid
+    # value of loc.book_n.)
+    NO_BOOK = object()
+    book_n = NO_BOOK
     for loc, line in doc.lines():
         if loc.book_n != book_n:
-            if book_n is not None:
+            if book_n is not NO_BOOK:
+                # End the previous book.
                 print_end_tag("div")
                 print_end_tag("section")
             print()
 
-            book_id = f"book-{loc.book_n}"
-            if book_id in seen_ids:
+            book_id = loc_id(loc.book_n)
+            if book_id is None:
+                pass
+            elif book_id in seen_ids:
                 book_id = None
             else:
                 seen_ids.add(book_id)
 
             # Begin book.
             print_start_tag("section", (
-                ("id", book_id) if book_id else None,
-                ("data-bookno", loc.book_n),
+                ("id", book_id) if book_id is not None else None,
+                ("data-bookno", loc.book_n) if loc.book_n is not None else None,
             ))
 
-            with html_element("h2", end=""):
-                with html_element("a", (("href", f"#book-{loc.book_n}"),), end=""):
-                    print(esc(loc.book_n), end="")
-            print()
+            if loc.book_n is not None:
+                with html_element("h2", end=""):
+                    with html_element("a", (("href", f"#{book_id}") if book_id is not None else None,), end=""):
+                        print(esc(loc.book_n), end="")
+                print()
 
             print("""\
 <div class="grid-markers grid">
@@ -728,17 +746,19 @@ summary, .word {
             print("<div class=text>")
         book_n = loc.book_n
 
-        line_id = f"book-{loc.book_n}-line-{loc.line_n}"
-        if line_id in seen_ids:
+        line_id = loc_id(loc.book_n, loc.line_n)
+        if line_id is None:
+            pass
+        elif line_id in seen_ids:
             line_id = None
         else:
             seen_ids.add(line_id)
 
         # Begin line.
         print_start_tag("span", (
-            ("id", line_id) if line_id else None,
+            ("id", line_id) if line_id is not None else None,
             ("class", "line"),
-            ("data-lineno", f"{loc.line_n}"),
+            ("data-lineno", f"{loc.line_n}") if loc.line_n is not None else None,
         ), end="")
 
         # tokens_between returns a sequence of tokens in line.tokens between the
@@ -841,7 +861,7 @@ summary, .word {
                     # we have already emitted a line with that number, and we do not
                     # want to have ids on just the last few words of this line, when
                     # this line has more words than the already emitted one.
-                    word_attrs["id"] = f"book-{loc.book_n}-line-{loc.line_n}-word-{word_n}"
+                    word_attrs["id"] = loc_id(loc.book_n, loc.line_n, word_n)
                 word_attrs["class"] = "word"
                 word_attrs["data-wordno"] = str(word_n)
                 # Join the lemmata of every word in the group with spaces, as
@@ -907,7 +927,8 @@ summary, .word {
         print_end_tag("span")
         print_start_tag("br")
 
-    if book_n is not None:
+    # End book.
+    if book_n is not NO_BOOK:
         print_end_tag("div")
         print_end_tag("section")
 
