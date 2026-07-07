@@ -844,7 +844,7 @@ summary, .word {
                 print(esc(normalize("".join(token.text for token in tokens_between(prev_group_end_index, this_group_start_index)))), end="")
 
             # This conditional code runs in every iteration but the last. The
-            # last iteration is only to output training nonword tokens in the
+            # last iteration is only to output trailing nonword tokens in the
             # line, which has just happened up above.
             if group is not None:
                 word = " ".join(line.tokens[tokens_word_index[i]].text for i in group)
