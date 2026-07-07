@@ -627,6 +627,10 @@ class TEI:
     def author(self):
         return "".join(self.tree.find(f"./{NS}teiHeader/{NS}fileDesc/{NS}titleStmt/{NS}author").itertext())
 
+    @property
+    def source_title(self):
+        return "".join(self.tree.find(f"./{NS}teiHeader/{NS}fileDesc/{NS}sourceDesc/{NS}biblStruct/{NS}monogr/{NS}title").itertext())
+
     def lines(self):
         """Return an iterator over (Locator, str) extracted from the text of the
         TEI document."""
