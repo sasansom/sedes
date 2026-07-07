@@ -907,6 +907,7 @@ summary, .word {
         print_end_tag("span")
         print_start_tag("br")
 
+    # End book.
     if book_n is not None:
         print_end_tag("div")
         print_end_tag("section")
