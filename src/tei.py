@@ -289,7 +289,7 @@ def events(elem, div_depth, in_line):
             else:
                 raise ValueError(f"unknown div type={div_type!r} subtype={div_subtype!r} at nesting level {div_depth}")
             div_depth += 1
-        elif child.tag == f"{NS}l":
+        elif child.tag == f"{NS}l" and "argument" not in parse_rend(child.get("rend")):
             # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
             if in_line:
                 yield Event(Event.Type.LINE_END)
@@ -358,7 +358,7 @@ def events(elem, div_depth, in_line):
             div_depth -= 1
             if div_depth == 1 and div_type == "textpart" and div_subtype in ("book", "Book", "poem", "Poem"):
                 yield Event(Event.Type.BOOK_END)
-        elif child.tag == f"{NS}l":
+        elif child.tag == f"{NS}l" and "argument" not in parse_rend(child.get("rend")):
             assert in_line
             in_line = False
             yield Event(Event.Type.LINE_END)
