@@ -54,6 +54,16 @@ corpus/callimachushymns.csv: \
 $(WORKS_HTML): .EXTRA_PREREQS = src/tei2html src/known.py src/lemma.py src/appositive.py src/lemma-overrides.csv src/exceptional-appositives.csv
 sedes-web/%.html: corpus/%.xml expectancy.all.csv
 	src/tei2html "$(WORK_IDENTIFIER_$*)" $^ > "$@"
+sedes-web/homerichymns.html: $(foreach n,01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33,corpus/homerichymns-$n.xml) expectancy.all.csv
+	src/tei2html "$(WORK_IDENTIFIER_homerichymns)" $^ > "$@"
+sedes-web/callimachushymns.html: \
+	corpus/callimachushymns-01.xml \
+	corpus/callimachushymns-02.xml \
+	corpus/callimachushymns-03.xml \
+	corpus/callimachushymns-04.xml \
+	corpus/callimachushymns-06.xml \
+	expectancy.all.csv
+	src/tei2html "$(WORK_IDENTIFIER_callimachushymns)" $^ > "$@"
 
 PYTHON = python3
 
