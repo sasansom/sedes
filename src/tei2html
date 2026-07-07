@@ -669,13 +669,6 @@ summary, .word {
                       ", ".join(f"<var>{esc(var)}</var>" for var in cond_vars),
 ))
 
-    print_start_tag("article")
-
-    with html_element("header"):
-        with html_element("h1", end=""):
-            print(esc(normalize(doc.title)), end="")
-        print()
-
     # Values of cond_vars whose expectancy entries we actually need for this
     # text, built up as we go.
     expectancy_needed = set()
@@ -688,6 +681,13 @@ summary, .word {
     # Cache of already emitted automatically generated HTML element ids, to
     # avoid duplicated.
     seen_ids = set()
+
+    print_start_tag("article")
+
+    with html_element("header"):
+        with html_element("h1", end=""):
+            print(esc(normalize(doc.title)), end="")
+        print()
 
     # We will emit a heading for each book, detecting a transition between books
     # when loc.book_n changes. For the first book, use a special sentinel
