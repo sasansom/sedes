@@ -87,8 +87,10 @@ It is by Hope Ranker and comes from https://github.com/epilanthanomai/hexameter.
 
 ## Corpus
 
-The "corpus" subdirectory contains selected TEI-encoded XML texts downloaded from
-[Perseus](https://www.perseus.tufts.edu/hopper/).
+The "corpus" subdirectory contains selected TEI-encoded XML texts.
+The texts come from the [master](https://github.com/sasansom/canonical-greekLit/tree/master) branch of the repository
+https://github.com/sasansom/canonical-greekLit,
+and ultimately from Perseus at https://github.com/PerseusDL/canonical-greekLit.
 These are suitable for input to `tei2csv` and `tei2html`.
 
 
