@@ -2,13 +2,16 @@
 # XML files.
 # https://tei-c.org/release/doc/tei-p5-doc/en/html/index.html
 
-import copy
 import enum
 import re
 import sys
 import xml.etree.ElementTree
+import unicodedata
 
-import betacode
+# The TEI XML namespace, contained in curly brackets as conventional for xml.etree.ElementTree.
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/USE.html#CFNS
+# https://docs.python.org/3/library/xml.etree.elementtree.html#parsing-xml-with-namespaces
+NS = "{http://www.tei-c.org/ns/1.0}"
 
 def split_line_n(line_n):
     """Split a line number string into an (integer, everything else) pair. A
@@ -21,7 +24,8 @@ def split_line_n(line_n):
     return int(number), extra
 
 class Locator:
-    """A combination of a book (div1) number and a line number."""
+    """A combination of a book number (attribute @n in <div type="textpart" subtype="book" n="...">)
+    and a line number (attribute @n in <l n="...">)."""
 
     def __init__(self, book_n=None, line_n=None):
         self.book_n = book_n
@@ -49,15 +53,466 @@ class Locator:
     def __repr__(self):
         return repr(str(self))
 
-class Environment:
-    """Environment represents the context of a call to TEI.do_elem."""
+# Parse a @rend attribute. The return value is a set which contains all the
+# tokens included in the attribute. According to the TEI specification, the
+# delimiter between tokens is whitespace only; but Perseus texts use whitespace
+# and a semicolon.
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.global.rendition.html#tei_att.rend
+# "The values of the rend attribute are a set of sequence-indeterminate
+# individual tokens separated by whitespace."
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/ST.html#STGAre
+# "The @rend attribute values are sequence-indeterminate set of
+# whitespace-separated tokens."
+def parse_rend(s):
+    if s is None:
+        return set()
+    else:
+        return set(re.findall(r'[^\s;]+', s))
 
-    def __init__(self):
-        self.book_n = None
-        self.in_line = False # Are we in a context that counts as being part of a line (i.e., not between l elements)?
+# Extracting metrically isolated lines of text from a TEI document is tricky in
+# the general case, because the divisions in the XML structure of TEI do not
+# always correspond to the line divisions we want. The main difficulties have to
+# do with metrical lines divided across typographic lines, and with quotations.
+# (Which are both instances of overlapping hierarchies.)
+#
+# Lines may be delimited by l or lb elements. l *encloses* lines, while lb
+# ("line beginning") *separates* lines.
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
+# Perseus 6 mostly prefers l over lb, but we understand both.
+#
+#   <l n="1">first line</l>
+#   <l n="2">second line</l>
+#
+#   <lb n="1"/>first line
+#   <lb n="2"/>second line
+#
+# One line at the metrical level may be made up of multiple lines at the TEI
+# level. This is indicated by the @part attribute.
+# https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.fragmentable.html#tei_att.part
+# An unset @part indicates a complete line. Otherwise, @part may be "I"
+# (initial), "M" (medial), or "F" (final). There may be one "I" part, followed
+# by any number of "M" parts, followed by one "F" part. @part only works with
+# the l element, not lb.
+#
+#   <l n="1" part="I">complete first line</l>
+#   <l n="2" part="I">initial part of second line</l>
+#   <l n="2b" part="F">final part of second line</l>
+#   <l n="3" part="I">initial part of third line</l>
+#   <l n="3b" part="M">medial part of third line</l>
+#   <l n="3c" part="F">final part of third line</l>
+#
+# Lines may be interleaved with quotations (q elements) in various ways. The
+# simplest case is when a quotation is contained entirely within a single line
+# (no difficulties with overlapping hierarchies in this case):
+#
+#   <l n="1">Say <q>goodnight</q>, Gracie</l>
+#
+#   <lb n="1"/>Say <q>goodnight</q>, Gracie
+#
+# A q element may *enclose* multiple while lines. When this happens, we
+# interpret it as if there where an opening quotation mark at the beginning of
+# the first enclosed line, and a closing quotation mark at the end of the final
+# enclosed line.
+#
+#   <l n="1">The priestess of Mercury intones:</l>
+#   <q>
+#   <l n="2">Pilgrim, you enter</l>
+#   <l n="3">a sacred place!</l>
+#   </q>
+#   <l n="4">You experience a sense of peace.</l>
+#
+# With lb elements, q elements may span multiple lines and may begin and end at
+# the beginning, end, or middle of lines:
+#
+#   <lb n="1"/>She said: <q>I think
+#   <lb n="2"/>that you should leave</q>
+#   <lb n="3"/>before long.</q><q>Only
+#   <lb n="4"/>too gladly</q> was the other's reply.
 
-    def copy(self):
-        return copy.copy(self)
+# To cope with these challenges, we parse TEI in multiple layers. The lowest
+# layer, the events function below, digests the hierarchical XML structure and
+# decomposes it into a nonhierarchical sequence of "events", represented by the
+# Event type (which is internal to this module). Events are things like
+# LINE_BEGIN and LINE_END, QUOTE_BEGIN and QUOTE_END. At this layer, the events
+# are not necessarily interleaved semantically they way we want them: for
+# example, <q><l></l><l></l></q> will have the QUOTE_BEGIN and QUOTE_END events
+# entirely outside the LINE_BEGIN and LINE_END events. Partial lines are not
+# joined but are represented by multiple LINE_BEGIN/LINE_END pairs.
+#
+# The next layer up is the filter_events function. This function consumes the
+# low-level sequence of events and makes local adjustments to make the sequence
+# more amenable to interpretation. It pushes QUOTE_BEGIN and QUOTE_END "inside"
+# the lines they belong to, joins partial lines, and merges quotations.
+#
+# The top layer is TEI.lines, which consumes the processed sequence of events
+# from filter_events. Comparatively little processing is required at this layer,
+# mostly just bundling up text between successive LINE_BEGIN and LINE_END
+# events.
+
+# The meaning of the data field depends on the event type:
+# BOOK_BEGIN: book number (as a string)
+# BOOK_END: not allowed
+# LINE_BEGIN: (line_n, line_part), where line_n is a string or None and line_part is "I", "M", "F", or None
+# LINE_END: not allowed
+# QUOTE_BEGIN: boolean indicating rend="merge" or not
+# QUOTE_END: not allowed
+# TEXT: text content
+class Event:
+    class Type(enum.Enum):
+        BOOK_BEGIN = enum.auto()
+        BOOK_END = enum.auto()
+        LINE_BEGIN = enum.auto()
+        LINE_END = enum.auto()
+        QUOTE_BEGIN = enum.auto()
+        QUOTE_END = enum.auto()
+        TEXT = enum.auto()
+
+    def __init__(self, type, data = None):
+        self.type = type
+        if type in (Event.Type.BOOK_END, Event.Type.LINE_END, Event.Type.QUOTE_END,):
+            assert data is None, (type, data)
+        self.data = data
+
+    def __repr__(self):
+        if self.data is None:
+            return f"Event({self.type})"
+        else:
+            return f"Event({self.type}, {self.data!r}))"
+
+# Elements that should have whitespace trimmed from the beginning and end of
+# their contents. Perseus texts often have whitespace at the ends of lines,
+# especially. We don't want it in any case, but if not removed, it causes
+# problems with quotation merging in cases like this:
+#   <l><q>hello there</q> </l>
+#   <l><q rend="merge">world</q>.</l>
+# The space at the end of the first line looks like content between the
+# quotations, which causes an error when the <q rend="merge"> sees it's not
+# immediately adjacent to a preceding </q>.
+TRIM_WHITESPACE_ELEMENTS = set((f"{NS}l", f"{NS}q"))
+
+# Helper function for trim_whitespace. Trim whitespace from the left side of
+# elem *in place*, recursing into child elements and also trimming elem.tail if
+# there was no non-whitespace text inside the element itself. The return value
+# is a boolean flag that is true when *all* this element's text was removed for
+# being whitespace; i.e., when the caller should keep trimming in the next
+# sibling element.
+def trim_whitespace_left(elem):
+    flag = True
+    if flag and elem.text is not None:
+        elem.text = elem.text.lstrip()
+        flag = not elem.text
+    for child in elem:
+        if not flag:
+            break
+        flag = trim_whitespace_left(child)
+    if flag and elem.tail is not None:
+        elem.tail = elem.tail.lstrip()
+        flag = not elem.tail
+    return flag
+
+# Helper function for trim_whitespace. Trim whitespace from the right side of
+# elem *in place*, starting from elem.tail and recursing into child elements in
+# reverse order. there was no non-whitespace text inside the element itself. The
+# return value is a boolean flag that is true when *all* this element's text was
+# removed for being whitespace; i.e., when the caller should keep trimming in
+# the previous sibling element.
+def trim_whitespace_right(elem):
+    flag = True
+    if flag and elem.tail is not None:
+        elem.tail = elem.tail.rstrip()
+        flag = not elem.tail
+    for child in reversed(elem):
+        if not flag:
+            break
+        flag = trim_whitespace_right(child)
+    if flag and elem.text is not None:
+        elem.text = elem.text.rstrip()
+        flag = not elem.text
+    return flag
+
+# Trim leading and trailing whitespace from elem *in place*, recursing into
+# child elements until hitting the first non-whitespace text character from the
+# left and the right. For example, given this input:
+#   <a>   <b>  X <c> Y </c>   </b>Z </a>
+# this function will transform it into
+#        <a><b>X <c> Y </c>   </b>Z</a>
+# Unlike trim_whitespace_left and trim_whitespace_right, this function never
+# touches elem.tail (which is after the end tag).
+def trim_whitespace(elem):
+    # Left whitespace.
+    flag = True
+    if flag and elem.text is not None:
+        elem.text = elem.text.lstrip()
+        flag = not elem.text
+    for child in elem:
+        if not flag:
+            break
+        flag = trim_whitespace_left(child)
+
+    # Right whitespace.
+    flag = True
+    for child in reversed(elem):
+        if not flag:
+            break
+        flag = trim_whitespace_right(child)
+    if flag and elem.text is not None:
+        elem.text = elem.text.rstrip()
+        flag = not elem.text
+
+# Generate a sequence of raw Events from a TEI element. div_depth is the number
+# of div elements that are ancestors of elem. in_line indicates whether the
+# given elem is inside a line (within <l></l> or after <lb/>). The return value
+# is the value of in_line on exiting the function.
+def events(elem, div_depth, in_line):
+    # Count the child elements of elem because there's special handling of
+    # child.tail in the final child element only.
+    num_children = sum(1 for _ in elem)
+    for (n, child) in enumerate(elem):
+        if child.tag in TRIM_WHITESPACE_ELEMENTS:
+            trim_whitespace(child)
+
+        if child.tag == f"{NS}div":
+            # https://tei-c.org/release/doc/tei-p5-doc/en/html/DS.html#DSDIV1
+            div_type = child.get("type")
+            div_subtype = child.get("subtype")
+            if div_depth == 0 and div_type in ("edition",):
+                pass
+            elif div_depth == 1 and div_type == "textpart" and div_subtype in ("book", "Book", "poem", "Poem"):
+                yield Event(Event.Type.BOOK_BEGIN, child.get("n"))
+            elif div_depth >= 1 and div_type == "textpart" and div_subtype is None:
+                # Hom.Hymn 3 uses <div type="textpart"> with no subtype
+                # to separate the Delian and Pythian parts.
+                # https://github.com/PerseusDL/canonical-greekLit/blob/2f26022a1c47089e6469b44d78f14b94aedc447d/data/tlg0013/tlg003/tlg0013.tlg003.perseus-grc2.xml#L85
+                # https://github.com/PerseusDL/canonical-greekLit/blob/2f26022a1c47089e6469b44d78f14b94aedc447d/data/tlg0013/tlg003/tlg0013.tlg003.perseus-grc2.xml#L85
+                pass
+            else:
+                raise ValueError(f"unknown div type={div_type!r} subtype={div_subtype!r} at nesting level {div_depth}")
+            div_depth += 1
+        elif child.tag == f"{NS}l" and "argument" not in parse_rend(child.get("rend")):
+            # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
+            if in_line:
+                yield Event(Event.Type.LINE_END)
+            in_line = True
+            yield Event(Event.Type.LINE_BEGIN, (child.get("n"), child.get("part")))
+        elif child.tag == f"{NS}lb":
+            # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
+            if in_line:
+                yield Event(Event.Type.LINE_END)
+            in_line = True
+            if child.get("part") is not None:
+                raise ValueError(f"the part attribute is not allowed on the lb element")
+            yield Event(Event.Type.LINE_BEGIN, (child.get("n"), None))
+        elif child.tag == f"{NS}q":
+            # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
+            # Set a flag if the q element's @rend attribute contains the token
+            # "merge". Perseus uses this token to indicate that this quotation
+            # should be merged with one that was enclosed in a preceding
+            # element.
+            merge = "merge" in parse_rend(child.get("rend"))
+            yield Event(Event.Type.QUOTE_BEGIN, merge)
+
+        if (
+            child.tag in (f"{NS}milestone", f"{NS}head", f"{NS}gap", f"{NS}pb", f"{NS}note", f"{NS}speaker", f"{NS}label")
+            # nonnusdionysiaca.xml uses <l rend="argument"> for per-book headings.
+            # https://github.com/sasansom/sedes/issues/57#issuecomment-3348714105
+            or (child.tag == f"{NS}l" and "argument" in parse_rend(child.get("rend")))
+        ):
+            # Ignore the contents of these elements.
+            pass
+        elif child.tag in (
+            f"{NS}div",
+            f"{NS}l", f"{NS}lb", f"{NS}lg", f"{NS}p", f"{NS}sp",
+            f"{NS}q",
+            f"{NS}add", f"{NS}del", f"{NS}name", f"{NS}supplied", f"{NS}surplus", f"{NS}sic",
+        ):
+            # Handle any text after the start tag, preceding the first child
+            # element. If we're in a line, yield a TEXT event. Outside a line,
+            # ignore whitespace and raise an error for any non-whitespace.
+            if in_line:
+                if child.text:
+                    yield Event(Event.Type.TEXT, child.text)
+            elif not (child.text is None or child.text.strip() == ""):
+                raise ValueError(f"non-whitespace text outside line: {child.text!r}")
+
+            # Recurse into the children of this element.
+            sub_in_line = yield from events(child, div_depth, in_line)
+            if not in_line and sub_in_line:
+                # If we were not originally in a line when this function was
+                # called, but we are in a line here at the end, yield a LINE_END
+                # event. This can happen when lines are delimited by <lb/> and
+                # also enclosed in another element such as <p></p>.
+                #   <p>
+                #   <lb/>line 1
+                #   <lb/>line 2
+                #   </p>  ← LINE_END inserted here.
+                #   <lb/>line 3
+                yield Event(Event.Type.LINE_END)
+                in_line = False
+            else:
+                in_line = sub_in_line
+        else:
+            raise ValueError(f"don't understand element {child.tag!r}")
+
+        if child.tag == f"{NS}div":
+            div_depth -= 1
+            if div_depth == 1 and div_type == "textpart" and div_subtype in ("book", "Book", "poem", "Poem"):
+                yield Event(Event.Type.BOOK_END)
+        elif child.tag == f"{NS}l" and "argument" not in parse_rend(child.get("rend")):
+            assert in_line
+            in_line = False
+            yield Event(Event.Type.LINE_END)
+        elif child.tag == f"{NS}lb":
+            pass
+        elif child.tag == f"{NS}q":
+            yield Event(Event.Type.QUOTE_END)
+
+        # Handle any text after the end tag. If we're in a line, yield a TEXT
+        # event. Outside a line, ignore whitespace and raise an error for any
+        # non-whitespace.
+        if in_line:
+            if child.tail:
+                yield Event(Event.Type.TEXT, child.tail)
+        elif not (child.tail is None or child.tail.strip() == ""):
+            raise ValueError(f"non-whitespace text outside line: {child.tail!r}")
+
+    return in_line
+
+def filter_events(events):
+    # An adjusted iterator over events that lets you defer events until after
+    # the next LINE_BEGIN event by appending them to after_next_line_begin.
+    after_next_line_begin = []
+    def deferred(events):
+        for event in events:
+            yield event
+            if event.type == Event.Type.LINE_BEGIN:
+                for event in after_next_line_begin:
+                    yield event
+                after_next_line_begin.clear()
+    # A buffer of events that have not been output yet.
+    buf = []
+    # Whether we are currently in a line.
+    in_line = False
+    # prev_line_part is the @part attribute of the previous line. It is None
+    # when there is no previous line yet, or when the previous line had the
+    # attribute unset. Otherwise it may have the value "I", "M", or "F" for the
+    # initial, medial, or final part of a line.
+    # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.fragmentable.html#tei_att.part
+    # When prev_line_part is not None, it means the previous line was incomplete
+    # and will be extended by the current line.
+    prev_line_part = None
+    # The index in buf of the most recent LINE_END event, set whenever we may
+    # still need to insert a QUOTE_BEGIN event before the end of the line.
+    most_recent_line_end = None
+    # A QUOTE_END inserted into buf may get canceled by a later QUOTE_BEGIN that
+    # requests merging. We track a stack of QUOTE_END elements, clearing the
+    # stack whenever something intervenes that would make merging impossible,
+    # like unquoted text or a book boundary. LINE_BEGIN and LINE_END do not
+    # prevent merging.
+    unresolved_quote_ends = []
+    for event in deferred(events):
+        if event.type == Event.Type.BOOK_BEGIN:
+            in_line = False
+            assert not buf, buf
+            assert prev_line_part is None, prev_line_part
+            assert not unresolved_quote_ends, unresolved_quote_ends
+            most_recent_line_end = None
+            buf.append(event)
+        elif event.type == Event.Type.BOOK_END:
+            in_line = False
+            if not (prev_line_part is None or prev_line_part == "F"):
+                raise ValueError(f"unfinished line part at BOOK_END: part={prev_line_part!r}")
+            prev_line_part = None
+            most_recent_line_end = None
+            # Quotations cannot merge across book boundaries.
+            unresolved_quote_ends.clear()
+            buf.append(event)
+        elif event.type == Event.Type.LINE_BEGIN:
+            assert not in_line, event
+            in_line = True
+
+            line_n, line_part = event.data
+            if (prev_line_part is None or prev_line_part == "F") and (line_part is None or line_part == "I"):
+                # This is the the beginning of a new line (the usual case).
+                # Remove the line_part from the event, because it is needed only
+                # by this processing layer.
+                buf.append(Event(Event.Type.LINE_BEGIN, (line_n, None)))
+            elif ((prev_line_part == "I" and (line_part == "M" or line_part == "F")) or
+                  (prev_line_part == "M" and (line_part == "M" or line_part == "F"))):
+                # This is a continuation of the previous line. Throw away this
+                # LINE_BEGIN event (and its line number) and replace the earlier
+                # LINE_END with a space.
+                buf[most_recent_line_end] = Event(Event.Type.TEXT, " ")
+            else:
+                raise ValueError(f"unhandled sequence of @part: {prev_line_part!r}, {line_part!r}")
+            prev_line_part = line_part
+
+            most_recent_line_end = None
+            # LINE_BEGIN and LINE_END do not affect unresolved_quote_ends.
+        elif event.type == Event.Type.LINE_END:
+            assert in_line, event
+            in_line = False
+            most_recent_line_end = len(buf)
+            # LINE_BEGIN and LINE_END do not affect unresolved_quote_ends.
+            buf.append(event)
+        elif event.type == Event.Type.QUOTE_BEGIN:
+            merge = event.data
+            if merge:
+                # Cancel the most recent QUOTE_END and throw away this QUOTE_BEGIN.
+                assert most_recent_line_end is None, most_recent_line_end
+                try:
+                    unresolved_quote_end = unresolved_quote_ends.pop()
+                except IndexError:
+                    raise ValueError("<q rend=\"merge\"> without a preceding </q>")
+                buf.pop(unresolved_quote_end)
+            else:
+                # A non-merge QUOTE_BEGIN resolves all outstanding QUOTE_END.
+                unresolved_quote_ends.clear()
+                if in_line:
+                    # Add this QUOTE_BEGIN to the events of this line.
+                    buf.append(event)
+                else:
+                    # We're not currently in a line; save this QUOTE_BEGIN to go
+                    # after the next LINE_BEGIN.
+                    after_next_line_begin.append(event)
+        elif event.type == Event.Type.QUOTE_END:
+            if in_line:
+                # We may end up canceling this QUOTE_END, if there's a future
+                # "merge" QUOTE_BEGIN.
+                unresolved_quote_ends.append(len(buf))
+                # Add this QUOTE_END to the events of this line.
+                buf.append(event)
+            else:
+                # We're not currently in a line; insert this QUOTE_END at the
+                # end of the most recent line.
+                assert most_recent_line_end is not None
+                # Likewise, we may end up canceling this QUOTE_END later.
+                unresolved_quote_ends.append(most_recent_line_end)
+                buf.insert(most_recent_line_end, event)
+                most_recent_line_end += 1
+        elif event.type == Event.Type.TEXT:
+            assert in_line, event
+            # Any text between quotes resolves all outstanding QUOTE_END.
+            unresolved_quote_ends.clear()
+            # Add this TEXT event to the current line.
+            buf.append(event)
+        else:
+            raise ValueError(event.type)
+        # If prev_line_part and most_recent_line_end are unset, and
+        # unresolved_quote_ends is empty, there is nothing in buf that we may
+        # have to adjust. Flush it all to the output.
+        if (
+            prev_line_part is None and
+            most_recent_line_end is None and
+            not unresolved_quote_ends
+        ):
+            for event in buf:
+                yield event
+            buf.clear()
+    for event in buf:
+        yield event
+    if not (prev_line_part is None or prev_line_part == "F"):
+        raise ValueError(f"unfinished line part at BOOK_END: part={prev_line_part!r}")
 
 class Token:
     """Token represents part of a text string, distinguishing words from
@@ -82,6 +537,18 @@ class Token:
 def tokenize_text(text):
     """Split text into a sequence of WORD and NONWORD tokens."""
 
+    text = unicodedata.normalize("NFD", text)
+
+    # Normalize quotation marks. Perseus texts often use U+02BC MODIFIER LETTER
+    # APOSTROPHE as an apostrophe, rather than U+2019 RIGHT SINGLE QUOTATION MARK:
+    # https://github.com/sasansom/sedes/issues/57#issuecomment-830509464
+    # The use of U+02BC for right-quote is by design. The presence of its
+    # left-quote counterpart U+02BD MODIFIER LETTER REVERSED COMMA, however, is
+    # an error: that only appears in contexts where text quotation marks should
+    # be replace with <q> elements, or in other erroneous contexts.
+    assert "\u02bd" not in text, text
+    text = text.replace("\u02bc", "\u2019")
+
     prev_end = 0
     for m in re.finditer("[\\w\u0313\u0314\u0301\u0342\u0300\u0308\u0345\u0323\u2019]+", text):
         nonword = text[prev_end:m.start()]
@@ -95,13 +562,6 @@ def tokenize_text(text):
     nonword = text[prev_end:]
     if nonword:
         yield Token(Token.Type.NONWORD, nonword)
-
-def tokenize_betacode(beta):
-    """Decode text from beta code, then split into a sequence of WORD and
-    NONWORD tokens."""
-    if "?" in beta:
-        raise ValueError("\"?\" not allowed in beta code; see https://github.com/sasansom/sedes/issues/11")
-    return tokenize_text(betacode.decode(beta))
 
 def consolidate_tokens(tokens):
     """Consolidate runs of consecutive WORD and NONWORD tokens."""
@@ -161,189 +621,48 @@ class TEI:
 
     @property
     def title(self):
-        return "".join(self.tree.find("./teiHeader/fileDesc/titleStmt/title").itertext())
+        return "".join(self.tree.find(f"./{NS}teiHeader/{NS}fileDesc/{NS}titleStmt/{NS}title").itertext())
 
     @property
     def author(self):
-        return "".join(self.tree.find("./teiHeader/fileDesc/titleStmt/author").itertext())
+        return "".join(self.tree.find(f"./{NS}teiHeader/{NS}fileDesc/{NS}titleStmt/{NS}author").itertext())
+
+    @property
+    def source_title(self):
+        return "".join(self.tree.find(f"./{NS}teiHeader/{NS}fileDesc/{NS}sourceDesc/{NS}biblStruct/{NS}monogr/{NS}title").itertext())
 
     def lines(self):
         """Return an iterator over (Locator, str) extracted from the text of the
         TEI document."""
 
-        # Internally this function works using recursion in the do_elem
-        # function. The current line number (line_n), and the partial contents
-        # of the current line (partial) are shared in common across all calls,
-        # in contrast to the Environment (env), which belongs to one call. The
-        # flush function is called at the end of a line to yield a line to the
-        # caller.
-        line_n = None
-        # partial contains a mix of betacode strings and literal Tokens. The
-        # flush function converts the betacode strings to Tokens themselves.
-        partial = []
-        # next_partial is a list of tokens to be prepended to the beginning of
-        # the next line, when it starts.
-        next_partial = []
+        cur_loc = Locator(None, None)
+        tokens = []
 
-        def flush(env):
-            """Yield the Line represented by the current partial list and clear
-            the list."""
-            nonlocal line_n, partial
-
-            # Convert betacode strings to tokens, output tokens directly.
-            tokens = []
-            for x in partial:
-                if type(x) == str:
-                    tokens.extend(tokenize_betacode(x))
+        for event in filter_events(events(self.tree.find(f".//{NS}text/{NS}body"), 0, False)):
+            if event.type == Event.Type.BOOK_BEGIN:
+                book_n = event.data
+                cur_loc = Locator(book_n, None)
+            elif event.type == Event.Type.BOOK_END:
+                cur_loc = Locator(None, None)
+            elif event.type == Event.Type.LINE_BEGIN:
+                assert not tokens, tokens
+                line_n, _ = event.data
+                if line_n is not None:
+                    # If this line has an explicit number, use it.
+                    new_loc = Locator(cur_loc.book_n, line_n)
                 else:
-                    tokens.append(x)
-            partial.clear()
+                    # If there's no explicit line number, guess based on the
+                    # previous line number.
+                    new_loc = cur_loc.successor()
+                cur_loc = new_loc
+            elif event.type == Event.Type.LINE_END:
+                yield cur_loc, Line(trim_tokens(tokens))
+                tokens.clear()
+            elif event.type == Event.Type.QUOTE_BEGIN:
+                tokens.append(Token(Token.Type.OPEN_QUOTE, "‘"))
+            elif event.type == Event.Type.QUOTE_END:
+                tokens.append(Token(Token.Type.CLOSE_QUOTE, "’"))
+            elif event.type == Event.Type.TEXT:
+                tokens.extend(tokenize_text(event.data))
 
-            if tokens:
-                tokens = trim_tokens(tokens)
-                if tokens:
-                    yield Locator(env.book_n, line_n), Line(tokens)
-
-        def output_betacode(beta):
-            if not partial or type(partial[-1]) != str:
-                partial.append(beta)
-            else:
-                partial[-1] += beta
-
-        def output_token(token):
-            partial.append(token)
-
-        def do_elem(root, env):
-            nonlocal line_n, partial, next_partial
-
-            # Handle any text before the first child element.
-            if env.in_line and root.text is not None:
-                output_betacode(root.text)
-
-            for elem in root:
-                # Make a copy of the environment to pass to recursive calls to
-                # do_elem. This allows them to know, for example, what book_n
-                # they're in, while enabling us to remember the environment
-                # before the call.
-                sub_env = env.copy()
-
-                # Lines may be marked up as
-                #   <l n="100">text text text</l>
-                #   <lb n="100"/>text text text
-                # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html
-                # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html
-                if elem.tag in ("l", "lb"):
-                    # Output the previous line. l elements are also flushed
-                    # at the end of the loop iteration, where the
-                    # element is closed.
-                    yield from flush(env)
-
-                    partial.extend(next_partial)
-                    next_partial.clear()
-
-                    cur_loc = Locator(env.book_n, line_n)
-                    n = elem.get("n")
-                    if n is not None:
-                        # If the new line is marked with a number, check it
-                        # against the previous line.
-                        new_loc = Locator(env.book_n, n)
-                    else:
-                        # If no line number is provided, guess based on the
-                        # previous line number.
-                        new_loc = cur_loc.successor()
-                    assert env.book_n == new_loc.book_n
-                    line_n = new_loc.line_n
-
-                    if elem.tag == "l":
-                        env.in_line = False
-                        sub_env.in_line = True
-                    elif elem.tag == "lb":
-                        env.in_line = True
-                elif elem.tag == "div1":
-                    assert elem.get("type").lower() in ("book", "hymn", "poem"), elem.get("type")
-                    sub_env.book_n = elem.get("n")
-                    # Reset the line counter at the beginning of a new book.
-                    line_n = None
-
-                if elem.tag in ("milestone", "head", "gap", "pb", "note", "speaker"):
-                    pass
-                elif elem.tag in ("div1", "div2", "l", "lb", "p", "sp", "add", "del", "name", "supplied", "surplus"):
-                    yield from do_elem(elem, sub_env)
-                elif elem.tag == "q":
-                    # https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html
-                    # Quotation is tricky because it can appear in two forms
-                    # with essentially opposite nesting:
-                    #   <lb/><q>abcd abcd abcd
-                    #   <lb/>efgh efgh efgh efgh</q>
-                    #
-                    #   <q><l>abcd abcd abcd</l>
-                    #   <l>efgh efgh efgh</l></q>
-                    # There may even be an intervening element inside the q
-                    # element, as in:
-                    #   <q><p>
-                    #   <lb/>abcd abcd abcd
-                    #   <lb/>efgh efgh efgh efgh
-                    #   </p></q>
-                    # If we are in a line already, we add an open quotation mark
-                    # wherever the <q> appears; if not, we add the open
-                    # quotation mark to the next_partial queue to be added to
-                    # the beginning of the next line.
-                    # The first case is easy: we just add open and close
-                    # quotation marks where the open and close q tags
-                    # appear. In the second case, the q element doesn't
-                    # actually belong to either line; we have to migrate the
-                    # open quotation mark to the beginning of the first
-                    # line, and the close quotation mark to the end of the
-                    # last line.
-                    if env.in_line:
-                        output_token(Token(Token.Type.OPEN_QUOTE, "‘"))
-                    else:
-                        # Put the open quotation mark in a queue to be
-                        # prepended to the next line that begins.
-                        next_partial.append(Token(Token.Type.OPEN_QUOTE, "‘"))
-                    # Yield all but the final line within the quotation. The
-                    # final line is left in buf.
-                    buf = None
-                    for x in do_elem(elem, sub_env):
-                        if buf is not None:
-                            yield buf
-                        buf = x
-                    if partial:
-                        # If partial is non-empty, then that incomplete line,
-                        # and not buf, is the final partial line. Flush buf and
-                        # tokenize partial, then add the close quotation mark to
-                        # the end of partial.
-                        if buf is not None:
-                            yield buf
-                        tokens = []
-                        for x in partial:
-                            if type(x) == str:
-                                tokens.extend(tokenize_betacode(x))
-                            else:
-                                tokens.append(x)
-                        partial = trim_tokens(tokens)
-                        output_token(Token(Token.Type.CLOSE_QUOTE, "’"))
-                    else:
-                        # If partial is empty, then buf is the final line.
-                        # Append the close quotation mark to it.
-                        assert buf is not None, buf
-                        loc, line = buf
-                        line.tokens.append(Token(Token.Type.CLOSE_QUOTE, "’"))
-                        yield loc, line
-                else:
-                    raise ValueError("don't understand element {!r}".format(elem.tag))
-
-                if elem.tag == "l":
-                    yield from flush(env)
-                elif elem.tag == "div1":
-                    yield from flush(sub_env)
-                    # At the end of a book, reset the line counter to be safe.
-                    line_n = None
-
-                # Handle any text between this child element and the next child
-                # element, or between the end tag of this child element and the
-                # end tag of the parent element.
-                if env.in_line and elem.tail is not None:
-                    output_betacode(elem.tail)
-
-        yield from do_elem(self.tree.find(".//text/body"), Environment())
+        assert not tokens, tokens
