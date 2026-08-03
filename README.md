@@ -28,9 +28,12 @@ in a virtual environment:
 ```
 python3 -m venv venv
 source venv/bin/activate
-pip3 install -U pip setuptools wheel
-pip3 install cltk
+pip3 install cltk==1.1.7 'setuptools<67.5' 'nltk!=3.10.1'
 ```
+The requirement specifiers other than `cltk==1.1.7` are to work around
+incompatibilities in newer versions of other packages that cltk depends on:
+https://github.com/pypa/setuptools/issues/5174 and
+https://github.com/nltk/nltk/issues/3730.
 
 Next, [install the `grc_models_cltk` corpus](https://docs.cltk.org/en/latest/data.html):
 ```
