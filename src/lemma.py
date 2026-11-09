@@ -13,7 +13,6 @@ import unicodedata
 
 try:
     from cltk.lemmatize.grc import GreekBackoffLemmatizer
-    from cltk.lemmatize.backoff import DictLemmatizer
     from cltk.alphabet.text_normalization import cltk_normalize
 except ModuleNotFoundError as e:
     e.msg += ". Run:\nsource venv/bin/activate"
