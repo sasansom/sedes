@@ -245,8 +245,8 @@ def process(docs, work_identifier, expectancy, dist_vars, cond_vars, merge_word)
     title = first_doc.source_title
     docs = itertools.chain((first_doc,), docs)
 
-    print(f"""\
-<!DOCTYPE html>
+    print(
+rf"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset=utf-8>
@@ -255,8 +255,8 @@ def process(docs, work_identifier, expectancy, dist_vars, cond_vars, merge_word)
 <style>
 """)
 
-    print("""\
-@font-face {
+    print(
+r"""@font-face {
     font-family: "Cardo";
     font-style: normal;
     font-weight: 400;
@@ -438,8 +438,8 @@ summary, .word {
 .grid .s12 { left: 78ex; }
 """)
 
-    print("""\
-.shade-bubbles .word,
+    print(
+r""".shade-bubbles .word,
 .shade-bubbles-diverging .word {
     --r: 2.5rem; /* radius of 100% circle */
     position: relative;
@@ -486,15 +486,15 @@ summary, .word {
     def interval_range(start, stop, num_steps):
         return [start + (stop - start) * (float(i) / num_steps) for i in range(num_steps + 1)]
 
-    print("""\
-#shade-scale, #shade-diverging-scale {
+    print(
+r"""#shade-scale, #shade-diverging-scale {
     display: none;
     justify-content: space-between;
     padding: 0.25em;
 }
 """)
-    print("""\
-#shade-scale {{
+    print(
+r"""#shade-scale {{
     background: linear-gradient(to right, {});
     color: gray;
 }}
@@ -504,8 +504,8 @@ summary, .word {
 }}
 """.format(", ".join(css_color(*(interpolate_srgb(tone_map(z), COLOR_LOW, COLOR_HIGH))) for z in interval_range(*SHADE_SCALE_RANGE, 50))))
 
-    print("""\
-#shade-diverging-scale {{
+    print(
+r"""#shade-diverging-scale {{
     background: linear-gradient(to right, {});
     color: black;
 }}
@@ -541,8 +541,8 @@ summary, .word {
     # sign.
     def fmt_float(x):
         return esc(f"{x:+.3g}".replace("-", "−"))
-    print("""\
-<details id=sidebar open>
+    print(
+r"""<details id=sidebar open>
 <summary>Controls</summary>
 
 <div>
@@ -729,8 +729,8 @@ summary, .word {
                             print(esc(loc.book_n), end="")
                     print()
 
-                print("""\
-<div class="grid-markers grid">
+                print(
+r"""<div class="grid-markers grid">
 <span class="s1">1</span>
 <span class="s2">2</span>
 <span class="s2_5">2.5</span>
@@ -969,7 +969,7 @@ summary, .word {
 
     print(f"const SHADE_MAPPING_ADJUST = {SHADE_MAPPING_ADJUST};")
 
-    print("""
+    print(r"""
 const LOC_OUTPUT = document.getElementById("loc-output");
 const LINK_OUTPUT = document.getElementById("link-output");
 const WORD_OUTPUT = document.getElementById("word-output");
@@ -993,7 +993,7 @@ function tone_map(z) {
 // strings with a comma as separator. This function provides a way of using
 // arrays of strings as Map keys.
 function escape(values) {
-    return values.map(x => x.replace(/[,\\\\]/, m => "\\\\"+m)).join(",");
+    return values.map(x => x.replace(/[,\\]/, m => "\\"+m)).join(",");
 }
 
 function info(target) {
@@ -1076,7 +1076,7 @@ function info(target) {
             output_x.textContent = "";
             output_fracx.textContent = "";
         }
-        output_z.parentNode.className = output_z.parentNode.className.split(" ").filter(name => !/^z-\\d+$/.test(name)).join(" ");
+        output_z.parentNode.className = output_z.parentNode.className.split(" ").filter(name => !/^z-\d+$/.test(name)).join(" ");
         if (z !== undefined) {
             output_z.textContent = format_signed_float(z, 2);
             output_z.parentNode.classList.add(`z-${(tone_map(z) * 100).toFixed()}`);
