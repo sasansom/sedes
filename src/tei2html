@@ -1076,7 +1076,7 @@ function info(target) {
             output_x.textContent = "";
             output_fracx.textContent = "";
         }
-        output_z.parentNode.className = output_z.parentNode.className.split(" ").filter(name => !/^z-\d+$/.test(name)).join(" ");
+        output_z.parentNode.className = output_z.parentNode.className.split(" ").filter(name => !/^z-\\d+$/.test(name)).join(" ");
         if (z !== undefined) {
             output_z.textContent = format_signed_float(z, 2);
             output_z.parentNode.classList.add(`z-${(tone_map(z) * 100).toFixed()}`);
