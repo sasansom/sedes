@@ -12,8 +12,11 @@ from cltk.lemmatize.backoff import (
     RegexpLemmatizer,
     UnigramLemmatizer,
 )
-from cltk.utils import CLTK_DATA_DIR
-from cltk.utils.file_operations import open_pickle
+CLTK_DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "cltk_data")
+import pickle
+def open_pickle(path):
+    with open(path, "rb") as f:
+        return pickle.load(f)
 
 greek_sub_patterns = [("(ων)(ος|ι|να)$", r"ων")]
 
