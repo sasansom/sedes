@@ -21,7 +21,7 @@ for the _CQ_ article, ["Breaking Hermann's Bridge from Homer to Nonnus: Towards 
 
 ## Setup
 
-Sedes depends on [The Classical Language Toolkit](http://cltk.org/)
+SEDES depends on [The Classical Language Toolkit](http://cltk.org/)
 for lemmatization.
 You first need to [install CLTK](https://docs.cltk.org/en/latest/installation.html)
 in a virtual environment:
