@@ -21,33 +21,22 @@ for the _CQ_ article, ["Breaking Hermann's Bridge from Homer to Nonnus: Towards 
 
 ## Setup
 
-SEDES depends on [The Classical Language Toolkit](http://cltk.org/)
+SEDES depends on the [Classical Language Toolkit](http://cltk.org/) (CLTK)
 for lemmatization.
-You first need to [install CLTK](https://docs.cltk.org/en/latest/installation.html)
-in a virtual environment:
+The necessary CLTK files are already included with the SEDES source code.
+But CLTK depends on the [Natural Language Toolkit](https://www.nltk.org/) (NLTK),
+but you must separately install.
+Install NLTK in a virtual environment:
 ```
 python3 -m venv venv
 source venv/bin/activate
-pip3 install cltk==1.1.7 'setuptools<67.5' 'nltk!=3.10.1'
-```
-The requirement specifiers other than `cltk==1.1.7` are to work around
-incompatibilities in newer versions of other packages that cltk depends on:
-https://github.com/pypa/setuptools/issues/5174 and
-https://github.com/nltk/nltk/issues/3730.
-
-Next, [install the `grc_models_cltk` corpus](https://docs.cltk.org/en/latest/data.html):
-```
-python3 -c 'from cltk.data.fetch import FetchCorpus; FetchCorpus("grc").import_corpus("grc_models_cltk")'
+pip3 install 'nltk~=3.10.2'
 ```
 
-The corpus is stored in a `cltk_data` subdirectory of your home directory.
-The authors have used commit
-[94c04ac](https://github.com/cltk/grc_models_cltk/commit/94c04acac4405e264322d825978a2f2a80d01da5)
-of the `grc_models_cltk` corpus.
-
-You only need to do the steps above once.
+You need to do the above installation steps only once.
 Thereafter, every time you start a new shell,
-you need to run only the single command
+you only need to activate the virtual environment
+with the command:
 ```
 source venv/bin/activate
 ```

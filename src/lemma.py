@@ -1,9 +1,4 @@
 # Lemmatization for Greek.
-#
-# Requires CLTK and the grc_models_cltk corpus. See:
-#   https://docs.cltk.org/en/latest/installation.html
-#   https://docs.cltk.org/en/latest/data.html
-# python3 -c 'from cltk.data.fetch import FetchCorpus; FetchCorpus("grc").import_corpus("grc_models_cltk")'
 
 import csv
 import os
@@ -12,6 +7,7 @@ import re
 import unicodedata
 
 try:
+    # The cltk module comes from SEDES's local copy.
     from cltk.lemmatize.grc import GreekBackoffLemmatizer
     from cltk.alphabet.text_normalization import cltk_normalize
 except ModuleNotFoundError as e:
