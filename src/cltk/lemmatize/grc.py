@@ -30,26 +30,21 @@ class GreekBackoffLemmatizer:
     """
 
     def __init__(self, train: list[list] = None, seed: int = 3, verbose: bool = False):
-        self.models_path = models_path
-
         missing_models_message = "GreekBackoffLemmatizer requires the ```grc_models_cltk``` to be in cltk_data. Please load this corpus."
 
         try:
-            self.train = open_pickle(
-                os.path.join(self.models_path, "greek_lemmatized_sents.pickle")
+            greek_lemmatized_sents = open_pickle(
+                os.path.join(models_path, "greek_lemmatized_sents.pickle")
             )
-            self.GREEK_OLD_MODEL = open_pickle(
-                os.path.join(self.models_path, "greek_lemmata_cltk.pickle")
+            GREEK_OLD_MODEL = open_pickle(
+                os.path.join(models_path, "greek_lemmata_cltk.pickle")
             )
-            self.GREEK_MODEL = open_pickle(
-                os.path.join(self.models_path, "greek_model.pickle")
+            GREEK_MODEL = open_pickle(
+                os.path.join(models_path, "greek_model.pickle")
             )
         except FileNotFoundError as err:
             raise type(err)(missing_models_message)
 
-        self.greek_sub_patterns = greek_sub_patterns
-
-        self.seed = seed
         self.VERBOSE = verbose
 
         def _randomize_data(train: list[list], seed: int):
@@ -65,40 +60,38 @@ class GreekBackoffLemmatizer:
 
             return pos_train_sents, train_sents, test_sents
 
-        self.pos_train_sents, self.train_sents, self.test_sents = _randomize_data(
-            self.train, self.seed
+        _pos_train_sents, train_sents, test_sents = _randomize_data(
+            greek_lemmatized_sents, seed
         )
-        self._define_lemmatizer()
+        self.test_sents = test_sents # Used in evaluate.
 
-    def _define_lemmatizer(self):
         # Suggested backoff chain--should be tested for optimal order
-        self.backoff0 = None
-        self.backoff1 = IdentityLemmatizer(verbose=self.VERBOSE)
-        self.backoff2 = DictLemmatizer(
-            lemmas=self.GREEK_OLD_MODEL,
+        backoff1 = IdentityLemmatizer(verbose=verbose)
+        backoff2 = DictLemmatizer(
+            lemmas=GREEK_OLD_MODEL,
             source="Morpheus Lemmas",
-            backoff=self.backoff1,
-            verbose=self.VERBOSE,
+            backoff=backoff1,
+            verbose=verbose,
         )
-        self.backoff3 = RegexpLemmatizer(
-            self.greek_sub_patterns,
+        backoff3 = RegexpLemmatizer(
+            greek_sub_patterns,
             source="CLTK Greek Regex Patterns",
-            backoff=self.backoff2,
-            verbose=self.VERBOSE,
+            backoff=backoff2,
+            verbose=verbose,
         )
-        self.backoff4 = UnigramLemmatizer(
-            self.train_sents,
+        backoff4 = UnigramLemmatizer(
+            train_sents,
             source="CLTK Sentence Training Data",
-            backoff=self.backoff3,
-            verbose=self.VERBOSE,
+            backoff=backoff3,
+            verbose=verbose,
         )
-        self.backoff5 = DictLemmatizer(
-            lemmas=self.GREEK_MODEL,
+        backoff5 = DictLemmatizer(
+            lemmas=GREEK_MODEL,
             source="Greek Model",
-            backoff=self.backoff4,
-            verbose=self.VERBOSE,
+            backoff=backoff4,
+            verbose=verbose,
         )
-        self.lemmatizer = self.backoff5
+        self.lemmatizer = backoff5
 
     def lemmatize(self, tokens: list[str]):
         """
