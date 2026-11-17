@@ -3,6 +3,7 @@
 __author__ = ["Patrick J. Burns <patrick@diyclassics.org>"]
 __license__ = "MIT License. See LICENSE."
 
+import json
 import os
 
 from cltk.lemmatize.backoff import (
@@ -12,10 +13,9 @@ from cltk.lemmatize.backoff import (
     UnigramLemmatizer,
 )
 CLTK_DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "cltk_data")
-import pickle
-def open_pickle(path):
-    with open(path, "rb") as f:
-        return pickle.load(f)
+def read_json(path):
+    with open(path, "r") as f:
+        return json.load(f)
 
 greek_sub_patterns = [("(ων)(ος|ι|να)$", r"ων")]
 
@@ -33,14 +33,14 @@ class GreekBackoffLemmatizer:
         missing_models_message = "GreekBackoffLemmatizer requires the ```grc_models_cltk``` to be in cltk_data. Please load this corpus."
 
         try:
-            greek_lemmatized_sents = open_pickle(
-                os.path.join(models_path, "greek_lemmatized_sents.pickle")
+            greek_lemmatized_sents = read_json(
+                os.path.join(models_path, "greek_lemmatized_sents.json")
             )
-            GREEK_OLD_MODEL = open_pickle(
-                os.path.join(models_path, "greek_lemmata_cltk.pickle")
+            GREEK_OLD_MODEL = read_json(
+                os.path.join(models_path, "greek_lemmata_cltk.json")
             )
-            GREEK_MODEL = open_pickle(
-                os.path.join(models_path, "greek_model.pickle")
+            GREEK_MODEL = read_json(
+                os.path.join(models_path, "greek_model.json")
             )
         except FileNotFoundError as err:
             raise type(err)(missing_models_message)
