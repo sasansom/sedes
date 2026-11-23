@@ -12,6 +12,19 @@ v26.8 is a release that occurred in August 2026.
   because the necessary data files are now included in the SEDES source tree.
   You may also delete your existing venv and recreate it with just nltk,
   in order to save about 5 GB of disk space.
+* Represent elision before apostrophe with a medial sigma, not a terminal sigma,
+  in lemmatization models (#94). Before commit 3a40e28c414f2a0a6979b93dc30069c8ea0668f6,
+  done as part of the the migration to Perseus 6 TEI texts (#57), beta code conversion
+  of sigma before apostrophe had incorrectly used a terminal sigma.
+  The CLTK lemmatizer dictionary, however, was *also* defined in terms
+  of terminal sigma, so lemmatization lookup was correct.
+  After changing how the beta code was interpreted (and later migrating
+  completely to Perseus 6, which are Unicode and already use media
+  sigma before apostrophe), the form of the words was correct but the
+  lemmatization of affected words was incorrect.
+  Now both aspects are correct: media sigma before apostrophe,
+  and corresponding lemma lookup.
+  This change affects 717 word instances throughout the corpus.
 
 ## v26.10
 
